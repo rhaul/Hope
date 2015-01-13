@@ -6,20 +6,25 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
+import com.xplorer.hope.adapter.ClAdaptor;
+import com.xplorer.hope.config.HopeApp;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class AddActivity extends Activity {
+public class AddActivity extends Activity implements View.OnClickListener {
     @InjectView(R.id.rl_add_button)RelativeLayout rl_button;
+    @InjectView(R.id.iv_add_categoryImage)ImageView iv_categoryImage;
 
     @InjectView(R.id.et_add_description)EditText et_description;
     @InjectView(R.id.et_add_address)EditText et_address;
@@ -50,7 +55,7 @@ public class AddActivity extends Activity {
         setContentView(R.layout.activity_add);
 
         ButterKnife.inject(this);
-
+        rl_button.setOnClickListener(this);
 
     }
 
@@ -60,24 +65,19 @@ public class AddActivity extends Activity {
         dialog.setContentView(R.layout.dialog_category_list);
         // Set dialog title
         dialog.setTitle("Select Category");
-
-        // set values for custom dialog components - text, image and button
-        TextView text = (TextView) dialog.findViewById(R.id.textDialog);
-        text.setText("Custom dialog Android example.");
-        ImageView image = (ImageView) dialog.findViewById(R.id.imageDialog);
-        image.setImageResource(R.drawable.image0);
-
-        dialog.show();
-
-        Button declineButton = (Button) dialog.findViewById(R.id.declineButton);
-        // if decline button is clicked, close the custom dialog
-        declineButton.setOnClickListener(new OnClickListener() {
+        ListView lvD = (ListView) dialog.findViewById(R.id.lv_category_list);
+        ClAdaptor clA = new ClAdaptor(this);
+        lvD.setAdapter(clA);
+        lvD.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                // Close dialog
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                iv_categoryImage.setVisibility(View.VISIBLE);
+                Picasso.with(AddActivity.this).load(HopeApp.ImgUrl[0]).into(iv_categoryImage);
                 dialog.dismiss();
             }
         });
+        dialog.show();
+
     }
 
     @Override
@@ -100,5 +100,18 @@ public class AddActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.rl_add_button: {
+                showCatDialog();
+                break;
+            }
+
+            default:
+                break;
+        }
     }
 }
