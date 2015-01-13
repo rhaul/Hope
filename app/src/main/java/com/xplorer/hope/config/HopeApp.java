@@ -16,6 +16,8 @@ public class HopeApp extends Application {
     private static HopeApp instance;
     // Debugging tag for the application
     public static final String APPTAG = "HopeApp";
+    public static final String[] TITLES = {"Dish Washing", "House Cleaning","Cloth Washing","Cooking","Construction","Wall paint","Driver","Watchmen","Shop Worker","Gardening","Miscellaneous"};
+    public static final String[] ImgUrl = {"http://www.sn24.se/sites/sn24.se/files/styles/w600/public/352474-chef-cooking.jpg"};
 
     //SP variables
 
