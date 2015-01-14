@@ -19,11 +19,15 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
 import com.xplorer.hope.adapter.CLAdapter;
 import com.xplorer.hope.config.HopeApp;
+import com.xplorer.hope.object.WorkAd;
 
 import java.util.Calendar;
 
@@ -84,8 +88,10 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     @InjectView(R.id.tv_add_s2_endingTime)
     TextView tv_s2_endingTime;
 
-    @InjectView(R.id.et_add_wage)
-    EditText et_wage;
+    @InjectView(R.id.et_add_wageLower)
+    EditText et_wageLower;
+    @InjectView(R.id.et_add_wageUpper)
+    EditText et_wageUpper;
 
     // variables
     int startYear;
@@ -215,12 +221,69 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_save) {
+            saveWorkAd();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void saveWorkAd() {
+        WorkAd ad = new WorkAd();
+        ad.setCategory(tv_categoryName.getText().toString());
+        ad.setDescription(et_description.getText().toString());
+        ad.setAddress(et_address.getText().toString());
+        ad.setPhoneNo(et_phone.getText().toString());
+        ad.setDateType(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()));
+        ad.setDateFrom(tv_startingDate.getText().toString());
+        ad.setDateTo(tv_endingDate.getText().toString());
+        ad.setTimeType(getTimeTypeFromRG(rg_timingType.getCheckedRadioButtonId()));
+        ad.setS1StartingTime(tv_s1_startingTime.getText().toString());
+        ad.setS1EndingTime(tv_s1_endingTime.getText().toString());
+        ad.setS2StartingTime(tv_s2_startingTime.getText().toString());
+        ad.setS2EndingTime(tv_s2_endingTime.getText().toString());
+        ad.setWageLowerLimit(Double.parseDouble(et_wageLower.getText().toString()));
+        ad.setWageHigherLimit(Double.parseDouble(et_wageUpper.getText().toString()));
+        ad.saveInBackground(new SaveCallback() {
+            public void done(ParseException e) {
+                if (e == null) {
+                    Toast.makeText(AddActivity.this,"Saved successfully",Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(AddActivity.this,"Error",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private String getTimeTypeFromRG(int checkedRadioButtonId) {
+        switch (checkedRadioButtonId){
+            case R.id.rb_add_1day:{
+                return "Once a day";
+            }
+            case R.id.rb_add_2day:{
+                return "Twice a day";
+            }
+        }
+        return null;
+    }
+
+    private String getDateTypeFromRG(int checkedRadioButtonId) {
+        switch (checkedRadioButtonId){
+            case R.id.rb_add_jobTypeOneDay:{
+                return "One Day";
+            }
+            case R.id.rb_add_jobTypeMonthly:{
+                return "Monthly";
+            }
+            case R.id.rb_add_jobTypeCustom:{
+                return "Custom";
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public void onClick(View view) {

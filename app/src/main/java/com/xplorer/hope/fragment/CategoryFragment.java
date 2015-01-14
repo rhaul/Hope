@@ -52,7 +52,7 @@ public class CategoryFragment extends Fragment {
         int cat = getArguments().getInt("category", 1);
         View view = getActivity().getLayoutInflater().inflate(R.layout.item_category_header, null, false);
         ImageView iv= (ImageView) view.findViewById(R.id.iv_category_header);
-        Picasso.with(getActivity()).load(HopeApp.ImgUrl[0]).into(iv);
+        Picasso.with(getActivity()).load(HopeApp.ImgUrl[cat]).into(iv);
         lv_category.addHeaderView(view);
         lva = new ListViewAdapter(getActivity());
         lv_category.setAdapter(lva);

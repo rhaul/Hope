@@ -265,14 +265,38 @@
                 android:id="@+id/tv_add_s2_endingTime" />
         </LinearLayout>
 
-        <EditText
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/et_add_wage"
-            android:hint="Wages"
-            android:numeric="integer" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Wages (Rupees)"
+            android:layout_marginBottom="5dp"
+            android:id="@+id/textView7" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:ems="10"
+                android:id="@+id/et_add_wageLower"
+                android:hint="Lower Limit"
+                android:numeric="integer" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:layout_weight="1"
+                android:ems="10"
+                android:id="@+id/et_add_wageUpper"
+                android:hint="Upper Limit"
+                android:numeric="integer" />
+        </LinearLayout>
 
 
     </LinearLayout>

@@ -9,7 +9,9 @@ import android.preference.PreferenceManager;
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.xplorer.hope.object.WorkAd;
 
 public class HopeApp extends Application {
     // app
@@ -123,7 +125,7 @@ public class HopeApp extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-
+        ParseObject.registerSubclass(WorkAd.class);
         // Initialize Crash Reporting.
         ParseCrashReporting.enable(this);
 
@@ -136,6 +138,7 @@ public class HopeApp extends Application {
 
         ParseUser.enableAutomaticUser();
         ParseACL defaultACL = new ParseACL();
+        //ParseUser.getCurrentUser().saveInBackground();
         // Optionally enable public read access.
         // defaultACL.setPublicReadAccess(true);
         ParseACL.setDefaultACL(defaultACL, true);
