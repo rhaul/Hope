@@ -16,8 +16,33 @@ public class HopeApp extends Application {
     private static HopeApp instance;
     // Debugging tag for the application
     public static final String APPTAG = "HopeApp";
-    public static final String[] TITLES = {"Dish Washing", "House Cleaning","Cloth Washing","Cooking","Construction","Wall paint","Driver","Watchmen","Shop Worker","Gardening","Miscellaneous"};
-    public static final String[] ImgUrl = {"http://www.sn24.se/sites/sn24.se/files/styles/w600/public/352474-chef-cooking.jpg"};
+    public static final String[] TITLES = {
+            "Dish Washing",
+            "House Cleaning",
+            "Cloth Washing",
+            "Cooking",
+            "Construction",
+            "Wall paint",
+            "Driver",
+            "Guard",
+            "Shop Worker",
+            "Gardening",
+            "Miscellaneous"
+    };
+    public static final String[] ImgUrl = {
+            "http://blanchile.cl/wp-content/uploads/2014/07/ahorrar-agua.jpg",
+            "http://uploads.staticjw.com/st/stadfirmastockholm2/stadning1.jpg",
+            "http://rtvbudva.me/vijesti-slike/1411453524.jpg",
+            "http://www.sn24.se/sites/sn24.se/files/styles/w600/public/352474-chef-cooking.jpg",
+            "http://hsgroup.la/wp-content/themes/skt-full-width/images/banner_bg.jpg",
+            "http://wallpaperscraft.com/image/80272/2560x1080.jpg",
+            "http://wymancenter.org/wordpress/wp-content/uploads/2012/10/driver.jpg",
+            "http://www.womenpghouse.com/example/slider3.jpg",
+            "http://www.sbsgroup.com.pk/wp-content/uploads/2005/12/Services-and-Shop-12.jpg",
+            "https://lh5.googleusercontent.com/-1cU8_40Gyj0/VB3ABp0JwGI/AAAAAAABEWo/G4eEtn0Xrrw/w620-h400/photo.jpg",
+            "http://scottishgames.files.wordpress.com/2013/05/other-logo-national-theatre-of-scotland-1.jpg"
+
+    };
 
     //SP variables
 
