@@ -1,236 +1,281 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
     tools:context="com.xplorer.hope.activity.AddActivity">
 
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:id="@+id/rl_add_button"
-        android:background="@color/BlueViolet">
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Add Category"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:id="@+id/tv_add_category"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
 
-        <ImageView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/iv_add_categoryImage"
-            android:visibility="gone"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
-    </RelativeLayout>
+            android:layout_height="150dp"
+            android:id="@+id/rl_add_button"
+            android:layout_marginBottom="5dp"
+            android:background="@color/BlueViolet">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/et_add_description"
-        android:hint="Description" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Add Category"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:id="@+id/tv_add_category"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPostalAddress"
-        android:ems="10"
-        android:id="@+id/et_add_address"
-        android:hint="Address" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/iv_add_categoryImage"
+                android:visibility="gone"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:ems="10"
-        android:id="@+id/et_add_phone"
-        android:hint="Phone Number" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:padding="5dp"
+                android:visibility="gone"
+                android:background="#40000000"
+                android:textColor="@color/white"
+                android:id="@+id/tv_add_categoryName"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            <requestFocus/>
+        </RelativeLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <EditText
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Job Type"
-            android:id="@+id/textView2" />
+            android:id="@+id/et_add_description"
+            android:layout_marginBottom="5dp"
+            android:maxLines="3"
+            android:hint="Description" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPostalAddress"
+            android:maxLines="3"
+            android:ems="10"
+            android:layout_marginBottom="5dp"
+            android:id="@+id/et_add_address"
+            android:hint="Address" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:layout_marginBottom="5dp"
+            android:ems="10"
+            android:id="@+id/et_add_phone"
+            android:hint="Phone Number" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Job Type"
+                android:id="@+id/textView2" />
+        </LinearLayout>
+
+        <RadioGroup
+            android:id="@+id/rg_add_jobType"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="One Day"
+                android:id="@+id/rb_add_jobTypeOneDay"
+                android:checked="false" />
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Monthly"
+                android:id="@+id/rb_add_jobTypeMonthly" />
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Custom"
+                android:checked="true"
+                android:id="@+id/rb_add_jobTypeCustom" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/ll_add_customView"
+            android:orientation="horizontal"
+            android:layout_marginBottom="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Starting Date"
+                android:gravity="center"
+                android:id="@+id/tv_add_startingDate" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Ending Date"
+                android:gravity="center"
+                android:id="@+id/tv_add_endingDate" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="5dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Timings"
+                android:id="@+id/textView3" />
+        </LinearLayout>
+
+        <RadioGroup
+            android:id="@+id/rg_add_timingType"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Once a day"
+                android:id="@+id/rb_add_1day" />
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Twice a day"
+                android:checked="true"
+                android:id="@+id/rb_add_2day" />
+
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/ll_add_s1_timings"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Slot 1:"
+                android:id="@+id/textView5" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Starting Time"
+                android:gravity="center"
+                android:id="@+id/tv_add_s1_startingTime" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Ending Time"
+                android:gravity="center"
+                android:id="@+id/tv_add_s1_endingTime" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_add_s2_timings"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Slot 2:"
+                android:id="@+id/textView4" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Starting Time"
+                android:gravity="center"
+                android:id="@+id/tv_add_s2_startingTime" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Ending Time"
+                android:gravity="center"
+                android:id="@+id/tv_add_s2_endingTime" />
+        </LinearLayout>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/et_add_wage"
+            android:hint="Wages"
+            android:numeric="integer" />
+
+
     </LinearLayout>
 
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
-        <RadioButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="One Day"
-            android:id="@+id/rb_add_jobTypeOneDay"
-            android:checked="false" />
-        <RadioButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Monthly"
-            android:id="@+id/rb_add_jobTypeMonthly" />
-        <RadioButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Custom"
-            android:checked="true"
-            android:id="@+id/rb_add_jobTypeCustom" />
-    </RadioGroup>
-
-    <LinearLayout
-        android:id="@+id/ll_add_customView"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Starting Date"
-            android:gravity="center"
-            android:id="@+id/tv_add_startingDate" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Ending Date"
-            android:gravity="center"
-            android:id="@+id/tv_add_endingDate" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Timings"
-            android:id="@+id/textView3" />
-    </LinearLayout>
-
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Once a day"
-            android:id="@+id/rb_add_1day" />
-
-        <RadioButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Twice a day"
-            android:id="@+id/rb_add_2day" />
-
-    </RadioGroup>
-
-    <LinearLayout
-        android:id="@+id/ll_add_s1_timings"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Slot 1:"
-            android:id="@+id/textView5" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Starting Time"
-            android:gravity="center"
-            android:id="@+id/tv_add_s1_startingTime" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Ending Time"
-            android:gravity="center"
-            android:id="@+id/tv_add_s1_endingTime" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_add_s2_timings"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Slot 2:"
-            android:id="@+id/textView4" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Starting Time"
-            android:gravity="center"
-            android:id="@+id/tv_add_s2_startingTime" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Ending Time"
-            android:gravity="center"
-            android:id="@+id/tv_add_s2_endingTime" />
-    </LinearLayout>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:id="@+id/et_add_wage"
-        android:hint="Wages"
-        android:numeric="integer" />
-
-
-</LinearLayout>
+</ScrollView>

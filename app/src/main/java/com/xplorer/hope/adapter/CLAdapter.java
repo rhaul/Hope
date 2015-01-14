@@ -1,7 +1,6 @@
 package com.xplorer.hope.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +16,12 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 /**
- * Created by Raghavendra on 13-01-2015.
+ * Created by rahul on 14-01-2015.
  */
-public class ClAdaptor extends BaseAdapter {
+public class CLAdapter extends BaseAdapter {
     private Context mContext;
 
-    public ClAdaptor(Context context){
+    public CLAdapter(Context context){
         mContext = context;
     }
 
@@ -58,7 +57,7 @@ public class ClAdaptor extends BaseAdapter {
         }
 
         Picasso.with(mContext).load(HopeApp.ImgUrl[0]).into(holder.iv_img);
-        Log.d("pos",i+"");
+        holder.tv_name.setText(HopeApp.TITLES[i]);
         return view;
     }
     public static class ViewHolder {
