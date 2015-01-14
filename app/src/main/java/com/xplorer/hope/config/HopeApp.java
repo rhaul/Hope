@@ -43,7 +43,15 @@ public class HopeApp extends Application {
             "http://scottishgames.files.wordpress.com/2013/05/other-logo-national-theatre-of-scotland-1.jpg"
 
     };
-
+    public static final String[] drawerTitlesWorker = {
+            "Profile",
+            "My Schedule",
+            "Holidays",
+            "History",
+            "Employers",
+            "Balance",
+            "My Ads"
+    };
     //SP variables
 
     public static String SELECTED_LANGUAGE = "selectedLanguage";

@@ -2,14 +2,19 @@ package com.xplorer.hope.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.xplorer.hope.R;
+import com.xplorer.hope.adapter.NavDrawerListAdapter;
 import com.xplorer.hope.adapter.TabsPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
 
@@ -24,8 +29,14 @@ public class MainActivity extends FragmentActivity {
     @InjectView(R.id.pager) ViewPager vp_pager;
 
     private TabsPagerAdapter pagerAdapter;
-    @Override
 
+    //---- drawer---//
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private NavDrawerListAdapter navDrawerListAdapter;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -41,6 +52,7 @@ public class MainActivity extends FragmentActivity {
         }
 
         setUpMainActivity();
+        setUpDrawer();
     }
 
     private void setUpMainActivity() {
@@ -49,6 +61,36 @@ public class MainActivity extends FragmentActivity {
         pts_titleBar.setViewPager(vp_pager);
     }
 
+     private void setUpDrawer(){
+
+         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+         // setting the nav drawer list adapter
+         navDrawerListAdapter = new NavDrawerListAdapter(getApplicationContext());
+         mDrawerList.setAdapter(navDrawerListAdapter);
+
+         getActionBar().setHomeButtonEnabled(true);
+
+         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                 R.drawable.ic_launcher, //nav menu toggle icon
+                 R.string.app_name, // nav drawer open - description for accessibility
+                 R.string.app_name // nav drawer close - description for accessibility
+         ){
+             public void onDrawerClosed(View view) {
+                 //getActionBar().setTitle(mTitle);
+                 // calling onPrepareOptionsMenu() to show action bar icons
+                 invalidateOptionsMenu();
+             }
+
+             public void onDrawerOpened(View drawerView) {
+                 //getActionBar().setTitle(mDrawerTitle);
+                 // calling onPrepareOptionsMenu() to hide action bar icons
+                 invalidateOptionsMenu();
+             }
+         };
+         mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
