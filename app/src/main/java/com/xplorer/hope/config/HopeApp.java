@@ -205,7 +205,7 @@ public class HopeApp extends Application {
         ParseQuery<ParseUser> query;
         query = ParseUser.getQuery();
 
-        query.getInBackground(userId, new GetCallback<ParseUser>() {
+        query.getInBackground(userId,   new GetCallback<ParseUser>() {
             public void done(ParseUser object, ParseException e) {
                 if (e == null) {
                     UserInfo usr = (UserInfo) object;
