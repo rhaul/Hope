@@ -22,11 +22,13 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
 import com.xplorer.hope.adapter.CLAdapter;
 import com.xplorer.hope.config.HopeApp;
+import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
 
 import java.util.Calendar;
@@ -230,6 +232,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     }
 
     private void saveWorkAd() {
+        UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
         WorkAd ad = new WorkAd();
         ad.setCategory(tv_categoryName.getText().toString());
         ad.setDescription(et_description.getText().toString());
@@ -243,15 +246,17 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         ad.setS1EndingTime(tv_s1_endingTime.getText().toString());
         ad.setS2StartingTime(tv_s2_startingTime.getText().toString());
         ad.setS2EndingTime(tv_s2_endingTime.getText().toString());
-        ad.setWageLowerLimit(Double.parseDouble(et_wageLower.getText().toString()));
-        ad.setWageHigherLimit(Double.parseDouble(et_wageUpper.getText().toString()));
+        ad.setWageLowerLimit(Long.parseLong(et_wageLower.getText().toString()));
+        ad.setWageHigherLimit(Long.parseLong(et_wageUpper.getText().toString()));
+        ad.setUserId(usr.getObjectId());
+        ad.setUserName(usr.getName());
         ad.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(AddActivity.this,"Saved successfully",Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    Toast.makeText(AddActivity.this,"Error",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddActivity.this,"Please check your Internet Connection.",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -433,14 +438,12 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     private void updateSEDateDisplay(int mType) {
         if (mType == 0) {
             tv_startingDate.setText(new StringBuilder()
-                    // Month is 0 based so add 1
                     .append(startMonth + 1).append("/").append(startDay).append("/")
-                    .append(startYear).append(" "));
+                    .append(startYear));
         } else {
             tv_endingDate.setText(new StringBuilder()
-                    // Month is 0 based so add 1
                     .append(endMonth + 1).append("/").append(endDay).append("/")
-                    .append(endYear).append(" "));
+                    .append(endYear));
         }
     }
 }

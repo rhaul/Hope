@@ -12,6 +12,7 @@ public class WorkAd extends ParseObject {
 
     public WorkAd(){
     }
+    public String imgURL;
 
     public String getCategory() {
         return getString("category");
@@ -41,22 +42,6 @@ public class WorkAd extends ParseObject {
 
     public void setPhoneNo(String phoneNo) {
         put("phoneNo", phoneNo);
-    }
-
-    public String getEmployerID() {
-        return getString("employerID");
-    }
-
-    public void setEmployerID(String employerID) {
-        put("employerID", employerID);
-    }
-
-    public String getEmployerName() {
-        return getString("employerName");
-    }
-
-    public void setEmployerName(String employerName) {
-        put("employerName", employerName);
     }
 
     public int getEmployerPhoneNo() {
@@ -120,23 +105,40 @@ public class WorkAd extends ParseObject {
     public void setS2EndingTime(String time){
         put("s2EndingTime",time);
     }
-    public String get21EndingTime(){
+    public String getS2EndingTime(){
         return getString("s2EndingTime");
     }
 
-    public double getWageLowerLimit() {
-        return getDouble("wageLowerLimit");
+    public long getWageLowerLimit() {
+        return getLong("wageLowerLimit");
     }
 
-    public void setWageLowerLimit(double wageLowerLimit) {
+    public void setWageLowerLimit(long wageLowerLimit) {
         put("wageLowerLimit", wageLowerLimit);
     }
 
-    public double getWageHigherLimit() {
-        return getDouble("wageHigherLimit");
+    public long getWageHigherLimit() {
+        return getLong("wageHigherLimit");
     }
 
-    public void setWageHigherLimit(double wageHigherLimit) {
+    public void setWageHigherLimit(long wageHigherLimit) {
         put("wageHigherLimit", wageHigherLimit);
     }
+
+    public void setUserId(String userObjId){
+        put("userID",userObjId);
+    }
+    public String getUserId(){
+        return getString("userID");
+    }
+
+    public void setUserName(String name_){
+        put("userName",name_);
+    }
+    public String getUserName(){
+        return getString("userName");
+    }
+
+
+
 }

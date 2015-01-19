@@ -1,142 +1,472 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
-    tools:context="com.xplorer.hope.activity.SignUpActivity"
-    android:weightSum="1">
+    android:weightSum="1"
+    tools:context="com.xplorer.hope.activity.SignUpActivity">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-                android:src="@drawable/defaultuser"
-                android:layout_width="100dp"
-                android:layout_height="120dp"
-                android:id="@+id/imageView" />
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-            <EditText
+            <ImageView
+                android:id="@+id/iv_sign_profilePhoto"
+                android:layout_width="100dp"
+                android:layout_height="120dp"
+                android:src="@drawable/defaultuser" />
+
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/editText"
-                android:hint="Name" />
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
 
-            <EditText
-                android:layout_marginTop="5dp"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:inputType="date"
-                android:ems="10"
-                android:id="@+id/editText2"
-                android:hint="Date of Birth" />
-
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:orientation="horizontal"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp">
-
-                <RadioButton
-                    android:layout_width="wrap_content"
+                <EditText
+                    android:id="@+id/et_sign_name"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="Male"
-                    android:layout_weight="1"
-                    />
-                <RadioButton
+                    android:ems="10"
+                    android:hint="Name"
+                    android:inputType="textPersonName" />
+
+                <TextView
+
+                    android:id="@+id/tv_sign_dob"
                     android:layout_width="wrap_content"
+                    android:layout_height="29dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/rounded_corner"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:hint="Date of Birth"
+                    android:inputType="date"
+                    android:text="Date of Birth"
+                    android:textColor="@color/DimGray"
+                    android:textSize="18dp" />
+
+                <RadioGroup
+                    android:id="@+id/rg_sign_gender"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Female"
-                    android:layout_weight="1"
-                    />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rb_sign_male"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="Male" />
+
+                    <RadioButton
+                        android:id="@+id/rb_sign_female"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Female" />
 
 
-            </RadioGroup>
+                </RadioGroup>
+            </LinearLayout>
+
         </LinearLayout>
 
+        <EditText
+            android:id="@+id/et_sign_addr"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:ems="10"
+            android:hint="Address"
+            android:inputType="textPostalAddress"
+            android:maxLines="3" />
+
+        <EditText
+            android:id="@+id/et_sign_num"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:hint="Phone Number"
+            android:inputType="phone" />
+
+        <LinearLayout
+            android:id="@+id/ll_signUp_qualDialogue"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textViewInterest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="Interest"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <TextView
+                    android:id="@+id/textViewExpected"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="130dp"
+                    android:text="Expected Wages"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_DishWashing"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Dish Washing" />
+
+                <EditText
+                    android:id="@+id/et_sign_DishWashingExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_HouseCleaning"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="House Cleaning" />
+
+                <EditText
+                    android:id="@+id/et_sign_HouseCleaningExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_ClothWashing"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Cloth Washing" />
+
+                <EditText
+                    android:id="@+id/et_sign_ClothWashingExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_Cooking"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Cooking" />
+
+                <EditText
+                    android:id="@+id/et_sign_CookingExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_Construction"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Construction" />
+
+                <EditText
+                    android:id="@+id/et_sign_ConstructionExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_Wallpaint"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Wall paint" />
+
+                <EditText
+                    android:id="@+id/et_sign_WallpaintExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_Driver"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Driver" />
+
+                <EditText
+                    android:id="@+id/et_sign_DriverExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_signUp_license"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_sign_License"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="License Type:"
+                    android:textSize="15dp" />
+
+                <CheckBox
+                    android:id="@+id/cb_sign_licenseFourwheeler"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:checked="false"
+                    android:text="Four wheeler" />
+
+                <CheckBox
+                    android:id="@+id/cb_sign_licenseHeavy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:text="Heavy" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_Guard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Guard" />
+
+                <EditText
+                    android:id="@+id/et_sign_GuardExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_ShopWorker"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Shop Worker" />
+
+                <EditText
+                    android:id="@+id/et_sign_ShopWorkerExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_signUp_language"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_sign_Language"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Language known:"
+                    android:textSize="15dp" />
+
+                <CheckBox
+                    android:id="@+id/cb_sign_LanguageEnglish"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:checked="false"
+                    android:text="English" />
+
+                <CheckBox
+                    android:id="@+id/cb_sign_LanguageHindi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:text="Hindi" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_Gardening"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Gardening" />
+
+                <EditText
+                    android:id="@+id/et_sign_GardeningExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_sign_Miscellaneous"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="7"
+                    android:checked="false"
+                    android:text="Miscellaneous" />
+
+                <EditText
+                    android:id="@+id/et_sign_MiscellaneousExpWage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:ems="10"
+                    android:hint="₹"
+                    android:inputType="number" />
+            </LinearLayout>
+
+
+        </LinearLayout>
     </LinearLayout>
 
-    <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="3"
-        android:inputType="textPostalAddress"
-        android:ems="10"
-        android:id="@+id/editText3"
-        android:layout_gravity="center_horizontal"
-        android:hint="Address" />
 
-    <EditText
-        android:layout_marginTop="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:ems="10"
-        android:id="@+id/editText4"
-        android:layout_gravity="center_horizontal"
-        android:hint="Phone Number" />
-
-    <LinearLayout
-        android:layout_marginTop="10dp"
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/ll_signUp_qualDialogue">
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Qualification"
-            android:layout_marginBottom="5dp"
-            android:id="@+id/textView" />
-
-        <CheckBox
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Do you know how to read/write?"
-            android:id="@+id/checkBox"
-            android:checked="false"
-            android:layout_gravity="center" />
-
-        <CheckBox
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Do you have license?"
-            android:id="@+id/checkBox2"
-            android:checked="false"
-            android:layout_gravity="center" />
-
-        <CheckBox
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Do you know how to cook?"
-            android:id="@+id/checkBox3"
-            android:checked="false"
-            android:layout_gravity="center" />
-
-        <CheckBox
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Do you know gardening pratices?"
-            android:id="@+id/checkBox4"
-            android:checked="false"
-            android:layout_gravity="center" />
-
-
-    </LinearLayout>
-
-
-</LinearLayout>
+</ScrollView>

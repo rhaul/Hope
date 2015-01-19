@@ -1,39 +1,45 @@
 package com.xplorer.hope.object;
 
+import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
 /**
  * Created by Raghavendra on 11-01-2015.
  */
-public class ewRelation extends ParseObject {
+@ParseClassName("EWRelation")
+public class EWRelation extends ParseObject {
 
-    public ewRelation(){}
+    public EWRelation(){}
 
-    public String userID;
-    public String employerID;
-    public String workID;
 
-    public String getUserID() {
-        return userID;
+    public String getUserID() { return getString("userID");
     }
 
     public void setUserID(String userID) {
-        this.userID = userID;
+        put("userID", userID);
     }
 
-    public String getEmployerID() {
-        return employerID;
-    }
+    public String getEmployerID() { return getString("employerID"); }
 
     public void setEmployerID(String employerID) {
-        this.employerID = employerID;
+        put("employerID", employerID);
     }
 
     public String getWorkID() {
-        return workID;
+        return getString("workID");
     }
 
     public void setWorkID(String workID) {
-        this.workID = workID;
+        put("workID", workID);
     }
+
+    public Boolean getApprove() {
+        return getBoolean("Approve");
+    }
+
+    public void setApprove(Boolean Approve) {
+        put("Approve", Approve);
+    }
+
+
 }

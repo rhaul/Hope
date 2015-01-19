@@ -66,6 +66,8 @@ public class SelectLangActivity extends Activity implements View.OnClickListener
             }
             break;
         }
+
+
         startActivity(new Intent(this,SelectUserTypeActivity.class));
         finish();
     }

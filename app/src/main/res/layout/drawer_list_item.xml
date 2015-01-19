@@ -7,8 +7,6 @@
         android:id="@+id/tv_drawer_itemTxt"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/Black"
         android:gravity="center"
         android:text="baba blacksheap"

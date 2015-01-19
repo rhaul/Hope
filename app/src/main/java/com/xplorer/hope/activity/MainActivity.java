@@ -10,13 +10,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.parse.ParseUser;
 import com.xplorer.hope.R;
 import com.xplorer.hope.adapter.NavDrawerListAdapter;
 import com.xplorer.hope.adapter.TabsPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
+import com.xplorer.hope.object.UserInfo;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -42,15 +45,17 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         ButterKnife.inject(this);
-
+        UserInfo user = (UserInfo) ParseUser.getCurrentUser();
         if(!HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi") && !HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("english") ){
             startActivity(new Intent(this,SelectLangActivity.class));
             finish();
         }else if(!HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("worker") && !HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("employer") ){
             startActivity(new Intent(this,SelectUserTypeActivity.class));
             finish();
+        }else if(user==null){
+            startActivity(new Intent(this,SignUpActivity.class).putExtra("from", "singup"));
+            finish();
         }
-
         setUpMainActivity();
         setUpDrawer();
     }
@@ -59,6 +64,8 @@ public class MainActivity extends FragmentActivity {
         pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager());
         vp_pager.setAdapter(pagerAdapter);
         pts_titleBar.setViewPager(vp_pager);
+        vp_pager.setOffscreenPageLimit(3);
+        vp_pager.setCurrentItem(0);
     }
 
      private void setUpDrawer(){
@@ -69,7 +76,15 @@ public class MainActivity extends FragmentActivity {
          navDrawerListAdapter = new NavDrawerListAdapter(getApplicationContext());
          mDrawerList.setAdapter(navDrawerListAdapter);
 
-         getActionBar().setHomeButtonEnabled(true);
+         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+             @Override
+             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                 if(i==0){
+                     startActivity(new Intent(MainActivity.this, SignUpActivity.class).putExtra("from", "menu"));
+                 }
+             }
+         });
+         //getActionBar().setHomeButtonEnabled(true);
 
          mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                  R.drawable.ic_launcher, //nav menu toggle icon
@@ -79,13 +94,13 @@ public class MainActivity extends FragmentActivity {
              public void onDrawerClosed(View view) {
                  //getActionBar().setTitle(mTitle);
                  // calling onPrepareOptionsMenu() to show action bar icons
-                 invalidateOptionsMenu();
+                 //invalidateOptionsMenu();
              }
 
              public void onDrawerOpened(View drawerView) {
                  //getActionBar().setTitle(mDrawerTitle);
                  // calling onPrepareOptionsMenu() to hide action bar icons
-                 invalidateOptionsMenu();
+                 //invalidateOptionsMenu();
              }
          };
          mDrawerLayout.setDrawerListener(mDrawerToggle);
