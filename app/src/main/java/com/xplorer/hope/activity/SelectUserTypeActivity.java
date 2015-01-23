@@ -1,7 +1,6 @@
 package com.xplorer.hope.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,7 +9,6 @@ import android.widget.Button;
 
 import com.xplorer.hope.R;
 import com.xplorer.hope.config.HopeApp;
-import com.xplorer.hope.object.UserInfo;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -67,13 +65,7 @@ public class SelectUserTypeActivity extends Activity implements View.OnClickList
             }
             break;
         }
-        UserInfo user = (UserInfo) UserInfo.getCurrentUser();
-        if(user==null){
-            startActivity(new Intent(this,SignUpActivity.class).putExtra("from", "singup"));
-            finish();
-        }else {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        }
+        finish();
+        return;
     }
 }

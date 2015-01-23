@@ -14,12 +14,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.xplorer.hope.R;
 import com.xplorer.hope.adapter.NavDrawerListAdapter;
 import com.xplorer.hope.adapter.TabsPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.object.UserInfo;
+import com.xplorer.hope.service.ConnectionDetector;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -31,6 +33,7 @@ public class MainActivity extends FragmentActivity {
     PagerSlidingTabStrip pts_titleBar;
     @InjectView(R.id.pager) ViewPager vp_pager;
 
+    boolean isSetUp = false;
     private TabsPagerAdapter pagerAdapter;
 
     //---- drawer---//
@@ -38,26 +41,84 @@ public class MainActivity extends FragmentActivity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavDrawerListAdapter navDrawerListAdapter;
-
+    Boolean isInternetPresent;
+    ConnectionDetector cd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         ButterKnife.inject(this);
-        UserInfo user = (UserInfo) ParseUser.getCurrentUser();
+
         if(!HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi") && !HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("english") ){
-            startActivity(new Intent(this,SelectLangActivity.class));
-            finish();
+            startActivity(new Intent(this, SelectLangActivity.class));
+            return;
         }else if(!HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("worker") && !HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("employer") ){
-            startActivity(new Intent(this,SelectUserTypeActivity.class));
-            finish();
-        }else if(user==null){
-            startActivity(new Intent(this,SignUpActivity.class).putExtra("from", "singup"));
-            finish();
+            startActivity(new Intent(this, SelectUserTypeActivity.class));
+            return;
         }
-        setUpMainActivity();
-        setUpDrawer();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //-------------UserInfo-------------//
+        UserInfo user = (UserInfo) ParseUser.getCurrentUser();
+        if(user==null){
+            cd = new ConnectionDetector(getApplicationContext());
+            isInternetPresent= cd.isConnectingToInternet();
+
+            if(isInternetPresent) {
+                startActivity(new Intent(this,SignUpActivity.class).putExtra("from", "singup"));
+                finish();
+                return;
+            }else{
+                startActivity(new Intent(this, NoInternetActivity.class));
+                return;
+            }
+        }
+
+        //-------------ParseInstallation-------------//
+        String pobjId = ParseInstallation.getCurrentInstallation().get("userId").toString();
+
+        if(pobjId.equalsIgnoreCase("unregistered")) {
+            cd = new ConnectionDetector(getApplicationContext());
+            isInternetPresent= cd.isConnectingToInternet();
+
+            if(isInternetPresent) {
+                ParseInstallation.getCurrentInstallation().saveInBackground();
+
+                UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
+                if (usr != null) {
+                    ParseInstallation.getCurrentInstallation().put("userId", usr.getObjectId());
+                    ParseInstallation.getCurrentInstallation().saveInBackground();
+                } else {
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
+                }
+            }else{
+                startActivity(new Intent(this, NoInternetActivity.class));
+                return;
+            }
+
+
+        }
+        if(!isSetUp) {
+            setUpMainActivity();
+            setUpDrawer();
+            isSetUp=true;
+        }
+    }
+
+
+    public void setUpUser(){
+
+    }
+    public void setUpPushInstallation(){
+
     }
 
     private void setUpMainActivity() {
@@ -66,6 +127,7 @@ public class MainActivity extends FragmentActivity {
         pts_titleBar.setViewPager(vp_pager);
         vp_pager.setOffscreenPageLimit(3);
         vp_pager.setCurrentItem(0);
+
     }
 
      private void setUpDrawer(){

@@ -58,7 +58,7 @@ public class ListViewAdapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(final int i, View view, ViewGroup viewGroup) {
+    public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder = null;
 
         if (view == null) {
@@ -73,21 +73,31 @@ public class ListViewAdapter extends BaseAdapter{
             holder = (ViewHolder) view.getTag();
         }
 
+        final int pos = i;
         if(mAds.get(i).imgURL == null){
             final ViewHolder finalHolder = holder;
 
-            ParseQuery<ParseUser> query;
-            query = ParseUser.getQuery();
+            ParseQuery<ParseUser>  query = ParseUser.getQuery();
 
-            query.getInBackground(mAds.get(i).getUserId(), new GetCallback<ParseUser>() {
+            query.getInBackground(mAds.get(pos).getUserId(), new GetCallback<ParseUser>() {
                 public void done(ParseUser object, ParseException e) {
                     UserInfo usr = (UserInfo) object;
+
                     if (usr.getImageFile() != null){
+                        //Log.d("hope usr", pos+"> "+usr.getName()+">"+usr.getObjectId()+">"+usr.getImageFile().getUrl());
                         Picasso.with(mContext).load(usr.getImageFile().getUrl()).error(R.drawable.ic_launcher).into(finalHolder.iv_employerPic);
-                        mAds.get(i).imgURL = usr.getImageFile().getUrl();
+                        mAds.get(pos).imgURL = usr.getImageFile().getUrl();
+                        //Log.d("hope i",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
+                    }else{
+                        //Log.d("hope usr (null)", pos+"> "+usr.getName()+">"+usr.getObjectId());
+                        Picasso.with(mContext).load(R.drawable.defaultuser).into(finalHolder.iv_employerPic);
+                        mAds.get(pos).imgURL = "default.jpg";
+                        //Log.d("hope i(null)",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
                     }
                 }
             });
+        }else if(mAds.get(pos).imgURL.equalsIgnoreCase("default.jpg")){
+            Picasso.with(mContext).load(R.drawable.defaultuser).into(holder.iv_employerPic);
         }else{
             Picasso.with(mContext).load(mAds.get(i).imgURL).into(holder.iv_employerPic);
         }
@@ -95,20 +105,22 @@ public class ListViewAdapter extends BaseAdapter{
         holder.tv_name.setText(mAds.get(i).getUserName());
         String dateType=mAds.get(i).getDateType()+" Job";
         if(mAds.get(i).getDateType().equalsIgnoreCase("One Day")){
-            dateType+="\n("+mAds.get(i).getDateFrom()+")";
+            dateType+="\nOn: "+mAds.get(i).getDateFrom();
         }else if(mAds.get(i).getDateType().equalsIgnoreCase("Custom")){
-            dateType+="\n("+mAds.get(i).getDateFrom()+"-"+mAds.get(i).getDateTo()+")";
+            dateType+="\nnFrom: "+mAds.get(i).getDateFrom()+"\nTo  : "+mAds.get(i).getDateTo();
         }
         String timeType=mAds.get(i).getTimeType();
         if(timeType.equalsIgnoreCase("Once a day")){
-            timeType+="\n("+mAds.get(i).getS1StartingTime()+"-"+mAds.get(i).getS1EndingTime()+")";
+            timeType+="\n"+mAds.get(i).getS1StartingTime()+"-"+mAds.get(i).getS1EndingTime();
         }else {
-            timeType+="\n("+mAds.get(i).getS1StartingTime()+"-"+mAds.get(i).getS1EndingTime()+")\n("+mAds.get(i).getS2StartingTime()+"-"+mAds.get(i).getS2EndingTime()+")";
+            timeType+="\nSlot 1: "+mAds.get(i).getS1StartingTime()+"-"+mAds.get(i).getS1EndingTime()+"\nSlot 2: "+mAds.get(i).getS2StartingTime()+"-"+mAds.get(i).getS2EndingTime();
         }
+
+
         holder.tv_name.setText(mAds.get(i).getUserName());
         holder.tv_jobType.setText(dateType);
         holder.tv_timeType.setText(timeType);
-        holder.tv_wages.setText("₹"+mAds.get(i).getWageLowerLimit()+"-"+mAds.get(i).getWageHigherLimit());
+        holder.tv_wages.setText("₹ "+mAds.get(i).getWageLowerLimit()+"-"+mAds.get(i).getWageHigherLimit());
         holder.tv_phoneNo.setText(mAds.get(i).getPhoneNo());
         holder.ll_phone.setVisibility(View.GONE);
         holder.tv_address.setText(mAds.get(i).getAddress());
@@ -116,7 +128,7 @@ public class ListViewAdapter extends BaseAdapter{
         holder.b_apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                open(mAds.get(i).getUserName(),i);
+                open(mAds.get(pos).getUserName(),pos);
             }
         });
         return view;
@@ -179,7 +191,10 @@ public class ListViewAdapter extends BaseAdapter{
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(mContext, "Applied successfully", Toast.LENGTH_SHORT).show();
-                    HopeApp.sendJobAppliedRequest(mAds.get(pos).getUserId());
+                    ParseUser currentUser = ParseUser.getCurrentUser();
+                    String message = currentUser.getString("name") + " has applied in response to your Job Advertisement ";
+
+                    HopeApp.sendPushMessage(mAds.get(pos).getUserId(), currentUser.getObjectId(), mAds.get(pos).getObjectId(), "Job Application", message,"JARequest");
                 } else {
                     Toast.makeText(mContext, "Please check your Internet Connection.", Toast.LENGTH_SHORT).show();
                 }

@@ -60,7 +60,7 @@ public class CategoryFragment extends Fragment {
         int cat = getArguments().getInt("category", 1);
         View view = inflater.inflate(R.layout.item_category_header, null, false);
         ImageView iv= (ImageView) view.findViewById(R.id.iv_category_header);
-        //Log.d("raghav", String.valueOf(HopeApp.ImgUrl[cat]));
+
         Picasso.with(getActivity()).load(HopeApp.ImgUrl[cat]).into(iv);
 
         //iv.setImageResource(R.drawable.washing);
@@ -77,7 +77,8 @@ public class CategoryFragment extends Fragment {
             public void done(List<WorkAd> workAds, ParseException e) {
                 if(e == null) {
                     categoryItems = workAds;
-                    lva.notifyDataSetChanged();
+                    lva = new ListViewAdapter(getActivity(), categoryItems);
+                    lv_category.setAdapter(lva);
 
                 }
 

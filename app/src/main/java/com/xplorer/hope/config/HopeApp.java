@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.parse.GetCallback;
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
@@ -18,7 +18,6 @@ import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.parse.SendCallback;
 import com.xplorer.hope.R;
 import com.xplorer.hope.object.Attendance;
@@ -26,6 +25,9 @@ import com.xplorer.hope.object.EWRelation;
 import com.xplorer.hope.object.Schedule;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -142,12 +144,20 @@ public class HopeApp extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+
+
+        parseInit();
+
+
+    }
+
+    public void parseInit(){
+        // Register subclass
         ParseObject.registerSubclass(WorkAd.class);
         ParseUser.registerSubclass(UserInfo.class);
         ParseObject.registerSubclass(EWRelation.class);
         ParseObject.registerSubclass(Schedule.class);
         ParseObject.registerSubclass(Attendance.class);
-
 
         // Initialize Crash Reporting.
         ParseCrashReporting.enable(this);
@@ -159,24 +169,13 @@ public class HopeApp extends Application {
         Parse.initialize(this, "JY7mTiuGK4GHacsLmKg3ZlA2ctxcZF6j8Z7S7XVJ", "PX7zmXw36LJC7D7zOiWvYRs4ITG0SrcaVPSfrm5j");
 
 
-       // ParseUser.enableAutomaticUser();
+        // ParseUser.enableAutomaticUser();
         ParseACL defaultACL = new ParseACL();
         //ParseUser.getCurrentUser().saveInBackground();
         // Optionally enable public read access.
         // defaultACL.setPublicReadAccess(true);
         ParseACL.setDefaultACL(defaultACL, true);
-        ParseInstallation.getCurrentInstallation().saveInBackground();
-        ParseInstallation.getCurrentInstallation().put("userId", "unregistered");
-        ParsePush.subscribeInBackground("", new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
-                } else {
-                    Log.e("com.parse.push", "failed to subscribe for push", e);
-                }
-            }
-        });
+
     }
 
     /**
@@ -200,25 +199,34 @@ public class HopeApp extends Application {
         }
     }
 
-    public static void sendJobAppliedRequest(final String userId) {
+    public static void sendPushMessage(final String ReceiverUserId, final String SenderUserId,final String workAdId, final String title, final String msg,final String type) {
 
-        ParseQuery<ParseUser> query;
-        query = ParseUser.getQuery();
-
-        query.getInBackground(userId,   new GetCallback<ParseUser>() {
-            public void done(ParseUser object, ParseException e) {
-                if (e == null) {
-                    UserInfo usr = (UserInfo) object;
 
                     ParseQuery pushQuery = ParseInstallation.getQuery();
-                    Log.d("raghav", userId);
-                    pushQuery.whereEqualTo("userId", userId);
-                    ParseUser currentUser = ParseUser.getCurrentUser();
-                    String message = currentUser.getString("name") + " says Hi!";
+
+                    pushQuery.whereEqualTo("userId", ReceiverUserId);
+
+                    JSONObject data = new JSONObject();
+                    try {
+                        Log.d("raghav uri","com.xplorer.hope.activity.PushNotificationActivity");
+                       // data.put("uri", Uri.parse("com.xplorer.hope.activity.PushNotificationActivity"));
+                        data.put("title", title);
+                        data.put("senderId",SenderUserId );
+                        data.put("workId",workAdId );
+                        data.put("message",msg);
+                        data.put("type",type);
+
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    //uri
+                    //title "Job Application"
 
                     ParsePush push = new ParsePush();
                     push.setQuery(pushQuery); // Set our Installation query
-                    push.setMessage(message);
+                    push.setMessage(msg);
+                    push.setData(data);
 
                     push.sendInBackground(new SendCallback() {
                         @Override
@@ -230,8 +238,39 @@ public class HopeApp extends Application {
                             }
                         }
                     });
-                }else{
-                    Toast.makeText(instance,"Request not sent!",Toast.LENGTH_SHORT).show();
+
+    }
+
+    public static void removeEWRelation(String workId, String workerId, String employerId) {
+        ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
+        query.whereEqualTo("workID",workId);
+        query.whereEqualTo("userID",workerId);
+        query.whereEqualTo("employerID",employerId);
+        query.findInBackground(new FindCallback<EWRelation>() {
+            @Override
+            public void done(List<EWRelation> parseObjects, ParseException e) {
+                if (e == null) {
+                    for(int i=0;i<parseObjects.size();i++) {
+                        parseObjects.get(i).deleteInBackground();
+                    }
+                }
+            }
+        });
+    }
+
+    public static void setEWRelationTrue(String workId, String workerId, String employerId) {
+        ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
+        query.whereEqualTo("workID",workId);
+        query.whereEqualTo("userID",workerId);
+        query.whereEqualTo("employerID",employerId);
+        query.findInBackground(new FindCallback<EWRelation>() {
+            @Override
+            public void done(List<EWRelation> parseObjects, ParseException e) {
+                if (e == null) {
+                    for(int i=0;i<parseObjects.size();i++) {
+                        parseObjects.get(i).setApprove(true);
+                        parseObjects.get(i).saveInBackground();
+                    }
                 }
             }
         });

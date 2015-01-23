@@ -3,6 +3,7 @@ package com.xplorer.hope.activity;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.Menu;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -114,6 +116,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     int s2EndingHour;
     int s2EndingMinute;
     String s2EndingTimeType = "";
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +134,14 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         tv_s2_startingTime.setOnClickListener(this);
         tv_s2_endingTime.setOnClickListener(this);
     }
-
+    public void onPreExecute() {
+        pd = new ProgressDialog(AddActivity.this);
+        pd.setTitle("Processing...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
+        pd.setIndeterminate(true);
+        pd.show();
+    }
     private void showDatePickerDialog(int i) {
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -232,6 +242,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     }
 
     private void saveWorkAd() {
+        onPreExecute();
         UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
         WorkAd ad = new WorkAd();
         ad.setCategory(tv_categoryName.getText().toString());
@@ -249,7 +260,9 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         ad.setWageLowerLimit(Long.parseLong(et_wageLower.getText().toString()));
         ad.setWageHigherLimit(Long.parseLong(et_wageUpper.getText().toString()));
         ad.setUserId(usr.getObjectId());
-        ad.setUserName(usr.getName());
+        ad.setUserName(usr.getName());ParseACL acl = new ParseACL();
+        acl.setPublicReadAccess(true);
+        ad.setACL(acl);
         ad.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {
                 if (e == null) {
@@ -258,6 +271,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
                 } else {
                     Toast.makeText(AddActivity.this,"Please check your Internet Connection.",Toast.LENGTH_SHORT).show();
                 }
+                pd.dismiss();
             }
         });
     }

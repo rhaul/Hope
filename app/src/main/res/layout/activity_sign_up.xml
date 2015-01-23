@@ -24,6 +24,7 @@
                 android:id="@+id/iv_sign_profilePhoto"
                 android:layout_width="100dp"
                 android:layout_height="120dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/defaultuser" />
 
             <LinearLayout
@@ -113,23 +114,26 @@
 
             <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="5dp">
 
                 <TextView
                     android:id="@+id/textViewInterest"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
                     android:text="Interest"
+                    android:gravity="center"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
                     android:id="@+id/textViewExpected"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="130dp"
-                    android:text="Expected Wages"
+                    android:text="Expected Wages\n(per month)"
+                    android:gravity="center"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
 

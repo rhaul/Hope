@@ -3,6 +3,7 @@ package com.xplorer.hope.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +29,6 @@ import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
@@ -148,7 +148,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
     byte[] dataImage = null;
     UserInfo usr;
     Boolean isNull = false;
-
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +167,14 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         iv_profilePhoto.setOnClickListener(this);
     }
 
-
+    public void onPreExecute() {
+        pd = new ProgressDialog(SignUpActivity.this);
+        pd.setTitle("Processing...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
+        pd.setIndeterminate(true);
+        pd.show();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -180,6 +187,8 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
 
         } else {
             saveBtn.setTitle("SAVE");
+
+            onPreExecute();
             usr = (UserInfo) ParseUser.getCurrentUser();
 
             et_name.setText(usr.getName());
@@ -263,6 +272,9 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
 
             if (usr.getImageFile() != null)
                 Picasso.with(this).load(usr.getImageFile().getUrl()).into(iv_profilePhoto);
+
+
+            pd.dismiss();
         }
 
         return true;
@@ -347,7 +359,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             sendDataToServer();
         }
 
-
+        onPreExecute();
     }
 
     public void sendDataToServer() {
@@ -355,22 +367,11 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             usr.signUpInBackground(new SignUpCallback() {
                 public void done(ParseException e) {
                     isSaveClicked = false;
+                    pd.dismiss();
                     if (e == null) {
-
-                        UserInfo usr= (UserInfo) ParseUser.getCurrentUser();
-                        ParseInstallation.getCurrentInstallation().put("userId", usr.getObjectId());
-                        ParseInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if(e==null){
-                                    Toast.makeText(SignUpActivity.this, "User signed up successfully", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    Toast.makeText(SignUpActivity.this, "User signed up successfully but push service could not be enabled.", Toast.LENGTH_SHORT).show();
-                                }
-                                startActivity(new Intent(mcontex, MainActivity.class));
-                                finish();
-                            }
-                        });
+                        Toast.makeText(SignUpActivity.this, "User signed up successfully", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(mcontex, MainActivity.class));
+                        finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Please check your Internet Connection.", Toast.LENGTH_SHORT).show();
                     }
@@ -380,10 +381,10 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             usr.saveInBackground(new SaveCallback() {
                 public void done(ParseException e) {
                     isSaveClicked = false;
+                    pd.dismiss();
                     if (e == null) {
                         Toast.makeText(SignUpActivity.this, "Profile saved successfully", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(mcontex, MainActivity.class));
-
                         finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Please check your Internet Connection.", Toast.LENGTH_SHORT).show();
@@ -453,10 +454,10 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
 
         float bitmapRatio = (float)width / (float) height;
         if (bitmapRatio > 0) {
-            width = 200;
+            width = 400;
             height = (int) (width / bitmapRatio);
         } else {
-            height = 240;
+            height = 480;
             width = (int) (height * bitmapRatio);
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
