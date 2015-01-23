@@ -1,39 +1,36 @@
 package com.xplorer.hope.object;
 
+import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
 /**
  * Created by Raghavendra on 11-01-2015.
  */
-public class attendance extends ParseObject {
+@ParseClassName("attendance")
+public class Attendance extends ParseObject {
 
-    public attendance(){}
+    public Attendance(){}
 
-    public String userID;
-    public String employerID;
-    public String workID;
 
     public String getUserID() {
-        return userID;
+        return getString("userID");
     }
 
     public void setUserID(String userID) {
-        this.userID = userID;
+        put("userID", userID);
     }
 
     public String getEmployerID() {
-        return employerID;
+        return getString("employerID");
     }
 
-    public void setEmployerID(String employerID) {
-        this.employerID = employerID;
-    }
+    public void setEmployerID(String employerID) { put("employerID", employerID); }
 
     public String getWorkID() {
-        return workID;
+        return getString("workID");
     }
 
     public void setWorkID(String workID) {
-        this.workID = workID;
+        put("workID", workID);
     }
 }

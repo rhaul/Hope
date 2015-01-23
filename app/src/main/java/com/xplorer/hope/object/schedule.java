@@ -1,5 +1,6 @@
 package com.xplorer.hope.object;
 
+import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
 import java.util.ArrayList;
@@ -8,9 +9,10 @@ import java.util.List;
 /**
  * Created by Raghavendra on 11-01-2015.
  */
-public class schedule extends ParseObject {
+@ParseClassName("Schedule")
+public class Schedule extends ParseObject {
 
-    public schedule(){
+    public Schedule(){
     }
 
     public void setDefaultSched(){
@@ -52,6 +54,8 @@ public class schedule extends ParseObject {
         listPM.add("Not Available");
         listPM.add("Not Available");
     }
+
+
     public String userID;
     public List<String> mondayAM = new ArrayList<String>();
     public List<String> mondayPM = new ArrayList<String>();
@@ -76,13 +80,9 @@ public class schedule extends ParseObject {
         this.userID = userID;
     }
 
-    public List<String> getMondayAM() {
-        return mondayAM;
-    }
+    public List<String> getMondayAM() { return getList("mondayAM"); }
 
-    public void setMondayAM(List<String> mondayAM) {
-        this.mondayAM = mondayAM;
-    }
+    public void setMondayAM(List<String> mondayAM) { put("mondayAM", mondayAM); }
 
     public List<String> getMondayPM() {
         return mondayPM;

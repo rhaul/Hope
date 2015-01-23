@@ -1,7 +1,6 @@
 package com.xplorer.hope.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -66,7 +65,7 @@ public class SelectUserTypeActivity extends Activity implements View.OnClickList
             }
             break;
         }
-        startActivity(new Intent(this,MainActivity.class));
         finish();
+        return;
     }
 }

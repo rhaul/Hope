@@ -3,6 +3,7 @@ package com.xplorer.hope.activity;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,11 +20,18 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.parse.ParseACL;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
 import com.xplorer.hope.adapter.CLAdapter;
 import com.xplorer.hope.config.HopeApp;
+import com.xplorer.hope.object.UserInfo;
+import com.xplorer.hope.object.WorkAd;
 
 import java.util.Calendar;
 
@@ -84,8 +92,10 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     @InjectView(R.id.tv_add_s2_endingTime)
     TextView tv_s2_endingTime;
 
-    @InjectView(R.id.et_add_wage)
-    EditText et_wage;
+    @InjectView(R.id.et_add_wageLower)
+    EditText et_wageLower;
+    @InjectView(R.id.et_add_wageUpper)
+    EditText et_wageUpper;
 
     // variables
     int startYear;
@@ -106,6 +116,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     int s2EndingHour;
     int s2EndingMinute;
     String s2EndingTimeType = "";
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +134,14 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         tv_s2_startingTime.setOnClickListener(this);
         tv_s2_endingTime.setOnClickListener(this);
     }
-
+    public void onPreExecute() {
+        pd = new ProgressDialog(AddActivity.this);
+        pd.setTitle("Processing...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
+        pd.setIndeterminate(true);
+        pd.show();
+    }
     private void showDatePickerDialog(int i) {
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -215,12 +233,76 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_save) {
+            saveWorkAd();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void saveWorkAd() {
+        onPreExecute();
+        UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
+        WorkAd ad = new WorkAd();
+        ad.setCategory(tv_categoryName.getText().toString());
+        ad.setDescription(et_description.getText().toString());
+        ad.setAddress(et_address.getText().toString());
+        ad.setPhoneNo(et_phone.getText().toString());
+        ad.setDateType(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()));
+        ad.setDateFrom(tv_startingDate.getText().toString());
+        ad.setDateTo(tv_endingDate.getText().toString());
+        ad.setTimeType(getTimeTypeFromRG(rg_timingType.getCheckedRadioButtonId()));
+        ad.setS1StartingTime(tv_s1_startingTime.getText().toString());
+        ad.setS1EndingTime(tv_s1_endingTime.getText().toString());
+        ad.setS2StartingTime(tv_s2_startingTime.getText().toString());
+        ad.setS2EndingTime(tv_s2_endingTime.getText().toString());
+        ad.setWageLowerLimit(Long.parseLong(et_wageLower.getText().toString()));
+        ad.setWageHigherLimit(Long.parseLong(et_wageUpper.getText().toString()));
+        ad.setUserId(usr.getObjectId());
+        ad.setUserName(usr.getName());ParseACL acl = new ParseACL();
+        acl.setPublicReadAccess(true);
+        ad.setACL(acl);
+        ad.saveInBackground(new SaveCallback() {
+            public void done(ParseException e) {
+                if (e == null) {
+                    Toast.makeText(AddActivity.this,"Saved successfully",Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(AddActivity.this,"Please check your Internet Connection.",Toast.LENGTH_SHORT).show();
+                }
+                pd.dismiss();
+            }
+        });
+    }
+
+    private String getTimeTypeFromRG(int checkedRadioButtonId) {
+        switch (checkedRadioButtonId){
+            case R.id.rb_add_1day:{
+                return "Once a day";
+            }
+            case R.id.rb_add_2day:{
+                return "Twice a day";
+            }
+        }
+        return null;
+    }
+
+    private String getDateTypeFromRG(int checkedRadioButtonId) {
+        switch (checkedRadioButtonId){
+            case R.id.rb_add_jobTypeOneDay:{
+                return "One Day";
+            }
+            case R.id.rb_add_jobTypeMonthly:{
+                return "Monthly";
+            }
+            case R.id.rb_add_jobTypeCustom:{
+                return "Custom";
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -370,14 +452,12 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     private void updateSEDateDisplay(int mType) {
         if (mType == 0) {
             tv_startingDate.setText(new StringBuilder()
-                    // Month is 0 based so add 1
                     .append(startMonth + 1).append("/").append(startDay).append("/")
-                    .append(startYear).append(" "));
+                    .append(startYear));
         } else {
             tv_endingDate.setText(new StringBuilder()
-                    // Month is 0 based so add 1
                     .append(endMonth + 1).append("/").append(endDay).append("/")
-                    .append(endYear).append(" "));
+                    .append(endYear));
         }
     }
 }

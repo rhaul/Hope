@@ -56,7 +56,7 @@ public class CLAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        Picasso.with(mContext).load(HopeApp.ImgUrl[0]).into(holder.iv_img);
+        Picasso.with(mContext).load(HopeApp.ImgUrl[i]).into(holder.iv_img);
         holder.tv_name.setText(HopeApp.TITLES[i]);
         return view;
     }
