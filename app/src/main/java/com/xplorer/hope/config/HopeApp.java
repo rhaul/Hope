@@ -13,6 +13,7 @@ import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
@@ -38,6 +39,14 @@ public class HopeApp extends Application {
     // Debugging tag for the application
     public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
     public static final String APPTAG = "HopeApp";
+    public ParseQuery<WorkAd> filteredQuery ;
+    public static final String[] SORT_TYPES = {
+            "Wage: Higher to Lower",
+            "Wage: Lower to Higher",
+            "Distance: Nearest to Farthest",
+            "Date: Latest to Oldest",
+            "Date: Oldest to Latest"
+    };
     public static final String[] TITLES = {
             "Dish Washing",
             "House Cleaning",
@@ -256,5 +265,39 @@ public class HopeApp extends Application {
                 }
             }
         });
+    }
+    public void setWorkAdSortBy(int selection){
+        if(filteredQuery == null) {
+            filteredQuery = ParseQuery.getQuery("WorkAd");
+        }
+        switch (selection){
+            case 0:{
+                filteredQuery.addDescendingOrder("wageHigherLimit");
+            }
+            break;
+            case 1:{
+                filteredQuery.addAscendingOrder("wageHigherLimit");
+            }
+            break;
+            case 2:{
+                filteredQuery.whereWithinKilometers("location",HopeApp.getMyLocation(),5);
+            }
+            break;
+            case 3:{
+                filteredQuery.addDescendingOrder("createdAt");
+            }
+            break;
+            case 4:{
+                filteredQuery.addAscendingOrder("createdAt");
+            }
+            break;
+        }
+    }
+
+    public void setWorkAdFilter(){
+
+    }
+    private static ParseGeoPoint getMyLocation() {
+        return null;
     }
 }
