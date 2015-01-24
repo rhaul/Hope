@@ -1,6 +1,10 @@
 package com.xplorer.hope.activity;
 
+
 import android.content.Context;
+
+import android.app.Dialog;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -13,6 +17,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.astuetz.PagerSlidingTabStrip;
@@ -33,7 +39,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements QuickReturnInterface {
 
     @InjectView(R.id.tabs)
     PagerSlidingTabStrip pts_titleBar;
@@ -51,6 +57,16 @@ public class MainActivity extends FragmentActivity {
     Boolean isInternetPresent;
     ConnectionDetector cd;
 
+
+
+    // region Member Variables
+    @InjectView(R.id.ll_main_quick_return_footer)
+    LinearLayout ll_quick_return_footer;
+    @InjectView(R.id.b_main_sort)
+    LinearLayout b_sort;
+    @InjectView(R.id.b_main_filter)
+    LinearLayout b_filter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +75,12 @@ public class MainActivity extends FragmentActivity {
         ButterKnife.inject(this);
 
 
+    }
+
+    // region QuickReturnInterface Methods
+    @Override
+    public LinearLayout getFooter() {
+        return ll_quick_return_footer;
     }
 
     @Override
@@ -174,11 +196,45 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void setUpMainActivity() {
+
         pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager());
         vp_pager.setAdapter(pagerAdapter);
         pts_titleBar.setViewPager(vp_pager);
         vp_pager.setOffscreenPageLimit(3);
         vp_pager.setCurrentItem(0);
+        b_sort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSortDialog();
+            }
+        });
+        b_filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+    }
+
+    private void showSortDialog() {
+        final Dialog dialog = new Dialog(this);
+        // Include dialog.xml file
+        dialog.setContentView(R.layout.dialog_category_list);
+        // Set dialog title
+        dialog.setTitle("Select Category");
+        ListView lvD = (ListView) dialog.findViewById(R.id.lv_category_list);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_list_item_1, HopeApp.SORT_TYPES);
+        lvD.setAdapter(adapter);
+        lvD.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                HopeApp.getInstance().setWorkAdSortBy(i);
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
 
     }
 

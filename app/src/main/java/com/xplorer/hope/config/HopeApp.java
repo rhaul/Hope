@@ -13,6 +13,7 @@ import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
@@ -39,6 +40,14 @@ public class HopeApp extends Application {
     // Debugging tag for the application
     public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
     public static final String APPTAG = "HopeApp";
+    public ParseQuery<WorkAd> filteredQuery ;
+    public static final String[] SORT_TYPES = {
+            "Wage: Higher to Lower",
+            "Wage: Lower to Higher",
+            "Distance: Nearest to Farthest",
+            "Date: Latest to Oldest",
+            "Date: Oldest to Latest"
+    };
     public static final String[] TITLES = {
             "Dish Washing",
             "House Cleaning",
@@ -203,42 +212,42 @@ public class HopeApp extends Application {
     public static void sendPushMessage(final String ReceiverUserId, final String SenderUserId,final String workAdId, final String title, final String msg,final String type) {
 
 
-                    ParseQuery pushQuery = ParseInstallation.getQuery();
+        ParseQuery pushQuery = ParseInstallation.getQuery();
 
-                    pushQuery.whereEqualTo("userId", ReceiverUserId);
+        pushQuery.whereEqualTo("userId", ReceiverUserId);
 
-                    JSONObject data = new JSONObject();
-                    try {
-                        Log.d("raghav uri","com.xplorer.hope.activity.PushNotificationActivity");
-                       // data.put("uri", Uri.parse("com.xplorer.hope.activity.PushNotificationActivity"));
-                        data.put("title", title);
-                        data.put("senderId",SenderUserId );
-                        data.put("workId",workAdId );
-                        data.put("message",msg);
-                        data.put("type",type);
+        JSONObject data = new JSONObject();
+        try {
+            Log.d("raghav uri","com.xplorer.hope.activity.PushNotificationActivity");
+            // data.put("uri", Uri.parse("com.xplorer.hope.activity.PushNotificationActivity"));
+            data.put("title", title);
+            data.put("senderId",SenderUserId );
+            data.put("workId",workAdId );
+            data.put("message",msg);
+            data.put("type",type);
 
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                    }
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
 
-                    //uri
-                    //title "Job Application"
+        //uri
+        //title "Job Application"
 
-                    ParsePush push = new ParsePush();
-                    push.setQuery(pushQuery); // Set our Installation query
-                    push.setMessage(msg);
-                    push.setData(data);
+        ParsePush push = new ParsePush();
+        push.setQuery(pushQuery); // Set our Installation query
+        push.setMessage(msg);
+        push.setData(data);
 
-                    push.sendInBackground(new SendCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if(e== null){
-                                Toast.makeText(instance,"Request sent!",Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(instance,"Request not sent!",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+        push.sendInBackground(new SendCallback() {
+            @Override
+            public void done(ParseException e) {
+                if(e== null){
+                    Toast.makeText(instance,"Request sent!",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(instance,"Request not sent!",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 
@@ -265,7 +274,7 @@ public class HopeApp extends Application {
         query.whereEqualTo("userID", workerId);
         query.whereEqualTo("employerID", employerId);
 
-        Log.d("hope setEWRelationTrue",workId+":"+workerId+":"+ employerId);
+        Log.d("hope setEWRelationTrue", workId + ":" + workerId + ":" + employerId);
 
         query.findInBackground(new FindCallback<EWRelation>() {
             @Override
@@ -273,7 +282,7 @@ public class HopeApp extends Application {
                 if (e == null) {
                     Log.d("hope setEWRelationTrue(done)", String.valueOf(parseObjects.size()));
                     for (int i = 0; i < parseObjects.size(); i++) {
-                        Log.d("hope setEWRelationTrue(done)",parseObjects.get(i).getEmployerID());
+                        Log.d("hope setEWRelationTrue(done)", parseObjects.get(i).getEmployerID());
                         parseObjects.get(i).setApprove(true);
                         parseObjects.get(i).saveInBackground(new SaveCallback() {
                             @Override
@@ -286,5 +295,40 @@ public class HopeApp extends Application {
             }
         });
 
+    }
+
+    public void setWorkAdSortBy(int selection){
+        if(filteredQuery == null) {
+            filteredQuery = ParseQuery.getQuery("WorkAd");
+        }
+        switch (selection){
+            case 0:{
+                filteredQuery.addDescendingOrder("wageHigherLimit");
+            }
+            break;
+            case 1:{
+                filteredQuery.addAscendingOrder("wageHigherLimit");
+            }
+            break;
+            case 2:{
+                filteredQuery.whereWithinKilometers("location",HopeApp.getMyLocation(),5);
+            }
+            break;
+            case 3:{
+                filteredQuery.addDescendingOrder("createdAt");
+            }
+            break;
+            case 4:{
+                filteredQuery.addAscendingOrder("createdAt");
+            }
+            break;
+        }
+    }
+
+    public void setWorkAdFilter(){
+
+    }
+    private static ParseGeoPoint getMyLocation() {
+        return null;
     }
 }
