@@ -43,7 +43,7 @@
                 <TextView
 
                     android:id="@+id/tv_sign_dob"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="29dp"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/rounded_corner"
@@ -101,7 +101,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
             android:ems="10"
-            android:hint="Phone Number"
+            android:hint="Phone Number (10 digit)"
             android:inputType="phone" />
 
         <LinearLayout

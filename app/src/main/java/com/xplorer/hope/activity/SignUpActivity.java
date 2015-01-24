@@ -3,6 +3,7 @@ package com.xplorer.hope.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,10 +15,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,6 +31,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -161,9 +166,28 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         isSaveClicked = false;
         mcontex = this;
         tv_dob.setOnClickListener(this);
-        TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        PhoneNumber = tMgr.getLine1Number();
-        et_num.setText(PhoneNumber);
+        cb_ShopWorker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    ll_language.setVisibility(View.VISIBLE);
+                }else{
+
+                    ll_language.setVisibility(View.GONE);
+                }
+            }
+        });
+        cb_Driver.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    ll_license.setVisibility(View.VISIBLE);
+                }else{
+
+                    ll_license.setVisibility(View.GONE);
+                }
+            }
+        });
         iv_profilePhoto.setOnClickListener(this);
     }
 
@@ -184,7 +208,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
 
         if (getIntent().getStringExtra("from").equalsIgnoreCase("singup")) {
             saveBtn.setTitle("SIGN UP");
-
+            showMobileDialog();
         } else {
             saveBtn.setTitle("SAVE");
 
@@ -384,7 +408,6 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
                     pd.dismiss();
                     if (e == null) {
                         Toast.makeText(SignUpActivity.this, "Profile saved successfully", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(mcontex, MainActivity.class));
                         finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Please check your Internet Connection.", Toast.LENGTH_SHORT).show();
@@ -394,6 +417,60 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         }
     }
 
+
+    private void showMobileDialog() {
+        TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        PhoneNumber = tMgr.getLine1Number();
+        et_num.setText(PhoneNumber);
+
+        if(PhoneNumber==null || PhoneNumber.equalsIgnoreCase("")){
+            final Dialog dialog = new Dialog(this);
+            // Include dialog.xml file
+            dialog.setContentView(R.layout.dialog_phone_no);
+            // Set dialog title
+            dialog.setTitle("Enter your mobile number.");
+            final EditText etPhoneNo = (EditText) dialog.findViewById(R.id.et_pdialog_mobile);
+            final Button btnPhoneConfirm = (Button) dialog.findViewById(R.id.b_pdialog_confirm);
+
+            btnPhoneConfirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String username = etPhoneNo.getText().toString();
+                    dialog.dismiss();
+                    onPreExecute();
+                    ParseUser.logInInBackground(username, "", new LogInCallback() {
+                        public void done(ParseUser user, ParseException e) {
+                            pd.dismiss();
+                            if (user != null) {
+                                finish();
+                                return;
+                            } else {
+                                Log.e("hope showMobileDialog", e.toString());
+                            }
+                        }
+                    });
+
+
+
+                }
+            });
+
+            dialog.show();
+        }else{
+            ParseUser.logInInBackground(PhoneNumber, "", new LogInCallback() {
+                public void done(ParseUser user, ParseException e) {
+                    if (user != null) {
+                        finish();
+                        return;
+                    } else {
+                        Log.e("hope showMobileDialog(else)", e.toString());
+                    }
+                }
+            });
+        }
+
+
+    }
     private String getGenderFromRG(int checkedRadioButtonId) {
         switch (checkedRadioButtonId) {
             case R.id.rb_sign_male: {

@@ -1,5 +1,6 @@
 package com.xplorer.hope.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -26,6 +27,8 @@ import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.service.ConnectionDetector;
 
+import java.io.File;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
@@ -34,7 +37,8 @@ public class MainActivity extends FragmentActivity {
 
     @InjectView(R.id.tabs)
     PagerSlidingTabStrip pts_titleBar;
-    @InjectView(R.id.pager) ViewPager vp_pager;
+    @InjectView(R.id.pager)
+    ViewPager vp_pager;
 
     boolean isSetUp = false;
     private TabsPagerAdapter pagerAdapter;
@@ -46,6 +50,7 @@ public class MainActivity extends FragmentActivity {
     private NavDrawerListAdapter navDrawerListAdapter;
     Boolean isInternetPresent;
     ConnectionDetector cd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,24 +66,23 @@ public class MainActivity extends FragmentActivity {
         super.onResume();
 
         // language and user type selection
-        if(!HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi") && !HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("english") ){
+        if (!HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi") && !HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("english")) {
             startActivity(new Intent(this, SelectLangActivity.class));
             return;
-        }else if(!HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("worker") && !HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("employer") ){
+        } else if (!HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("worker") && !HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("employer")) {
             startActivity(new Intent(this, SelectUserTypeActivity.class));
             return;
         }
         //-------------UserInfo-------------//
         UserInfo user = (UserInfo) ParseUser.getCurrentUser();
-        if(user==null){
+        if (user == null) {
             cd = new ConnectionDetector(getApplicationContext());
-            isInternetPresent= cd.isConnectingToInternet();
+            isInternetPresent = cd.isConnectingToInternet();
 
-            if(isInternetPresent) {
-                startActivity(new Intent(this,SignUpActivity.class).putExtra("from", "singup"));
-                finish();
+            if (isInternetPresent) {
+                startActivity(new Intent(this, SignUpActivity.class).putExtra("from", "singup"));
                 return;
-            }else{
+            } else {
                 startActivity(new Intent(this, NoInternetActivity.class));
                 return;
             }
@@ -86,58 +90,87 @@ public class MainActivity extends FragmentActivity {
 
         //-------------ParseInstallation-------------//
 
-      //if(ParseInstallation.getCurrentInstallation() == null || ParseInstallation.getCurrentInstallation().get("userId") == null || ParseInstallation.getCurrentInstallation().get("userId").toString().equalsIgnoreCase("unregistered")) {
+
+
+        //------USER LOST/UNREGISTERED PARSE PUSH INFO ------//
+        if (ParseInstallation.getCurrentInstallation() == null || ParseInstallation.getCurrentInstallation().get("userId") == null || ParseInstallation.getCurrentInstallation().get("userId").toString().equalsIgnoreCase("unregistered")) {
             cd = new ConnectionDetector(getApplicationContext());
-            isInternetPresent= cd.isConnectingToInternet();
+            isInternetPresent = cd.isConnectingToInternet();
 
-            if(isInternetPresent) {
-                ParseInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if(e==null){
-
-                            UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
-                            if (usr != null) {
-                                ParseInstallation.getCurrentInstallation().put("userId", usr.getObjectId());
-                                ParseInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if(e != null) {
-                                            Log.d("error", e.toString());
-                                        }
-                                    }
-                                });
-                            } else {
-                                Intent intent = getIntent();
-                                finish();
-                                startActivity(intent);
-                            }
-                        }else{
-                            Log.d("error", e.toString());
-                        }
-                    }
-                });
-
-            }else{
+            if (isInternetPresent) {
+                parseInstallation();
+            } else {
                 startActivity(new Intent(this, NoInternetActivity.class));
                 return;
             }
 
 
-      // }
-        if(!isSetUp) {
+        }
+
+
+
+        //-----SET UP MAIN ACTIVITY------------//
+        if (!isSetUp) {
             setUpMainActivity();
             setUpDrawer();
-            isSetUp=true;
+            isSetUp = true;
         }
     }
 
+    public void parseInstallation() {
+        ParseInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
 
-    public void setUpUser(){
+                    UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
+                    if (usr != null) {
+                        ParseInstallation.getCurrentInstallation().put("userId", usr.getObjectId());
+                        ParseInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    Log.d("hope parseInstallation", e.toString());
+                                    if (e.toString().equalsIgnoreCase("object not found for update")) {
+                                        deleteInstallationCache(MainActivity.this);
+                                        parseInstallation();
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        Log.e("hope parseInstallation", "User found null");
+                        Intent intent = getIntent();
+                        startActivity(intent);
+                        finish();
+                        return;
 
+                    }
+                } else {
+                    Log.d("hope parseInstallation", e.toString());
+                    if (e.toString().equalsIgnoreCase("object not found for update")) {
+                        deleteInstallationCache(MainActivity.this);
+                        parseInstallation();
+                    }
+                }
+            }
+        });
     }
-    public void setUpPushInstallation(){
 
+
+    public static boolean deleteInstallationCache(Context context) {
+        boolean deletedParseFolder = false;
+        File cacheDir = context.getCacheDir();
+        File parseApp = new File(cacheDir.getParent(), "app_Parse");
+        File installationId = new File(parseApp, "installationId");
+        File currentInstallation = new File(parseApp, "currentInstallation");
+        if (installationId.exists()) {
+            deletedParseFolder = deletedParseFolder || installationId.delete();
+        }
+        if (currentInstallation.exists()) {
+            deletedParseFolder = deletedParseFolder && currentInstallation.delete();
+        }
+        return deletedParseFolder;
     }
 
     private void setUpMainActivity() {
@@ -149,44 +182,44 @@ public class MainActivity extends FragmentActivity {
 
     }
 
-     private void setUpDrawer(){
+    private void setUpDrawer() {
 
-         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
-         // setting the nav drawer list adapter
-         navDrawerListAdapter = new NavDrawerListAdapter(getApplicationContext());
-         mDrawerList.setAdapter(navDrawerListAdapter);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+        // setting the nav drawer list adapter
+        navDrawerListAdapter = new NavDrawerListAdapter(getApplicationContext());
+        mDrawerList.setAdapter(navDrawerListAdapter);
 
-         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-             @Override
-             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                 if(i==0){
-                     startActivity(new Intent(MainActivity.this, SignUpActivity.class).putExtra("from", "menu"));
-                 }
-             }
-         });
-         //getActionBar().setHomeButtonEnabled(true);
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i == 0) {
+                    startActivity(new Intent(MainActivity.this, SignUpActivity.class).putExtra("from", "menu"));
+                }
+            }
+        });
+        //getActionBar().setHomeButtonEnabled(true);
 
-         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                 R.drawable.ic_launcher, //nav menu toggle icon
-                 R.string.app_name, // nav drawer open - description for accessibility
-                 R.string.app_name // nav drawer close - description for accessibility
-         ){
-             public void onDrawerClosed(View view) {
-                 //getActionBar().setTitle(mTitle);
-                 // calling onPrepareOptionsMenu() to show action bar icons
-                 //invalidateOptionsMenu();
-             }
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.drawable.ic_launcher, //nav menu toggle icon
+                R.string.app_name, // nav drawer open - description for accessibility
+                R.string.app_name // nav drawer close - description for accessibility
+        ) {
+            public void onDrawerClosed(View view) {
+                //getActionBar().setTitle(mTitle);
+                // calling onPrepareOptionsMenu() to show action bar icons
+                //invalidateOptionsMenu();
+            }
 
-             public void onDrawerOpened(View drawerView) {
-                 //getActionBar().setTitle(mDrawerTitle);
-                 // calling onPrepareOptionsMenu() to hide action bar icons
-                 //invalidateOptionsMenu();
-             }
-         };
-         mDrawerLayout.setDrawerListener(mDrawerToggle);
+            public void onDrawerOpened(View drawerView) {
+                //getActionBar().setTitle(mDrawerTitle);
+                // calling onPrepareOptionsMenu() to hide action bar icons
+                //invalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-     }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -205,7 +238,7 @@ public class MainActivity extends FragmentActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
-            startActivity(new Intent(this,AddActivity.class));
+            startActivity(new Intent(this, AddActivity.class));
             return true;
         }
 

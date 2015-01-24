@@ -260,7 +260,8 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         ad.setWageLowerLimit(Long.parseLong(et_wageLower.getText().toString()));
         ad.setWageHigherLimit(Long.parseLong(et_wageUpper.getText().toString()));
         ad.setUserId(usr.getObjectId());
-        ad.setUserName(usr.getName());ParseACL acl = new ParseACL();
+        ad.setUserName(usr.getName());
+        ParseACL acl = new ParseACL();
         acl.setPublicReadAccess(true);
         ad.setACL(acl);
         ad.saveInBackground(new SaveCallback() {

@@ -1,6 +1,8 @@
 package com.xplorer.hope.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +23,9 @@ import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,6 +44,12 @@ public class PushNotificationActivity extends Activity {
     Button b_accept;
     @InjectView(R.id.b_push_decline)
     Button b_decline;
+    @InjectView(R.id.ll_push_workad)
+    LinearLayout ll_workad;
+    @InjectView(R.id.ll_push_divider)
+    LinearLayout ll_divider;
+
+
 
     String workerId;
     String workId;
@@ -60,6 +71,10 @@ public class PushNotificationActivity extends Activity {
     LinearLayout ll_interestTitle;
 
     LinearLayout ll_interest;
+    LinearLayout ll_license;
+    LinearLayout ll_language;
+
+
 
     // workAd
     View viewWorkAd;
@@ -74,6 +89,8 @@ public class PushNotificationActivity extends Activity {
     Button b_apply;
     LinearLayout ll_phone;
 
+    ProgressDialog pd;
+    int infoObtained =0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +110,9 @@ public class PushNotificationActivity extends Activity {
         tv_lang = (TextView) viewProfile.findViewById(R.id.tv_wprofile_lang);
         iv_workerPic = (ImageView) viewProfile.findViewById(R.id.iv_wprofile_img);
         ll_interestTitle = (LinearLayout)  viewProfile.findViewById(R.id.ll_wprofile_interestTitle);
+        ll_language = (LinearLayout) viewProfile.findViewById(R.id.ll_wprofile_language);
+        ll_license = (LinearLayout) viewProfile.findViewById(R.id.ll_wprofile_license);
+
         ll_profile.addView(viewProfile);
 
         viewWorkAd = getLayoutInflater().inflate(R.layout.item_ad, null);
@@ -107,11 +127,11 @@ public class PushNotificationActivity extends Activity {
         tv_phoneNo = (TextView) viewWorkAd.findViewById(R.id.tv_ad_phoneNo);
         b_apply = (Button) viewWorkAd.findViewById(R.id.b_ad_apply);
 
-        ll_profile.addView(viewWorkAd);
+        ll_workad.addView(viewWorkAd);
         Bundle b = getIntent().getExtras();
 
 
-        /*try {
+        try {
             JSONObject jsonObject = new JSONObject(getIntent().getExtras().getString("com.parse.Data"));
             workerId = jsonObject.getString("senderId");
             workId = jsonObject.getString("workId");
@@ -119,53 +139,92 @@ public class PushNotificationActivity extends Activity {
             type = jsonObject.getString("type");
         } catch (JSONException e) {
             e.printStackTrace();
+        }
 
-
-        }*/
-                workerId = "fxgEQj3UdP";
-            workId = "4RTVJMVU64";
-            msg = "Rahul Kumar has applied in response to your Job Advertisement ";
-            type = "JARequest";
 
 
         tv_message.setText(msg);
         if(type.equalsIgnoreCase("JAReply")){
-            b_accept.setVisibility(View.GONE);
+            b_accept.setText("My Schedule");
+            ll_divider.setVisibility(View.GONE);
             b_decline.setVisibility(View.GONE);
+
+            //--- My Schedule Activity
+            b_accept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(PushNotificationActivity.this, MainActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                    finish();
+                    return;
+                }
+            });
+        }else{
+            b_accept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    HopeApp.sendPushMessage(workerId,ParseUser.getCurrentUser().getObjectId(),workId,"Job Application Accepted","Your application for the following job has been accepted.","JAReply");
+                    HopeApp.setEWRelationTrue(workId, workerId, ParseUser.getCurrentUser().getObjectId());
+                    Intent i = new Intent(PushNotificationActivity.this, MainActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                    finish();
+                    return;
+                }
+            });
+            b_decline.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    HopeApp.sendPushMessage(workerId,ParseUser.getCurrentUser().getObjectId(),workId,"Job Application Declined","Your application for the following job has been declined.","JAReply");
+                    HopeApp.removeEWRelation(workId,workerId,ParseUser.getCurrentUser().getObjectId());
+                    Intent i = new Intent(PushNotificationActivity.this, MainActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                    finish();
+                    return;
+                }
+            });
         }
+
+
+        onPreExecute();
+        fetchWorker();
+        fetchWork();
+
+    }
+
+    public void fetchWorker(){
         ParseQuery<ParseUser> fetchUser;
         fetchUser = ParseUser.getQuery();
-
         fetchUser.getInBackground(workerId, new GetCallback<ParseUser>() {
             public void done(ParseUser object, ParseException e) {
+
                 if (e == null) {
+                    infoObtained++;
+                    if(infoObtained==2) pd.dismiss();
+
                     workerObject = (UserInfo) object;
                     setWorkerProfile();
+                }else{
+                    fetchWorker();
                 }
             }
         });
-
+    }
+    public void fetchWork(){
         ParseQuery<WorkAd> fetchWorkAd = ParseQuery.getQuery("WorkAd");
         fetchWorkAd.getInBackground(workId, new GetCallback<WorkAd>() {
             @Override
             public void done(WorkAd workAd, ParseException e) {
                 if (e == null) {
+                    infoObtained++;
+                    if(infoObtained==2) pd.dismiss();
                     workAdObject = workAd;
                     setWorkAd();
+                }else{
+                    fetchWork();
                 }
-            }
-        });
-        b_accept.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                HopeApp.sendPushMessage(workerId,ParseUser.getCurrentUser().getObjectId(),workId,"Job Application Accepted","Your application for the following job has been accepted.","JAReply");
-            }
-        });
-        b_decline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                HopeApp.sendPushMessage(workerId,ParseUser.getCurrentUser().getObjectId(),workId,"Job Application Declined","Your application for the following job has been declined.","JAReply");
-                HopeApp.removeEWRelation(workId,workerId,ParseUser.getCurrentUser().getObjectId());
             }
         });
     }
@@ -173,30 +232,52 @@ public class PushNotificationActivity extends Activity {
     private void setWorkAd() {
 
         if(((UserInfo) ParseUser.getCurrentUser()).getImageFile() != null ) Picasso.with(this).load(((UserInfo) ParseUser.getCurrentUser()).getImageFile().getUrl()).into(iv_employerPic);
+
+        ParseQuery<ParseUser>  query = ParseUser.getQuery();
+
+        query.getInBackground(workAdObject.getUserId(), new GetCallback<ParseUser>() {
+            public void done(ParseUser object, ParseException e) {
+                UserInfo usr = (UserInfo) object;
+
+                if (usr.getImageFile() != null) {
+                    Picasso.with(PushNotificationActivity.this).load(usr.getImageFile().getUrl()).error(R.drawable.ic_launcher).into(iv_employerPic);
+                } else {
+                    Picasso.with(PushNotificationActivity.this).load(R.drawable.defaultuser).into(iv_employerPic);
+                }
+            }
+        });
+
         tv_description.setText(workAdObject.getDescription());
-        tv_name.setText(workAdObject.getUserName());
+
         String dateType = workAdObject.getDateType() + " Job";
         if (workAdObject.getDateType().equalsIgnoreCase("One Day")) {
-            dateType += "\n(" + workAdObject.getDateFrom() + ")";
+            dateType += "\nOn: " + workAdObject.getDateFrom();
         } else if (workAdObject.getDateType().equalsIgnoreCase("Custom")) {
-            dateType += "\n(" + workAdObject.getDateFrom() + "-" + workAdObject.getDateTo() + ")";
+            dateType += "\nFrom: " + workAdObject.getDateFrom() + "\nTo  : " + workAdObject.getDateTo();
         }
         String timeType = workAdObject.getTimeType();
         if (timeType.equalsIgnoreCase("Once a day")) {
-            timeType += "\n(" + workAdObject.getS1StartingTime() + "-" + workAdObject.getS1EndingTime() + ")";
+            timeType += "\n" + workAdObject.getS1StartingTime() + "-" + workAdObject.getS1EndingTime() + "";
         } else {
-            timeType += "\n(" + workAdObject.getS1StartingTime() + "-" + workAdObject.getS1EndingTime() + ")\n(" + workAdObject.getS2StartingTime() + "-" + workAdObject.getS2EndingTime() + ")";
+            timeType += "\n" + workAdObject.getS1StartingTime() + "-" + workAdObject.getS1EndingTime() + "\n" + workAdObject.getS2StartingTime() + "-" + workAdObject.getS2EndingTime() + "";
         }
-        tv_name.setText(workAdObject.getUserName());
+        tv_name.setText(workAdObject.getCategory());
         tv_jobType.setText(dateType);
         tv_timeType.setText(timeType);
-        tv_wages.setText("₹" + workAdObject.getWageLowerLimit() + "-" + workAdObject.getWageHigherLimit());
+        tv_wages.setText("₹ " + workAdObject.getWageLowerLimit() + "-" + workAdObject.getWageHigherLimit());
         tv_phoneNo.setText(workAdObject.getPhoneNo());
         ll_phone.setVisibility(View.VISIBLE);
         tv_address.setText(workAdObject.getAddress());
         b_apply.setVisibility(View.GONE);
     }
-
+    public void onPreExecute() {
+        pd = new ProgressDialog(PushNotificationActivity.this);
+        pd.setTitle("Processing...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
+        pd.setIndeterminate(true);
+        pd.show();
+    }
     public void setWorkerProfile() {
         tv_worker_name.setText(workerObject.getName());
         tv_gender.setText(workerObject.getGender());
@@ -213,7 +294,7 @@ public class PushNotificationActivity extends Activity {
         } catch (java.text.ParseException e1) {
             e1.printStackTrace();
         }
-        tv_addr.setText("Address: "+workerObject.getAddress());
+        tv_addr.setText(workerObject.getAddress());
         tv_wprofile_phoneno.setText(workerObject.getPhoneNo());
 
 
@@ -225,8 +306,9 @@ public class PushNotificationActivity extends Activity {
             LicenseStr += "| Heavy";
         }
         if (LicenseStr.equalsIgnoreCase("License: ")) {
-            tv_license.setVisibility(View.GONE);
+            ll_license.setVisibility(View.GONE);
         } else {
+            ll_license.setVisibility(View.VISIBLE);
             tv_license.setText(LicenseStr);
         }
         if (workerObject.getLangEnglish()) {
@@ -236,8 +318,9 @@ public class PushNotificationActivity extends Activity {
             LangStr += "| Hindi";
         }
         if (LangStr.equalsIgnoreCase("Language: ")) {
-            tv_lang.setVisibility(View.GONE);
+            ll_language.setVisibility(View.GONE);
         } else {
+            ll_language.setVisibility(View.VISIBLE);
             tv_lang.setText(LangStr);
         }
 

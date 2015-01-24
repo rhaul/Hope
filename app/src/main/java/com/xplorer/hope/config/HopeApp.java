@@ -18,6 +18,7 @@ import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SendCallback;
 import com.xplorer.hope.R;
 import com.xplorer.hope.object.Attendance;
@@ -256,5 +257,34 @@ public class HopeApp extends Application {
                 }
             }
         });
+    }
+
+    public static void setEWRelationTrue(String workId, String workerId, String employerId) {
+        ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
+        query.whereEqualTo("workID", workId);
+        query.whereEqualTo("userID", workerId);
+        query.whereEqualTo("employerID", employerId);
+
+        Log.d("hope setEWRelationTrue",workId+":"+workerId+":"+ employerId);
+
+        query.findInBackground(new FindCallback<EWRelation>() {
+            @Override
+            public void done(List<EWRelation> parseObjects, ParseException e) {
+                if (e == null) {
+                    Log.d("hope setEWRelationTrue(done)", String.valueOf(parseObjects.size()));
+                    for (int i = 0; i < parseObjects.size(); i++) {
+                        Log.d("hope setEWRelationTrue(done)",parseObjects.get(i).getEmployerID());
+                        parseObjects.get(i).setApprove(true);
+                        parseObjects.get(i).saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
     }
 }
