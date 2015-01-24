@@ -1,13 +1,14 @@
 package com.xplorer.hope.adapter;
 
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.fragment.CategoryFragment;
 
 public class TabsPagerAdapter extends FragmentPagerAdapter {
+
 
     public TabsPagerAdapter(FragmentManager fm) {
         super(fm);
