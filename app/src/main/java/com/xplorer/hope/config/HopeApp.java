@@ -32,16 +32,23 @@ import com.xplorer.hope.object.WorkAd;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HopeApp extends Application {
     // app
     private static HopeApp instance;
     // Debugging tag for the application
+
     public static HashMap<String, List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
     public static final String APPTAG = "HopeApp";
     public ParseQuery<WorkAd> filteredQuery;
+
+    //public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
+    public static final String APPTAG = "HopeApp";
+    public static int sortedBy = 3;
+    public static ParseQuery<WorkAd> globalQuery;
+
     public static final String[] SORT_TYPES = {
             "Wage: Higher to Lower",
             "Wage: Lower to Higher",
@@ -103,6 +110,7 @@ public class HopeApp extends Application {
 
     public static String SELECTED_LANGUAGE = "selectedLanguage";
     public static String SELECTED_USER_TYPE = "selectedUserType";
+    public static int filteredBy = 0;
 
 
     public static HashMap myPendingWorksIds = new HashMap();
@@ -342,16 +350,61 @@ public class HopeApp extends Application {
     }
 
     public void setWorkAdSortBy(int selection) {
-        if (filteredQuery == null) {
-            filteredQuery = ParseQuery.getQuery("WorkAd");
+
+        sortedBy = selection;
+    }
+
+    public void setFilters(int [] filters){
+        for (int i=0;i<filters.length;i++){
+            filterValues[i] = filters[i];
         }
-        switch (selection) {
+        if(filteredBy ==0) {
+            filteredBy = 1;
+        }else{
+            filteredBy = 0;
+        }
+    }
+
+    public int filterValues[] = new int[]{1,1,1,
+                                            1,1,
+                                            0,40};
+
+    public ParseQuery<WorkAd> applyFilteredQuery() {
+        ParseQuery<WorkAd> filteredQuery = ParseQuery.getQuery("WorkAd");
+
+        //filter
+
+        List<String> dateTypes= new ArrayList<String>();
+        List<String> frequency= new ArrayList<String>();
+        if(filterValues[0] == 1){
+            dateTypes.add("One Day");
+        }
+        if(filterValues[1] == 1){
+            dateTypes.add("Monthly");
+        }
+        if(filterValues[2] == 1){
+            dateTypes.add("Custom");
+        }
+        if(filterValues[3] == 1){
+            frequency.add("Once a day");
+        }
+        if(filterValues[4] == 1){
+            frequency.add("Twice a day");
+        }
+        filteredQuery.whereContainedIn("dateType", dateTypes);
+        filteredQuery.whereContainedIn("timeType", frequency);
+        filteredQuery.whereGreaterThanOrEqualTo("wageLowerLimit",filterValues[5]*500).whereLessThanOrEqualTo("wageHigherLimit",filterValues[6]*500);
+
+
+        // sort
+        switch (sortedBy) {
             case 0: {
-                filteredQuery.addDescendingOrder("wageHigherLimit");
+                filteredQuery.orderByDescending("wageHigherLimit");
             }
             break;
             case 1: {
-                filteredQuery.addAscendingOrder("wageHigherLimit");
+                filteredQuery.orderByAscending("wageHigherLimit");
+
             }
             break;
             case 2: {
@@ -359,15 +412,18 @@ public class HopeApp extends Application {
             }
             break;
             case 3: {
-                filteredQuery.addDescendingOrder("createdAt");
+		filteredQuery.orderByDescending("createdAt");
             }
             break;
             case 4: {
-                filteredQuery.addAscendingOrder("createdAt");
+                filteredQuery.orderByAscending("createdAt");
+
             }
             break;
         }
+        return filteredQuery;
     }
+
 
     public void onPreExecute(Context context) {
         pd = new ProgressDialog(context);
@@ -381,6 +437,7 @@ public class HopeApp extends Application {
     public void setWorkAdFilter() {
 
     }
+
 
     private static ParseGeoPoint getMyLocation() {
         return null;

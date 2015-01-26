@@ -9,13 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
 
-import com.dobmob.doblist.DobList;
-import com.dobmob.doblist.events.OnLoadMoreListener;
-import com.dobmob.doblist.exceptions.NoEmptyViewException;
-import com.dobmob.doblist.exceptions.NoListViewException;
+import com.costum.android.widget.LoadMoreListView;
 import com.etiennelawlor.quickreturn.library.enums.QuickReturnType;
 import com.etiennelawlor.quickreturn.library.listeners.QuickReturnListViewOnScrollListener;
 import com.etiennelawlor.quickreturn.library.utils.QuickReturnUtils;
@@ -41,15 +36,22 @@ import butterknife.InjectView;
 public class CategoryFragment extends Fragment {
 
     private QuickReturnInterface mCoordinator;
-   // private QuickReturnFooter ll_footer;
-    private ListViewAdapter lva;
+    // private QuickReturnFooter ll_footer;
+    public ListViewAdapter lva;
     @InjectView(R.id.lv_frag_category)
-    ListView lv_category;
+	LoadMoreListView lv_category;
+
     @InjectView(R.id.fl_frag_bg)
     FrameLayout fl_bg;
+
+    
+
     private List<WorkAd> categoryItems;
     int cat = 0;
-    DobList dobList;
+    int locallySortedBy = 3;
+    int locallyFilteredBy = 0;
+    ParseQuery<WorkAd> query;
+    boolean loadMore = true;
 
     public static CategoryFragment newInstance(int someInt) {
         CategoryFragment myFragment = new CategoryFragment();
@@ -96,10 +98,11 @@ public class CategoryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         int footerHeight = getResources().getDimensionPixelSize(R.dimen.twitter_footer_height);
-        int indicatorHeight =  QuickReturnUtils.dp2px(getActivity(), 4);
+        int indicatorHeight = QuickReturnUtils.dp2px(getActivity(), 4);
         int footerTranslation = -footerHeight + indicatorHeight;
-        lv_category.setOnScrollListener(new QuickReturnListViewOnScrollListener(QuickReturnType.FOOTER, null, 0, mCoordinator.getFooter(), -footerTranslation));
-
+        QuickReturnListViewOnScrollListener scrollListener =new QuickReturnListViewOnScrollListener(QuickReturnType.FOOTER, null, 0, mCoordinator.getFooter(), -footerTranslation);
+        scrollListener.setCanSlideInIdleScrollState(true);
+        lv_category.setOnScrollListener(scrollListener);
         View headerView = getActivity().getLayoutInflater().inflate(R.layout.item_category_header, null, false);
         ImageView iv = (ImageView) headerView.findViewById(R.id.iv_category_header);
         Picasso.with(getActivity()).load(HopeApp.ImgUrl[cat]).into(iv);
@@ -108,100 +111,62 @@ public class CategoryFragment extends Fragment {
         categoryItems = new ArrayList<WorkAd>();
         lva = new ListViewAdapter(getActivity(), categoryItems);
         lv_category.setAdapter(lva);
-        initList(view, lv_category);
-        //fetchWorks();
+
+
+        lv_category.setOnLoadMoreListener(new LoadMoreListView.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                fetchWorks(HopeApp.getInstance().applyFilteredQuery());
+            }
+        });
+        //initList(view, lv_category);
+        fetchWorks(HopeApp.getInstance().applyFilteredQuery());
+
     }
 
-    private void fetchWorks() {
+    private void fetchWorks(ParseQuery<WorkAd> adParseQuery) {
 
-        ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
+        query = adParseQuery;
         query.whereEqualTo("category", HopeApp.TITLES[cat]);
-//        query.setLimit(1);
+
+
         query.addDescendingOrder("createdAt");
+
+
+        query.setLimit(2);
+
         query.setSkip(categoryItems.size());
         query.findInBackground(new FindCallback<WorkAd>() {
             @Override
             public void done(List<WorkAd> workAds, ParseException e) {
-                if (e == null) {
+                if (workAds != null && workAds.size() > 0 && e == null) {
                     categoryItems.addAll(workAds);
                     lva.notifyDataSetChanged();
                 }
-               dobList.finishLoading();
+
+
+                locallySortedBy = HopeApp.sortedBy;
+                locallyFilteredBy = HopeApp.filteredBy;
+                query = null;
+                loadMore = true;
+                lv_category.onLoadMoreComplete();
+
             }
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(HopeApp.getInstance().filteredQuery!=null) {
-            Toast.makeText(getActivity(), "yay", Toast.LENGTH_LONG).show();
-            fetchFilteredWorks();
-        }
-    }
 
-    private void fetchFilteredWorks() {
-        HopeApp.getInstance().filteredQuery.whereEqualTo("category", HopeApp.TITLES[cat]);
-        HopeApp.getInstance().filteredQuery.setLimit(1);
-        HopeApp.getInstance().filteredQuery.setSkip(categoryItems.size());
-        HopeApp.getInstance().filteredQuery.findInBackground(new FindCallback<WorkAd>() {
-            @Override
-            public void done(List<WorkAd> workAds, ParseException e) {
-                if (e == null) {
-                    categoryItems = workAds;
-                    lva.notifyDataSetChanged();
-                }
-                // dobList.finishLoading();
+    public void checkIfFilterApplied() {
+        if (query == null && categoryItems != null) {
+            if (HopeApp.sortedBy != locallySortedBy) {
+                categoryItems.clear();
+                lva.notifyDataSetChanged();
+                fetchWorks(HopeApp.getInstance().applyFilteredQuery());
+            } else if (HopeApp.filteredBy != locallyFilteredBy) {
+                categoryItems.clear();
+                lva.notifyDataSetChanged();
+                fetchWorks(HopeApp.getInstance().applyFilteredQuery());
             }
-        });
-    }
-
-    private void initList(View rootView, ListView listView) {
-
-        // DobList initializing
-        dobList = new DobList();
-        try {
-
-            // Register ListView
-            //
-            // NoListViewException will be thrown when
-            // there is no ListView
-            dobList.register(listView);
-            // Add ProgressBar to footers of ListView
-            // to be shown in loading more
-            dobList.addDefaultLoadingFooterView();
-
-            // Sets the view to show if the adapter is empty
-            // see startCentralLoading() method
-            //  View noItems = rootView.findViewById(R.id.tv_interest_name);
-            // dobList.setEmptyView(noItems);
-
-            // Callback called when reaching last item in ListView
-            dobList.setOnLoadMoreListener(new OnLoadMoreListener() {
-
-                @Override
-                public void onLoadMore(final int totalItemCount) {
-                    fetchWorks();
-                }
-            });
-
-        } catch (NoListViewException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            // Show ProgressBar at the center of ListView
-            // this can be used while loading data from
-            // server at the first time
-            //
-            // setEmptyView() must be called before
-            //
-            // NoEmptyViewException will be thrown when
-            // there is no EmptyView
-            dobList.startCentralLoading();
-
-        } catch (NoEmptyViewException e) {
-            e.printStackTrace();
         }
     }
 

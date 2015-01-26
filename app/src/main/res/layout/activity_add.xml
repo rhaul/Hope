@@ -70,15 +70,29 @@
             android:maxLines="3"
             android:hint="Description" />
 
-        <EditText
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPostalAddress"
-            android:maxLines="3"
-            android:ems="10"
             android:layout_marginBottom="5dp"
-            android:id="@+id/et_add_address"
-            android:hint="Address" />
+            android:gravity="bottom"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress"
+                android:maxLines="3"
+                android:ems="10"
+                android:layout_weight="1"
+                android:id="@+id/et_add_address"
+                android:hint="Address" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Map"
+                android:id="@+id/b_add_map" />
+        </LinearLayout>
 
         <EditText
             android:layout_width="match_parent"

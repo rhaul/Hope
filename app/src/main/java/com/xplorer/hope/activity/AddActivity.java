@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +27,7 @@ import com.parse.FindCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
@@ -121,12 +123,14 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     int s2EndingMinute;
     String s2EndingTimeType = "";
 
-    Menu menu;
+            Menu menu;
     MenuItem addBtn;
 
     String workObjId ="";
     WorkAd workAdSave;
-
+    ProgressDialog pd;
+    ParseGeoPoint gp;
+    WorkAd ad;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,7 +152,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     }
 
     @Override
-     public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_add, menu);
         this.menu = menu;
@@ -184,8 +188,8 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
                 HopeApp.pd.dismiss();
                 if (e == null && parseObjects.size()==1) {
 
-                        workAdSave = parseObjects.get(0);
-                        fillForm();
+                    workAdSave = parseObjects.get(0);
+                    fillForm();
 
 
                 }else{
@@ -404,6 +408,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     private void saveWorkAd() {
         HopeApp.getInstance().onPreExecute(AddActivity.this);
         UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
+
         WorkAd ad;
         if(workAdSave!=null)  ad = workAdSave;
         else  ad= new WorkAd();
@@ -431,8 +436,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
 
         ad.setACL(acl);
-
-
+        ad.setAddressGP(new ParseGeoPoint());
 
         ad.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {
@@ -508,8 +512,36 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
                 showTimePickerDialog(3);
             }
             break;
+            case R.id.b_add_map: {
+                openMapForAddress();
+            }
+            break;
             default:
                 break;
+        }
+    }
+
+
+    private void openMapForAddress() {
+        if(ad.getAddressGP()!= null){
+            Intent intent = new Intent(this,MapActivity.class);
+            intent.putExtra("lat",ad.getAddressGP().getLatitude());
+            intent.putExtra("lng",ad.getAddressGP().getLongitude());
+            startActivityForResult(intent, 1); // 1 = get address from map
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1)
+        {
+            String address = data.getStringExtra("address");
+            double lat = data.getDoubleExtra("lat", 0);
+            double lng = data.getDoubleExtra("lng",0);
+            gp = new ParseGeoPoint(lat,lng);
+            et_address.setText(address);
         }
     }
 

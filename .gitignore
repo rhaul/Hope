@@ -7,3 +7,4 @@
 app/src/main/java/com/xplorer/hope/config/HopeApp.java
 .idea/gradle.xml
 app/src/main/java/com/xplorer/hope/config/HopeApp.java
+app/src/main/java/com/xplorer/hope/activity/AddActivity.java

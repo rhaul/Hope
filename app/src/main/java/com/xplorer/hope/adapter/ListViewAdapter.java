@@ -87,12 +87,16 @@ public class ListViewAdapter extends BaseAdapter{
                     if (usr.getImageFile() != null){
                         //Log.d("hope usr", pos+"> "+usr.getName()+">"+usr.getObjectId()+">"+usr.getImageFile().getUrl());
                         Picasso.with(mContext).load(usr.getImageFile().getUrl()).error(R.drawable.ic_launcher).into(finalHolder.iv_employerPic);
-                        mAds.get(pos).imgURL = usr.getImageFile().getUrl();
+                        if(mAds != null && mAds.size()>0) {
+                            mAds.get(pos).imgURL = usr.getImageFile().getUrl();
+                        }
                         //Log.d("hope i",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
                     }else{
                         //Log.d("hope usr (null)", pos+"> "+usr.getName()+">"+usr.getObjectId());
                         Picasso.with(mContext).load(R.drawable.defaultuser).into(finalHolder.iv_employerPic);
-                        mAds.get(pos).imgURL = "default.jpg";
+                        if(mAds != null && mAds.size()>0) {
+                            mAds.get(pos).imgURL = "default.jpg";
+                        }
                         //Log.d("hope i(null)",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
                     }
                 }
