@@ -1,10 +1,8 @@
 package com.xplorer.hope.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -89,7 +87,7 @@ public class PushNotificationActivity extends Activity {
     Button b_apply;
     LinearLayout ll_phone;
 
-    ProgressDialog pd;
+
     int infoObtained =0;
 
     @Override
@@ -188,7 +186,7 @@ public class PushNotificationActivity extends Activity {
         }
 
 
-        onPreExecute();
+        HopeApp.getInstance().onPreExecute(PushNotificationActivity.this);
         fetchWorker();
         fetchWork();
 
@@ -202,7 +200,7 @@ public class PushNotificationActivity extends Activity {
 
                 if (e == null) {
                     infoObtained++;
-                    if(infoObtained==2) pd.dismiss();
+                    if(infoObtained==2) HopeApp.pd.dismiss();
 
                     workerObject = (UserInfo) object;
                     setWorkerProfile();
@@ -219,7 +217,7 @@ public class PushNotificationActivity extends Activity {
             public void done(WorkAd workAd, ParseException e) {
                 if (e == null) {
                     infoObtained++;
-                    if(infoObtained==2) pd.dismiss();
+                    if(infoObtained==2) HopeApp.pd.dismiss();
                     workAdObject = workAd;
                     setWorkAd();
                 }else{
@@ -270,14 +268,8 @@ public class PushNotificationActivity extends Activity {
         tv_address.setText(workAdObject.getAddress());
         b_apply.setVisibility(View.GONE);
     }
-    public void onPreExecute() {
-        pd = new ProgressDialog(PushNotificationActivity.this);
-        pd.setTitle("Processing...");
-        pd.setMessage("Please wait.");
-        pd.setCancelable(false);
-        pd.setIndeterminate(true);
-        pd.show();
-    }
+
+
     public void setWorkerProfile() {
         tv_worker_name.setText(workerObject.getName());
         tv_gender.setText(workerObject.getGender());
@@ -289,7 +281,6 @@ public class PushNotificationActivity extends Activity {
         try {
             Date bdate = dateFormat.parse(workerObject.getDob());
             tv_age.setText("Age: "+getAge(bdate.getYear()+1900, bdate.getMonth(), bdate.getDate()));
-            Log.d("hope Age", bdate.getYear()+1900+":"+bdate.getMonth()+":"+bdate.getDate());
 
         } catch (java.text.ParseException e1) {
             e1.printStackTrace();
@@ -303,7 +294,8 @@ public class PushNotificationActivity extends Activity {
             LicenseStr += "FourWheeler";
         }
         if (workerObject.getlicenseHeavy()) {
-            LicenseStr += "| Heavy";
+            if(LicenseStr.equalsIgnoreCase("License: ")) LicenseStr +="Heavy";
+            else LicenseStr += "| Heavy";
         }
         if (LicenseStr.equalsIgnoreCase("License: ")) {
             ll_license.setVisibility(View.GONE);
@@ -315,7 +307,8 @@ public class PushNotificationActivity extends Activity {
             LangStr += "English";
         }
         if (workerObject.getLangHindi()) {
-            LangStr += "| Hindi";
+            if (LangStr.equalsIgnoreCase("Language: "))LangStr += "Hindi";
+            else LangStr += "| Hindi";
         }
         if (LangStr.equalsIgnoreCase("Language: ")) {
             ll_language.setVisibility(View.GONE);

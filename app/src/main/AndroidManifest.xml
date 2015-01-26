@@ -37,7 +37,6 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name" >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -106,6 +105,14 @@
         <activity
             android:name=".activity.NoInternetActivity"
             android:label="@string/title_activity_no_internet" >
+        </activity>
+        <activity
+            android:name=".activity.EmpolyerActivity"
+            android:label="@string/title_activity_empolyer" >
+        </activity>
+        <activity
+            android:name=".activity.WorkActivity"
+            android:label="@string/title_activity_work" >
         </activity>
     </application>
 

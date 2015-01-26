@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
+                android:text="Category"
                 android:padding="5dp"
                 android:visibility="gone"
                 android:background="#40000000"
@@ -66,6 +66,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/et_add_description"
             android:layout_marginBottom="5dp"
+            android:singleLine="true"
             android:maxLines="3"
             android:hint="Description" />
 

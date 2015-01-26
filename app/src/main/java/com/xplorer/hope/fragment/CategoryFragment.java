@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -44,6 +45,8 @@ public class CategoryFragment extends Fragment {
     private ListViewAdapter lva;
     @InjectView(R.id.lv_frag_category)
     ListView lv_category;
+    @InjectView(R.id.fl_frag_bg)
+    FrameLayout fl_bg;
     private List<WorkAd> categoryItems;
     int cat = 0;
     DobList dobList;
@@ -66,7 +69,13 @@ public class CategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_category, container, false);
         ButterKnife.inject(this, view);
+
+
         cat = getArguments().getInt("category", 1);
+
+        /*Integer colorVal =  HopeApp.CategoryLightColor.get(HopeApp.TITLES[cat]);
+        fl_bg.setBackgroundColor(getResources().getColor(colorVal));
+        lv_category.setBackgroundColor(getResources().getColor(colorVal));*/
         return view;
     }
 
@@ -99,15 +108,15 @@ public class CategoryFragment extends Fragment {
         categoryItems = new ArrayList<WorkAd>();
         lva = new ListViewAdapter(getActivity(), categoryItems);
         lv_category.setAdapter(lva);
-        //initList(view, lv_category);
-        fetchWorks();
+        initList(view, lv_category);
+        //fetchWorks();
     }
 
     private void fetchWorks() {
 
         ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
         query.whereEqualTo("category", HopeApp.TITLES[cat]);
-        query.setLimit(1);
+//        query.setLimit(1);
         query.addDescendingOrder("createdAt");
         query.setSkip(categoryItems.size());
         query.findInBackground(new FindCallback<WorkAd>() {
@@ -117,7 +126,7 @@ public class CategoryFragment extends Fragment {
                     categoryItems.addAll(workAds);
                     lva.notifyDataSetChanged();
                 }
-               // dobList.finishLoading();
+               dobList.finishLoading();
             }
         });
     }

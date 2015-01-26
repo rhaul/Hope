@@ -2,6 +2,7 @@ package com.xplorer.hope.config;
 
 import android.app.Application;
 import android.app.Instrumentation;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -38,9 +39,9 @@ public class HopeApp extends Application {
     // app
     private static HopeApp instance;
     // Debugging tag for the application
-    public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
+    public static HashMap<String, List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
     public static final String APPTAG = "HopeApp";
-    public ParseQuery<WorkAd> filteredQuery ;
+    public ParseQuery<WorkAd> filteredQuery;
     public static final String[] SORT_TYPES = {
             "Wage: Higher to Lower",
             "Wage: Lower to Higher",
@@ -61,6 +62,10 @@ public class HopeApp extends Application {
             "Gardening",
             "Miscellaneous"
     };
+
+    public static HashMap<String, Integer> CategoryColor = new HashMap();
+    public static HashMap<String, Integer> CategoryLightColor = new HashMap();
+
     public static final int[] ImgUrl = {
             R.drawable.dishwashing,
             R.drawable.cleaning,
@@ -76,17 +81,37 @@ public class HopeApp extends Application {
     };
     public static final String[] drawerTitlesWorker = {
             "Profile",
-            "My Schedule",
-            "Holidays",
+            "Manage Jobs",
+            "Employers",
             "History",
             "Employers",
             "Balance",
-            "My Ads"
+            "Holidays"
     };
+
+    public static final String[] drawerTitlesEmployer = {
+            "Profile",
+            "Manage Jobs",
+            "History",
+            "Employers",
+            "Balance",
+            "Holidays"
+    };
+    public static String[] drawerCandidate ={};
+
     //SP variables
 
     public static String SELECTED_LANGUAGE = "selectedLanguage";
     public static String SELECTED_USER_TYPE = "selectedUserType";
+
+
+    public static HashMap myPendingWorksIds = new HashMap();
+    public static HashMap myPendingEmployerIds = new HashMap();
+
+    public static HashMap myWorksIds = new HashMap();
+    public static HashMap myEmployerIds = new HashMap();
+
+    public static ProgressDialog pd;
 
     /**
      * Create main application
@@ -157,11 +182,11 @@ public class HopeApp extends Application {
 
 
         parseInit();
-
+        CatColorInit();
 
     }
 
-    public void parseInit(){
+    public void parseInit() {
         // Register subclass
         ParseObject.registerSubclass(WorkAd.class);
         ParseUser.registerSubclass(UserInfo.class);
@@ -188,6 +213,25 @@ public class HopeApp extends Application {
 
     }
 
+
+    public void CatColorInit() {
+
+        CategoryColor.put("Dish Washing", R.color.LightGold);
+        CategoryColor.put("House Cleaning",R.color.LightOrange);
+        CategoryColor.put("Cloth Washing", R.color.LightViolet);
+        CategoryColor.put("Cooking", R.color.Green);
+        CategoryColor.put("Construction", R.color.SkyBlue);
+        CategoryColor.put("Wall paint", R.color.Red);
+        CategoryColor.put("Driver", R.color.Green_2);
+        CategoryColor.put("Guard", R.color.Blue_1);
+        CategoryColor.put("Shop Worker", R.color.LightViolet);
+        CategoryColor.put("Gardening", R.color.Sienna);
+        CategoryColor.put("Miscellaneous", R.color.gray8);
+
+
+
+    }
+
     /**
      * Create main application
      *
@@ -209,7 +253,7 @@ public class HopeApp extends Application {
         }
     }
 
-    public static void sendPushMessage(final String ReceiverUserId, final String SenderUserId,final String workAdId, final String title, final String msg,final String type) {
+    public static void sendPushMessage(final String ReceiverUserId, final String SenderUserId, final String workAdId, final String title, final String msg, final String type) {
 
 
         ParseQuery pushQuery = ParseInstallation.getQuery();
@@ -218,13 +262,13 @@ public class HopeApp extends Application {
 
         JSONObject data = new JSONObject();
         try {
-            Log.d("raghav uri","com.xplorer.hope.activity.PushNotificationActivity");
+            Log.d("raghav uri", "com.xplorer.hope.activity.PushNotificationActivity");
             // data.put("uri", Uri.parse("com.xplorer.hope.activity.PushNotificationActivity"));
             data.put("title", title);
-            data.put("senderId",SenderUserId );
-            data.put("workId",workAdId );
-            data.put("message",msg);
-            data.put("type",type);
+            data.put("senderId", SenderUserId);
+            data.put("workId", workAdId);
+            data.put("message", msg);
+            data.put("type", type);
 
         } catch (JSONException e1) {
             e1.printStackTrace();
@@ -241,10 +285,10 @@ public class HopeApp extends Application {
         push.sendInBackground(new SendCallback() {
             @Override
             public void done(ParseException e) {
-                if(e== null){
-                    Toast.makeText(instance,"Request sent!",Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(instance,"Request not sent!",Toast.LENGTH_SHORT).show();
+                if (e == null) {
+                    Toast.makeText(instance, "Request sent!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(instance, "Request not sent!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -253,14 +297,14 @@ public class HopeApp extends Application {
 
     public static void removeEWRelation(String workId, String workerId, String employerId) {
         ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
-        query.whereEqualTo("workID",workId);
-        query.whereEqualTo("userID",workerId);
-        query.whereEqualTo("employerID",employerId);
+        query.whereEqualTo("workID", workId);
+        query.whereEqualTo("userID", workerId);
+        query.whereEqualTo("employerID", employerId);
         query.findInBackground(new FindCallback<EWRelation>() {
             @Override
             public void done(List<EWRelation> parseObjects, ParseException e) {
                 if (e == null) {
-                    for(int i=0;i<parseObjects.size();i++) {
+                    for (int i = 0; i < parseObjects.size(); i++) {
                         parseObjects.get(i).deleteInBackground();
                     }
                 }
@@ -297,38 +341,50 @@ public class HopeApp extends Application {
 
     }
 
-    public void setWorkAdSortBy(int selection){
-        if(filteredQuery == null) {
+    public void setWorkAdSortBy(int selection) {
+        if (filteredQuery == null) {
             filteredQuery = ParseQuery.getQuery("WorkAd");
         }
-        switch (selection){
-            case 0:{
+        switch (selection) {
+            case 0: {
                 filteredQuery.addDescendingOrder("wageHigherLimit");
             }
             break;
-            case 1:{
+            case 1: {
                 filteredQuery.addAscendingOrder("wageHigherLimit");
             }
             break;
-            case 2:{
-                filteredQuery.whereWithinKilometers("location",HopeApp.getMyLocation(),5);
+            case 2: {
+                filteredQuery.whereWithinKilometers("location", HopeApp.getMyLocation(), 5);
             }
             break;
-            case 3:{
+            case 3: {
                 filteredQuery.addDescendingOrder("createdAt");
             }
             break;
-            case 4:{
+            case 4: {
                 filteredQuery.addAscendingOrder("createdAt");
             }
             break;
         }
     }
 
-    public void setWorkAdFilter(){
+    public void onPreExecute(Context context) {
+        pd = new ProgressDialog(context);
+        pd.setTitle("Processing...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
+        pd.setIndeterminate(true);
+        pd.show();
+    }
+
+    public void setWorkAdFilter() {
 
     }
+
     private static ParseGeoPoint getMyLocation() {
         return null;
     }
+
+
 }

@@ -1,11 +1,10 @@
 package com.xplorer.hope.activity;
 
 
-import android.content.Context;
-
 import android.app.Dialog;
-
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -18,22 +17,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.xplorer.hope.R;
 import com.xplorer.hope.adapter.NavDrawerListAdapter;
 import com.xplorer.hope.adapter.TabsPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
+import com.xplorer.hope.object.EWRelation;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.service.ConnectionDetector;
 
 import java.io.File;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -45,6 +49,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     PagerSlidingTabStrip pts_titleBar;
     @InjectView(R.id.pager)
     ViewPager vp_pager;
+
+    static public int currentFragment=0;
 
     boolean isSetUp = false;
     private TabsPagerAdapter pagerAdapter;
@@ -63,9 +69,9 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @InjectView(R.id.ll_main_quick_return_footer)
     LinearLayout ll_quick_return_footer;
     @InjectView(R.id.b_main_sort)
-    LinearLayout b_sort;
+    Button b_sort;
     @InjectView(R.id.b_main_filter)
-    LinearLayout b_filter;
+    Button b_filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +139,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
         //-----SET UP MAIN ACTIVITY------------//
         if (!isSetUp) {
-            setUpMainActivity();
+            getMyWorkids();//which sets up man activity
             setUpDrawer();
             isSetUp = true;
         }
@@ -200,7 +206,29 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager());
         vp_pager.setAdapter(pagerAdapter);
         pts_titleBar.setViewPager(vp_pager);
+        setBarColors(0);
+        pts_titleBar.setTextColor(getResources().getColor(R.color.white));
+        pts_titleBar.setIndicatorColor(getResources().getColor(R.color.white));
+        pts_titleBar.setDividerColor(getResources().getColor(R.color.white));
+
+        pts_titleBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setBarColors(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         vp_pager.setOffscreenPageLimit(3);
+
         vp_pager.setCurrentItem(0);
         b_sort.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -214,6 +242,46 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
             }
         });
+
+    }
+
+    public void setBarColors(int position){
+        currentFragment=position;
+        Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[position]);
+        pts_titleBar.setBackgroundColor(getResources().getColor(colorVal));
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+    }
+
+    public void getMyWorkids(){
+        String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
+
+        ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
+        query.whereEqualTo("userID", myWorkerId);
+
+        Log.d("hope getMyWorkids", myWorkerId);
+
+            query.findInBackground(new FindCallback<EWRelation>() {
+                @Override
+                public void done(List<EWRelation> parseObjects, ParseException e) {
+
+                    if (e == null) {
+                        Log.d("hope getMyWorkids(done)", String.valueOf(parseObjects.size()));
+                        for (int i = 0; i < parseObjects.size(); i++) {
+                            if(parseObjects.get(i).getApprove()==true) {
+                                HopeApp.myWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
+                                HopeApp.myEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
+                            }else{
+                                HopeApp.myPendingWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
+                                HopeApp.myPendingEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
+
+                            }
+                            Log.d("hope getMyWorkids(workId)", parseObjects.get(i).getWorkID());
+
+                        }
+                    }setUpMainActivity();
+                }
+            });
+
 
     }
 
@@ -239,6 +307,12 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     }
 
     private void setUpDrawer() {
+        if(HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("worker")){
+            HopeApp.drawerCandidate = HopeApp.drawerTitlesWorker;
+        }else{
+            HopeApp.drawerCandidate = HopeApp.drawerTitlesEmployer;
+
+        }
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
@@ -251,9 +325,16 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0) {
                     startActivity(new Intent(MainActivity.this, SignUpActivity.class).putExtra("from", "menu"));
+                }else if(i==1){
+                    startActivity(new Intent(MainActivity.this, WorkActivity.class));
+                }else if(i==2){
+                    startActivity(new Intent(MainActivity.this, EmpolyerActivity.class));
                 }
             }
         });
+
+
+       // vp_pager.getCurrentItem()
         //getActionBar().setHomeButtonEnabled(true);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
@@ -293,8 +374,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_add) {
-            startActivity(new Intent(this, AddActivity.class));
+        if (id == R.id.action_addAd) {
+            startActivity(new Intent(this, AddActivity.class).putExtra("title", "add"));
             return true;
         }
 

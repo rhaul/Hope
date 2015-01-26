@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -153,7 +152,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
     byte[] dataImage = null;
     UserInfo usr;
     Boolean isNull = false;
-    ProgressDialog pd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,14 +190,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         iv_profilePhoto.setOnClickListener(this);
     }
 
-    public void onPreExecute() {
-        pd = new ProgressDialog(SignUpActivity.this);
-        pd.setTitle("Processing...");
-        pd.setMessage("Please wait.");
-        pd.setCancelable(false);
-        pd.setIndeterminate(true);
-        pd.show();
-    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -212,7 +204,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         } else {
             saveBtn.setTitle("SAVE");
 
-            onPreExecute();
+            HopeApp.getInstance().onPreExecute(SignUpActivity.this);
             usr = (UserInfo) ParseUser.getCurrentUser();
 
             et_name.setText(usr.getName());
@@ -298,7 +290,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
                 Picasso.with(this).load(usr.getImageFile().getUrl()).into(iv_profilePhoto);
 
 
-            pd.dismiss();
+            HopeApp.pd.dismiss();
         }
 
         return true;
@@ -383,7 +375,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             sendDataToServer();
         }
 
-        onPreExecute();
+        HopeApp.getInstance().onPreExecute(SignUpActivity.this);
     }
 
     public void sendDataToServer() {
@@ -391,7 +383,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             usr.signUpInBackground(new SignUpCallback() {
                 public void done(ParseException e) {
                     isSaveClicked = false;
-                    pd.dismiss();
+                    HopeApp.pd.dismiss();
                     if (e == null) {
                         Toast.makeText(SignUpActivity.this, "User signed up successfully", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(mcontex, MainActivity.class));
@@ -405,7 +397,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             usr.saveInBackground(new SaveCallback() {
                 public void done(ParseException e) {
                     isSaveClicked = false;
-                    pd.dismiss();
+                    HopeApp.pd.dismiss();
                     if (e == null) {
                         Toast.makeText(SignUpActivity.this, "Profile saved successfully", Toast.LENGTH_SHORT).show();
                         finish();
@@ -437,10 +429,10 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
                 public void onClick(View view) {
                     String username = etPhoneNo.getText().toString();
                     dialog.dismiss();
-                    onPreExecute();
+                    HopeApp.getInstance().onPreExecute(SignUpActivity.this);
                     ParseUser.logInInBackground(username, "", new LogInCallback() {
                         public void done(ParseUser user, ParseException e) {
-                            pd.dismiss();
+                            HopeApp.pd.dismiss();
                             if (user != null) {
                                 finish();
                                 return;

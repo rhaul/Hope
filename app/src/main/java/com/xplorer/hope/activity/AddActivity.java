@@ -3,9 +3,9 @@ package com.xplorer.hope.activity;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,8 +22,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
@@ -33,7 +35,9 @@ import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -116,7 +120,12 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     int s2EndingHour;
     int s2EndingMinute;
     String s2EndingTimeType = "";
-    ProgressDialog pd;
+
+    Menu menu;
+    MenuItem addBtn;
+
+    String workObjId ="";
+    WorkAd workAdSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,15 +142,103 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         tv_s1_endingTime.setOnClickListener(this);
         tv_s2_startingTime.setOnClickListener(this);
         tv_s2_endingTime.setOnClickListener(this);
+
+
+
     }
-    public void onPreExecute() {
-        pd = new ProgressDialog(AddActivity.this);
-        pd.setTitle("Processing...");
-        pd.setMessage("Please wait.");
-        pd.setCancelable(false);
-        pd.setIndeterminate(true);
-        pd.show();
+
+    @Override
+     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_add, menu);
+        this.menu = menu;
+        addBtn = menu.findItem(R.id.action_add);
+
+        if (getIntent().getStringExtra("title").equalsIgnoreCase("add")) {
+            addBtn.setTitle("ADD");
+            String myWorkerPhoneNo= ((UserInfo) ParseUser.getCurrentUser()).getPhoneNo();
+            et_phone.setText(myWorkerPhoneNo);
+        }else{
+            workObjId = getIntent().getStringExtra("workId");
+            HopeApp.getInstance().onPreExecute(AddActivity.this);
+            fetchWorkFromWorkId(workObjId);
+            addBtn.setTitle("SAVE");
+        }
+
+        return true;
     }
+
+
+    public void fetchWorkFromWorkId(String workId){
+
+
+        ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
+        query.whereEqualTo("objectId", workId);
+
+        Log.d("hope fetchWorkFromWorkId", workId);
+
+        query.findInBackground(new FindCallback<WorkAd>() {
+            @Override
+            public void done(List<WorkAd> parseObjects, ParseException e) {
+
+                HopeApp.pd.dismiss();
+                if (e == null && parseObjects.size()==1) {
+
+                        workAdSave = parseObjects.get(0);
+                        fillForm();
+
+
+                }else{
+                    Log.e("fetchWorkFromWorkId(size)",parseObjects.size()+"" );
+                }
+            }
+        });
+    }
+
+    public void fillForm(){
+        tv_categoryName.setText(workAdSave.getCategory());
+        et_description.setText(workAdSave.getDescription());
+        et_address.setText(workAdSave.getAddress());
+        et_phone.setText(workAdSave.getPhoneNo());
+
+        if(workAdSave.getDateType().equalsIgnoreCase("One Day")){
+            rb_jobTypeOneDay.setChecked(true);
+            tv_startingDate.setText(workAdSave.getDateFrom());
+            tv_endingDate.setVisibility(View.GONE);
+        }else if(workAdSave.getDateType().equalsIgnoreCase("Monthly")){
+            rb_jobTypeMonthly.setChecked(true);
+            ll_customView.setVisibility(View.GONE);
+        }else if(workAdSave.getDateType().equalsIgnoreCase("Custom")){
+            rb_jobTypeCustom.setChecked(true);
+            tv_startingDate.setText(workAdSave.getDateFrom());
+            tv_endingDate.setText(workAdSave.getDateTo());
+        }
+
+
+        if(workAdSave.getTimeType().equalsIgnoreCase("Once a day")){
+            rb_1day.setChecked(true);
+        }else if(workAdSave.getTimeType().equalsIgnoreCase("Twice a day")){
+            rb_2day.setChecked(true);
+            ll_s2_timings.setVisibility(View.GONE);
+        }
+
+
+        tv_s1_startingTime.setText(workAdSave.getS1StartingTime());
+        tv_s1_endingTime.setText(workAdSave.getS1EndingTime());
+        tv_s2_startingTime.setText(workAdSave.getS2StartingTime());
+        tv_s2_endingTime.setText(workAdSave.getS2EndingTime());
+
+        et_wageLower.setText(workAdSave.getWageLowerLimit()+"");
+        et_wageUpper.setText(workAdSave.getWageHigherLimit()+"");
+
+        int index = Arrays.asList(HopeApp.TITLES).indexOf(workAdSave.getCategory());
+        Log.d("index", index+"");
+        iv_categoryImage.setVisibility(View.VISIBLE);
+        tv_categoryName.setVisibility(View.VISIBLE);
+        Picasso.with(AddActivity.this).load(HopeApp.ImgUrl[index]).into(iv_categoryImage);
+    }
+
+
     private void showDatePickerDialog(int i) {
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -166,6 +263,8 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
                 new SEDatePicker(i), year, month, day);
         dialog.show();
     }
+
+
     private void showTimePickerDialog(int i) {
         Calendar mcurrentTime = Calendar.getInstance();
         int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
@@ -219,13 +318,6 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_add, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -233,18 +325,90 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_save) {
-            saveWorkAd();
+        if (id == R.id.action_add) {
+            if(isFormFilled()) saveWorkAd();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+
+    public boolean isFormFilled(){
+        if (tv_categoryName.getText().toString().equalsIgnoreCase("Category")) {
+            Toast.makeText(AddActivity.this, "Work Category cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        } else if (et_description.getText().toString().equalsIgnoreCase("")) {
+            Toast.makeText(AddActivity.this, "Work Description cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        } else if (et_address.getText().toString().equalsIgnoreCase("")) {
+            Toast.makeText(AddActivity.this, "Work Address cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        } else if (et_phone.getText().toString().equalsIgnoreCase("")) {
+            Toast.makeText(AddActivity.this, "Work Phone Number cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()).equalsIgnoreCase("One Day")){
+            if(tv_startingDate.getText().toString().equalsIgnoreCase("Starting Date")){
+                Toast.makeText(AddActivity.this, "Work Date cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        }else if(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()).equalsIgnoreCase("Custom")){
+
+            if(tv_startingDate.getText().toString().equalsIgnoreCase("Starting Date")){
+                Toast.makeText(AddActivity.this, "Work Starting Date cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }else if(tv_endingDate.getText().toString().equalsIgnoreCase("Starting Date")){
+                Toast.makeText(AddActivity.this, "Work Ending Date cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+
+        }
+
+        if(getTimeTypeFromRG(rg_timingType.getCheckedRadioButtonId()).equalsIgnoreCase("Once a day")){
+            if(tv_s1_startingTime.getText().toString().equalsIgnoreCase("Starting Time")){
+                Toast.makeText(AddActivity.this, "Work Slot 1 Starting Time cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }else if(tv_s1_endingTime.getText().toString().equalsIgnoreCase("Ending Date")){
+                Toast.makeText(AddActivity.this, "Work Slot 1 Ending Time cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        }else{
+            if(tv_s1_startingTime.getText().toString().equalsIgnoreCase("Starting Time")){
+                Toast.makeText(AddActivity.this, "Work Slot 1 Starting Time cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }else if(tv_s1_endingTime.getText().toString().equalsIgnoreCase("Ending Date")){
+                Toast.makeText(AddActivity.this, "Work Slot 1 Ending Time cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }else if(tv_s2_startingTime.getText().toString().equalsIgnoreCase("Starting Time")){
+                Toast.makeText(AddActivity.this, "Work Slot 2 Starting Time cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }else if(tv_s2_endingTime.getText().toString().equalsIgnoreCase("Ending Date")){
+                Toast.makeText(AddActivity.this, "Work Slot 2 Ending Time cannot be empty.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        }
+
+        if (et_wageLower.getText().toString().equalsIgnoreCase("")) {
+            Toast.makeText(AddActivity.this, "Work Wage lower limit cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }else if (et_wageUpper.getText().toString().equalsIgnoreCase("")) {
+            Toast.makeText(AddActivity.this, "Work Wage upper limit cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+
+        return true;
+    }
     private void saveWorkAd() {
-        onPreExecute();
+        HopeApp.getInstance().onPreExecute(AddActivity.this);
         UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
-        WorkAd ad = new WorkAd();
+        WorkAd ad;
+        if(workAdSave!=null)  ad = workAdSave;
+        else  ad= new WorkAd();
+
+
         ad.setCategory(tv_categoryName.getText().toString());
         ad.setDescription(et_description.getText().toString());
         ad.setAddress(et_address.getText().toString());
@@ -263,18 +427,26 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         ad.setUserName(usr.getName());
         ParseACL acl = new ParseACL();
         acl.setPublicReadAccess(true);
+        acl.setPublicWriteAccess(true);
+
+
         ad.setACL(acl);
+
+
+
         ad.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {
+                HopeApp.pd.dismiss();
                 if (e == null) {
-                    Toast.makeText(AddActivity.this,"Saved successfully",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddActivity.this,"Saved successfully",Toast.LENGTH_LONG).show();
                     finish();
                 } else {
-                    Toast.makeText(AddActivity.this,"Please check your Internet Connection.",Toast.LENGTH_SHORT).show();
+                    Log.e("hope saveInBackground", e.toString());
+                    Toast.makeText(AddActivity.this,"Please check your Internet Connection.",Toast.LENGTH_LONG).show();
                 }
-                pd.dismiss();
             }
         });
+
     }
 
     private String getTimeTypeFromRG(int checkedRadioButtonId) {
@@ -389,7 +561,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         public SEDatePicker(int type) {
             mType = type;
         }
-
+        @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
             if (mType == 0) {

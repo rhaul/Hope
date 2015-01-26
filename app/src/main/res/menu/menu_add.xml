@@ -2,9 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.xplorer.hope.activity.AddActivity">
-    <item android:id="@+id/action_save"
+    <item android:id="@+id/action_add"
 
-        android:title="Save"
+        android:title="Add"
         android:showAsAction="always"
         />
 </menu>

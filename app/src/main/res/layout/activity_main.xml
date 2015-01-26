@@ -41,16 +41,18 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:text="Sort"
                 android:layout_weight="1"
+                android:background="@color/gray"
                 android:id="@+id/b_main_sort" />
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:text="Filter"
                 android:layout_weight="1"
+                android:background="@color/gray"
                 android:id="@+id/b_main_filter" />
         </LinearLayout>
 
@@ -72,7 +74,6 @@
         android:choiceMode="singleChoice"
         android:divider="@color/DimGray"
         android:dividerHeight="1dp"
-        android:listSelector="@drawable/list_selector"
         android:background="@color/white"/>
 
     </LinearLayout>
