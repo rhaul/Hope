@@ -7,16 +7,24 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.fragment.CategoryFragment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TabsPagerAdapter extends FragmentPagerAdapter {
 
-
-    public TabsPagerAdapter(FragmentManager fm) {
+    private List<CategoryFragment> fragments = new ArrayList<CategoryFragment>();
+    public TabsPagerAdapter(FragmentManager fm,List<CategoryFragment> list) {
         super(fm);
+        fragments = list;
+    }
+
+    public CategoryFragment getFragment(int position){
+        return fragments.get(position);
     }
 
     @Override
     public Fragment getItem(int index) {
-        return new CategoryFragment().newInstance(index);
+        return fragments.get(index);
     }
 
     @Override

@@ -31,16 +31,17 @@ import com.xplorer.hope.object.WorkAd;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HopeApp extends Application {
     // app
     private static HopeApp instance;
     // Debugging tag for the application
-    public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
+    //public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
     public static final String APPTAG = "HopeApp";
-    public ParseQuery<WorkAd> filteredQuery ;
+    public static int sortedBy = 3;
+    public static ParseQuery<WorkAd> globalQuery;
     public static final String[] SORT_TYPES = {
             "Wage: Higher to Lower",
             "Wage: Lower to Higher",
@@ -87,6 +88,7 @@ public class HopeApp extends Application {
 
     public static String SELECTED_LANGUAGE = "selectedLanguage";
     public static String SELECTED_USER_TYPE = "selectedUserType";
+    public static int filteredBy = 0;
 
     /**
      * Create main application
@@ -161,7 +163,7 @@ public class HopeApp extends Application {
 
     }
 
-    public void parseInit(){
+    public void parseInit() {
         // Register subclass
         ParseObject.registerSubclass(WorkAd.class);
         ParseUser.registerSubclass(UserInfo.class);
@@ -209,7 +211,7 @@ public class HopeApp extends Application {
         }
     }
 
-    public static void sendPushMessage(final String ReceiverUserId, final String SenderUserId,final String workAdId, final String title, final String msg,final String type) {
+    public static void sendPushMessage(final String ReceiverUserId, final String SenderUserId, final String workAdId, final String title, final String msg, final String type) {
 
 
         ParseQuery pushQuery = ParseInstallation.getQuery();
@@ -218,13 +220,13 @@ public class HopeApp extends Application {
 
         JSONObject data = new JSONObject();
         try {
-            Log.d("raghav uri","com.xplorer.hope.activity.PushNotificationActivity");
+            Log.d("raghav uri", "com.xplorer.hope.activity.PushNotificationActivity");
             // data.put("uri", Uri.parse("com.xplorer.hope.activity.PushNotificationActivity"));
             data.put("title", title);
-            data.put("senderId",SenderUserId );
-            data.put("workId",workAdId );
-            data.put("message",msg);
-            data.put("type",type);
+            data.put("senderId", SenderUserId);
+            data.put("workId", workAdId);
+            data.put("message", msg);
+            data.put("type", type);
 
         } catch (JSONException e1) {
             e1.printStackTrace();
@@ -241,10 +243,10 @@ public class HopeApp extends Application {
         push.sendInBackground(new SendCallback() {
             @Override
             public void done(ParseException e) {
-                if(e== null){
-                    Toast.makeText(instance,"Request sent!",Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(instance,"Request not sent!",Toast.LENGTH_SHORT).show();
+                if (e == null) {
+                    Toast.makeText(instance, "Request sent!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(instance, "Request not sent!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -253,14 +255,14 @@ public class HopeApp extends Application {
 
     public static void removeEWRelation(String workId, String workerId, String employerId) {
         ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
-        query.whereEqualTo("workID",workId);
-        query.whereEqualTo("userID",workerId);
-        query.whereEqualTo("employerID",employerId);
+        query.whereEqualTo("workID", workId);
+        query.whereEqualTo("userID", workerId);
+        query.whereEqualTo("employerID", employerId);
         query.findInBackground(new FindCallback<EWRelation>() {
             @Override
             public void done(List<EWRelation> parseObjects, ParseException e) {
                 if (e == null) {
-                    for(int i=0;i<parseObjects.size();i++) {
+                    for (int i = 0; i < parseObjects.size(); i++) {
                         parseObjects.get(i).deleteInBackground();
                     }
                 }
@@ -297,37 +299,78 @@ public class HopeApp extends Application {
 
     }
 
-    public void setWorkAdSortBy(int selection){
-        if(filteredQuery == null) {
-            filteredQuery = ParseQuery.getQuery("WorkAd");
+    public void setWorkAdSortBy(int selection) {
+        sortedBy = selection;
+    }
+
+    public void setFilters(int [] filters){
+        for (int i=0;i<filters.length;i++){
+            filterValues[i] = filters[i];
         }
-        switch (selection){
-            case 0:{
-                filteredQuery.addDescendingOrder("wageHigherLimit");
-            }
-            break;
-            case 1:{
-                filteredQuery.addAscendingOrder("wageHigherLimit");
-            }
-            break;
-            case 2:{
-                filteredQuery.whereWithinKilometers("location",HopeApp.getMyLocation(),5);
-            }
-            break;
-            case 3:{
-                filteredQuery.addDescendingOrder("createdAt");
-            }
-            break;
-            case 4:{
-                filteredQuery.addAscendingOrder("createdAt");
-            }
-            break;
+        if(filteredBy ==0) {
+            filteredBy = 1;
+        }else{
+            filteredBy = 0;
         }
     }
 
-    public void setWorkAdFilter(){
+    public int filterValues[] = new int[]{1,1,1,
+                                            1,1,
+                                            0,40};
 
+    public ParseQuery<WorkAd> applyFilteredQuery() {
+        ParseQuery<WorkAd> filteredQuery = ParseQuery.getQuery("WorkAd");
+
+        //filter
+
+        List<String> dateTypes= new ArrayList<String>();
+        List<String> frequency= new ArrayList<String>();
+        if(filterValues[0] == 1){
+            dateTypes.add("One Day");
+        }
+        if(filterValues[1] == 1){
+            dateTypes.add("Monthly");
+        }
+        if(filterValues[2] == 1){
+            dateTypes.add("Custom");
+        }
+        if(filterValues[3] == 1){
+            frequency.add("Once a day");
+        }
+        if(filterValues[4] == 1){
+            frequency.add("Twice a day");
+        }
+        filteredQuery.whereContainedIn("dateType", dateTypes);
+        filteredQuery.whereContainedIn("timeType", frequency);
+        filteredQuery.whereGreaterThanOrEqualTo("wageLowerLimit",filterValues[5]*500).whereLessThanOrEqualTo("wageHigherLimit",filterValues[6]*500);
+
+
+        // sort
+        switch (sortedBy) {
+            case 0: {
+                filteredQuery.orderByDescending("wageHigherLimit");
+            }
+            break;
+            case 1: {
+                filteredQuery.orderByAscending("wageHigherLimit");
+            }
+            break;
+            case 2: {
+                filteredQuery.whereWithinKilometers("location", HopeApp.getMyLocation(), 5);
+            }
+            break;
+            case 3: {
+                filteredQuery.orderByDescending("createdAt");
+            }
+            break;
+            case 4: {
+                filteredQuery.orderByAscending("createdAt");
+            }
+            break;
+        }
+        return filteredQuery;
     }
+
     private static ParseGeoPoint getMyLocation() {
         return null;
     }

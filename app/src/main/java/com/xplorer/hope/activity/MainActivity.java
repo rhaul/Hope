@@ -1,10 +1,10 @@
 package com.xplorer.hope.activity;
 
 
-import android.content.Context;
-
+import android.app.AlertDialog;
 import android.app.Dialog;
-
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -18,22 +18,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.edmodo.rangebar.RangeBar;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.xplorer.hope.R;
 import com.xplorer.hope.adapter.NavDrawerListAdapter;
 import com.xplorer.hope.adapter.TabsPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
+import com.xplorer.hope.fragment.CategoryFragment;
 import com.xplorer.hope.object.UserInfo;
+import com.xplorer.hope.object.WorkAd;
 import com.xplorer.hope.service.ConnectionDetector;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -58,14 +67,13 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     ConnectionDetector cd;
 
 
-
     // region Member Variables
     @InjectView(R.id.ll_main_quick_return_footer)
     LinearLayout ll_quick_return_footer;
     @InjectView(R.id.b_main_sort)
-    LinearLayout b_sort;
+    Button b_sort;
     @InjectView(R.id.b_main_filter)
-    LinearLayout b_filter;
+    Button b_filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +121,6 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         //-------------ParseInstallation-------------//
 
 
-
         //------USER LOST/UNREGISTERED PARSE PUSH INFO ------//
         if (ParseInstallation.getCurrentInstallation() == null || ParseInstallation.getCurrentInstallation().get("userId") == null || ParseInstallation.getCurrentInstallation().get("userId").toString().equalsIgnoreCase("unregistered")) {
             cd = new ConnectionDetector(getApplicationContext());
@@ -128,7 +135,6 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
 
         }
-
 
 
         //-----SET UP MAIN ACTIVITY------------//
@@ -197,10 +203,10 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
     private void setUpMainActivity() {
 
-        pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager(), loadFragments());
         vp_pager.setAdapter(pagerAdapter);
         pts_titleBar.setViewPager(vp_pager);
-        vp_pager.setOffscreenPageLimit(3);
+        vp_pager.setOffscreenPageLimit(1);
         vp_pager.setCurrentItem(0);
         b_sort.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,9 +217,162 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         b_filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                showFilterDialog();
+            }
+        });
+        pts_titleBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                pagerAdapter.getFragment(position).checkIfFilterApplied();
+                // Log.d("position",position+"");
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
 
             }
         });
+
+    }
+
+    private void showFilterDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Filters");
+        View filters = getLayoutInflater().inflate(R.layout.dialog_filter, null);
+        builder.setView(filters);
+        final CheckBox cb_filter_wt_oneDay = (CheckBox) filters.findViewById(R.id.cb_filter_wt_oneDay);
+        final CheckBox cb_filter_wt_monthly = (CheckBox) filters.findViewById(R.id.cb_filter_wt_monthly);
+        final CheckBox cb_filter_wt_custom = (CheckBox) filters.findViewById(R.id.cb_filter_wt_custom);
+        final CheckBox cb_filter_f_once = (CheckBox) filters.findViewById(R.id.cb_filter_f_once);
+        final CheckBox cb_filter_f_twice = (CheckBox) filters.findViewById(R.id.cb_filter_f_twice);
+        final RangeBar rb_filter_wageLimit = (RangeBar) filters.findViewById(R.id.rb_filter_wageLimit);
+        final TextView tv_filter_wl_lower = (TextView) filters.findViewById(R.id.tv_filter_wl_lower);
+        final TextView tv_filter_wl_higher = (TextView) filters.findViewById(R.id.tv_filter_wl_higher);
+
+        for (int i = 0; i < HopeApp.getInstance().filterValues.length; i++) {
+            switch (i) {
+                case 0: {
+                    if (HopeApp.getInstance().filterValues[i] == 1) {
+                        cb_filter_wt_oneDay.setChecked(true);
+                    } else {
+                        cb_filter_wt_oneDay.setChecked(false);
+                    }
+                }
+                break;
+                case 1: {
+                    if (HopeApp.getInstance().filterValues[i] == 1) {
+                        cb_filter_wt_monthly.setChecked(true);
+                    } else {
+                        cb_filter_wt_monthly.setChecked(false);
+                    }
+                }
+                break;
+                case 2: {
+                    if (HopeApp.getInstance().filterValues[i] == 1) {
+                        cb_filter_wt_custom.setChecked(true);
+                    } else {
+                        cb_filter_wt_custom.setChecked(false);
+                    }
+                }
+                break;
+                case 3: {
+                    if (HopeApp.getInstance().filterValues[i] == 1) {
+                        cb_filter_f_once.setChecked(true);
+                    } else {
+                        cb_filter_f_once.setChecked(false);
+                    }
+                }
+                break;
+                case 4: {
+                    if (HopeApp.getInstance().filterValues[i] == 1) {
+                        cb_filter_f_twice.setChecked(true);
+                    } else {
+                        cb_filter_f_twice.setChecked(false);
+                    }
+                }
+                break;
+                case 5: {
+                    tv_filter_wl_lower.setText("Lower: ₹ " + HopeApp.getInstance().filterValues[i] * 500);
+                }
+                break;
+                case 6: {
+                    tv_filter_wl_higher.setText("Higher: ₹ " + HopeApp.getInstance().filterValues[i] * 500);
+                    rb_filter_wageLimit.setThumbIndices(HopeApp.getInstance().filterValues[5],HopeApp.getInstance().filterValues[6]);
+                }
+                break;
+            }
+        }
+        rb_filter_wageLimit.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+            @Override
+            public void onIndexChangeListener(RangeBar rangeBar, int i, int i2) {
+                tv_filter_wl_lower.setText("Lower: ₹ " + i * 500);
+                tv_filter_wl_higher.setText("Higher: ₹ " + i2 * 500);
+            }
+        });
+
+        builder.setPositiveButton("Apply",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
+                        int[] filters = new int[7];
+                        if (cb_filter_wt_oneDay.isChecked()) {
+                            filters[0] = 1;
+                        } else {
+                            filters[0] = 0;
+                        }
+                        if (cb_filter_wt_monthly.isChecked()) {
+                            filters[1] = 1;
+                        } else {
+                            filters[1] = 0;
+                        }
+                        if (cb_filter_wt_custom.isChecked()) {
+                            filters[2] = 1;
+                        } else {
+                            filters[2] = 0;
+                        }
+                        if (cb_filter_f_once.isChecked()) {
+                            filters[3] = 1;
+                        } else {
+                            filters[3] = 0;
+                        }
+                        if (cb_filter_f_twice.isChecked()) {
+                            filters[4] = 1;
+                        } else {
+                            filters[4] = 0;
+                        }
+                        filters[5] = rb_filter_wageLimit.getLeftIndex();
+                        filters[6] = rb_filter_wageLimit.getRightIndex();
+                        query.whereGreaterThanOrEqualTo("wageLowerLimit", rb_filter_wageLimit.getLeftIndex() * 500).whereLessThanOrEqualTo("wageHigherLimit", rb_filter_wageLimit.getRightIndex() * 500);
+                        HopeApp.getInstance().setFilters(filters);
+                        pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        })
+                .setNeutralButton("Reset",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                cb_filter_wt_oneDay.setChecked(true);
+                                cb_filter_wt_monthly.setChecked(true);
+                                cb_filter_wt_custom.setChecked(true);
+                                cb_filter_f_once.setChecked(true);
+                                cb_filter_f_twice.setChecked(true);
+                                rb_filter_wageLimit.setThumbIndices(0,500*40);
+                                tv_filter_wl_lower.setText("Lower: ₹ " + 0 * 500);
+                                tv_filter_wl_higher.setText("Higher: ₹ " + 40 * 500);
+                            }
+                        });
+        builder.show();
 
     }
 
@@ -222,7 +381,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         // Include dialog.xml file
         dialog.setContentView(R.layout.dialog_category_list);
         // Set dialog title
-        dialog.setTitle("Select Category");
+        dialog.setTitle("Select Filter");
         ListView lvD = (ListView) dialog.findViewById(R.id.lv_category_list);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_list_item_1, HopeApp.SORT_TYPES);
@@ -231,11 +390,11 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 HopeApp.getInstance().setWorkAdSortBy(i);
+                pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
                 dialog.dismiss();
             }
         });
         dialog.show();
-
     }
 
     private void setUpDrawer() {
@@ -299,5 +458,13 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private List<CategoryFragment> loadFragments() {
+        List<CategoryFragment> list = new ArrayList<CategoryFragment>();
+        for (int i = 0; i < 11; i++) {
+            list.add(new CategoryFragment().newInstance(i));
+        }
+        return list;
     }
 }

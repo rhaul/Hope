@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.parse.ParseACL;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
@@ -117,7 +119,8 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     int s2EndingMinute;
     String s2EndingTimeType = "";
     ProgressDialog pd;
-
+    ParseGeoPoint gp;
+    WorkAd ad;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -244,7 +247,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     private void saveWorkAd() {
         onPreExecute();
         UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
-        WorkAd ad = new WorkAd();
+        ad = new WorkAd();
         ad.setCategory(tv_categoryName.getText().toString());
         ad.setDescription(et_description.getText().toString());
         ad.setAddress(et_address.getText().toString());
@@ -264,6 +267,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         ParseACL acl = new ParseACL();
         acl.setPublicReadAccess(true);
         ad.setACL(acl);
+        ad.setAddressGP(new ParseGeoPoint());
         ad.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {
                 if (e == null) {
@@ -336,8 +340,36 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
                 showTimePickerDialog(3);
             }
             break;
+            case R.id.b_add_map: {
+                openMapForAddress();
+            }
+            break;
             default:
                 break;
+        }
+    }
+
+
+    private void openMapForAddress() {
+        if(ad.getAddressGP()!= null){
+            Intent intent = new Intent(this,MapActivity.class);
+            intent.putExtra("lat",ad.getAddressGP().getLatitude());
+            intent.putExtra("lng",ad.getAddressGP().getLongitude());
+            startActivityForResult(intent, 1); // 1 = get address from map
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1)
+        {
+            String address = data.getStringExtra("address");
+            double lat = data.getDoubleExtra("lat", 0);
+            double lng = data.getDoubleExtra("lng",0);
+            gp = new ParseGeoPoint(lat,lng);
+            et_address.setText(address);
         }
     }
 

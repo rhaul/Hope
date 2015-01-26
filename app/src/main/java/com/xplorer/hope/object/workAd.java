@@ -1,6 +1,7 @@
 package com.xplorer.hope.object;
 
 import com.parse.ParseClassName;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 
 /**
@@ -140,5 +141,11 @@ public class WorkAd extends ParseObject {
     }
 
 
+    public void setAddressGP(ParseGeoPoint gp){
+        put("addressGP",gp);
+    }
+    public ParseGeoPoint getAddressGP(){
+        return getParseGeoPoint("addressGP");
+    }
 
 }
