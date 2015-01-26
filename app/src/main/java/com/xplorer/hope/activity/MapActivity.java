@@ -67,14 +67,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         b_setMyWL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Geocoder.isPresent()) {
-                    geocoder = new Geocoder(MapActivity.this, Locale.getDefault());
-                    if(getAddressTask != null) {
-                        getAddressTask.cancel(true);
-                    }
-                    getAddressTask = new GetAddressTask(MapActivity.this, true);
-                    getAddressTask.execute(latLng.longitude, latLng.longitude);
+                if (getAddressTask != null) {
+                    getAddressTask.cancel(true);
                 }
+                getAddressTask = new GetAddressTask(MapActivity.this, true);
+                getAddressTask.execute(latLng.latitude, latLng.longitude);
             }
         });
     }
@@ -136,20 +133,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             marker.remove();
             marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Work Location")
                     .draggable(true));
+
+            if (getAddressTask != null) {
+                getAddressTask.cancel(true);
+            }
+            getAddressTask = new GetAddressTask(MapActivity.this, false);
+            getAddressTask.execute(latLng.latitude, latLng.longitude);
+            
         } else {
             marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Long press to drag me to your Work Location")
                     .draggable(true));
         }
         marker.showInfoWindow();
-
-        if (Geocoder.isPresent()) {
-            geocoder = new Geocoder(MapActivity.this, Locale.getDefault());
-            if (getAddressTask != null) {
-                getAddressTask.cancel(true);
-            }
-            getAddressTask = new GetAddressTask(MapActivity.this, false);
-            getAddressTask.execute(latLng.longitude, latLng.longitude);
-        }
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
         mMap.animateCamera(cameraUpdate);
 
@@ -159,7 +154,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             AsyncTask<Double, Void, Address> {
         Context mContext;
         boolean setFinalAddress = false;
-        public GetAddressTask(Context context,boolean value) {
+
+        public GetAddressTask(Context context, boolean value) {
             super();
             mContext = context;
             setFinalAddress = value;
@@ -198,18 +194,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             } else {
                 Toast.makeText(mContext, "No Address found", Toast.LENGTH_SHORT).show();
             }
-            if(setFinalAddress) {
+            if (setFinalAddress) {
                 setResults();
             }
         }
     }
 
     private void setResults() {
-        Intent intent=new Intent();
-        intent.putExtra("address",address);
-        intent.putExtra("lat",latLng.latitude);
-        intent.putExtra("lng",latLng.longitude);
-        setResult(1,intent);
+        Intent intent = new Intent();
+        intent.putExtra("address", address);
+        intent.putExtra("lat", latLng.latitude);
+        intent.putExtra("lng", latLng.longitude);
+        setResult(1, intent);
         finish();
     }
 
