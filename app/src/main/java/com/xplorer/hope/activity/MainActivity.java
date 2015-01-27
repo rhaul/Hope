@@ -292,35 +292,38 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
     }
 
-    public void getMyWorkids(){
-        String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
+    public void getMyWorkids() {
+        String myWorkerId = ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
 
         ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
         query.whereEqualTo("userID", myWorkerId);
 
         Log.d("hope getMyWorkids", myWorkerId);
 
-            query.findInBackground(new FindCallback<EWRelation>() {
-                @Override
-                public void done(List<EWRelation> parseObjects, ParseException e) {
+        query.findInBackground(new FindCallback<EWRelation>() {
+            @Override
+            public void done(List<EWRelation> parseObjects, ParseException e) {
 
-                    if (e == null) {
-                        Log.d("hope getMyWorkids(done)", String.valueOf(parseObjects.size()));
-                        for (int i = 0; i < parseObjects.size(); i++) {
-                            if(parseObjects.get(i).getApprove()==true) {
-                                HopeApp.myWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
-                                HopeApp.myEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
-                            }else{
-                                HopeApp.myPendingWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
-                                HopeApp.myPendingEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
-
-                            }
-                            Log.d("hope getMyWorkids(workId)", parseObjects.get(i).getWorkID());
+                if (e == null) {
+                    Log.d("hope getMyWorkids(done)", String.valueOf(parseObjects.size()));
+                    for (int i = 0; i < parseObjects.size(); i++) {
+                        if (parseObjects.get(i).getApprove() == true) {
+                            HopeApp.myWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
+                            HopeApp.myEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
+                        } else {
+                            HopeApp.myPendingWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
+                            HopeApp.myPendingEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
 
                         }
-                    }setUpMainActivity();
+                        Log.d("hope getMyWorkids(workId)", parseObjects.get(i).getWorkID());
+
+                    }
                 }
-            });
+                setUpMainActivity();
+            }
+        });
+
+    }
 
 
 
@@ -381,11 +384,11 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 }
                 break;
                 case 5: {
-                    tv_filter_wl_lower.setText("Lower: ₹ " + HopeApp.getInstance().filterValues[i] * 500);
+                    tv_filter_wl_lower.setText("Lower: ? " + HopeApp.getInstance().filterValues[i] * 500);
                 }
                 break;
                 case 6: {
-                    tv_filter_wl_higher.setText("Higher: ₹ " + HopeApp.getInstance().filterValues[i] * 500);
+                    tv_filter_wl_higher.setText("Higher: ? " + HopeApp.getInstance().filterValues[i] * 500);
                     rb_filter_wageLimit.setThumbIndices(HopeApp.getInstance().filterValues[5],HopeApp.getInstance().filterValues[6]);
                 }
                 break;
@@ -394,8 +397,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         rb_filter_wageLimit.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onIndexChangeListener(RangeBar rangeBar, int i, int i2) {
-                tv_filter_wl_lower.setText("Lower: ₹ " + i * 500);
-                tv_filter_wl_higher.setText("Higher: ₹ " + i2 * 500);
+                tv_filter_wl_lower.setText("Lower: ? " + i * 500);
+                tv_filter_wl_higher.setText("Higher: ? " + i2 * 500);
             }
         });
 
@@ -452,8 +455,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                                 cb_filter_f_once.setChecked(true);
                                 cb_filter_f_twice.setChecked(true);
                                 rb_filter_wageLimit.setThumbIndices(0,500*40);
-                                tv_filter_wl_lower.setText("Lower: ₹ " + 0 * 500);
-                                tv_filter_wl_higher.setText("Higher: ₹ " + 40 * 500);
+                                tv_filter_wl_lower.setText("Lower: ? " + 0 * 500);
+                                tv_filter_wl_higher.setText("Higher: ? " + 40 * 500);
                             }
                         });
         builder.show();
@@ -511,7 +514,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         });
 
 
-       // vp_pager.getCurrentItem()
+        // vp_pager.getCurrentItem()
         //getActionBar().setHomeButtonEnabled(true);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,

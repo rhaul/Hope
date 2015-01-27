@@ -26,8 +26,8 @@ import android.widget.Toast;
 import com.parse.FindCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
-import com.parse.ParseQuery;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
@@ -128,7 +128,6 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
     String workObjId ="";
     WorkAd workAdSave;
-    ProgressDialog pd;
     ParseGeoPoint gp;
     WorkAd ad;
     @Override

@@ -119,7 +119,9 @@
             android:name=".activity.WorkActivity"
             android:label="@string/title_activity_work" >
         </activity>
-android:name=".activity.MapActivity"
+
+        <activity
+            android:name=".activity.MapActivity"
             android:label="@string/title_activity_map" >
             
         </activity>

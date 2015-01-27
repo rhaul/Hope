@@ -9,6 +9,7 @@ import com.parse.ParseObject;
  */
 
 @ParseClassName("WorkAd")
+
 public class WorkAd extends ParseObject {
 
     public WorkAd(){

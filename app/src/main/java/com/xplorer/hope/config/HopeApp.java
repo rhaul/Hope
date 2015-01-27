@@ -33,6 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class HopeApp extends Application {
@@ -40,12 +41,14 @@ public class HopeApp extends Application {
     private static HopeApp instance;
     // Debugging tag for the application
 
+
     public static HashMap<String, List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
+
     public static final String APPTAG = "HopeApp";
     public ParseQuery<WorkAd> filteredQuery;
 
     //public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
-    public static final String APPTAG = "HopeApp";
+
     public static int sortedBy = 3;
     public static ParseQuery<WorkAd> globalQuery;
 
