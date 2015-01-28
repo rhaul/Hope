@@ -13,5 +13,6 @@
     <string name="title_activity_push_notification">PushNotificationActivity</string>
     <string name="title_activity_no_internet">NoInternetActivity</string>
     <string name="title_activity_map">MapActivity</string>
+    <string name="title_activity_nearby_works">NearbyWorksActivity</string>
 
 </resources>
