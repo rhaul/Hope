@@ -19,7 +19,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <!--
       IMPORTANT: Change "com.parse.tutorials.pushnotifications.permission.C2D_MESSAGE" in the lines below
       to match your app's package name + ".permission.C2D_MESSAGE".
@@ -40,9 +40,23 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light" >
+
+
+
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchActivity" />
+
         </activity>
         <activity
             android:name=".activity.SelectLangActivity"
@@ -63,7 +77,15 @@
         </activity>
         <activity
             android:name=".activity.SearchActivity"
-            android:label="@string/title_activity_search" >
+            android:label="@string/title_activity_search"
+            android:launchMode="singleTop">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
         </activity>
 
         <service android:name="com.parse.PushService" />
@@ -108,6 +130,14 @@
             android:label="@string/title_activity_no_internet" >
         </activity>
         <activity
+            android:name=".activity.EmpolyerActivity"
+            android:label="@string/title_activity_empolyer" >
+        </activity>
+        <activity
+            android:name=".activity.WorkActivity"
+            android:label="@string/title_activity_work" >
+        </activity>
+        <activity
             android:name=".activity.MapActivity"
             android:label="@string/title_activity_map" >
         </activity>
@@ -119,15 +149,12 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCSO1r1bEhtCcRe0Bmvx4IF9G7bYoyeSsc" />
 
+
         <activity
             android:name=".activity.NearbyWorksActivity"
             android:label="@string/title_activity_nearby_works" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
