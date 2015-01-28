@@ -322,11 +322,11 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             isNull = true;
         }
         usr.setPassword("");
-        usr.setUsername(et_num.getText().toString());
+        usr.setUsername(et_num.getText().toString().toLowerCase());
         usr.setType(HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE));
         usr.setName(et_name.getText().toString());
         usr.setDob(tv_dob.getText().toString());
-        usr.setAddress(et_addr.getText().toString());
+        usr.setAddress(et_addr.getText().toString().toLowerCase());
         usr.setPhoneNo(et_num.getText().toString());
         usr.setGender(getGenderFromRG(rg_gender.getCheckedRadioButtonId()));
 

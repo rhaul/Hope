@@ -85,19 +85,15 @@ public class ListViewAdapter extends BaseAdapter{
                     UserInfo usr = (UserInfo) object;
 
                     if (usr.getImageFile() != null){
-                        //Log.d("hope usr", pos+"> "+usr.getName()+">"+usr.getObjectId()+">"+usr.getImageFile().getUrl());
                         Picasso.with(mContext).load(usr.getImageFile().getUrl()).error(R.drawable.ic_launcher).into(finalHolder.iv_employerPic);
                         if(mAds != null && mAds.size()>0) {
                             mAds.get(pos).imgURL = usr.getImageFile().getUrl();
                         }
-                        //Log.d("hope i",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
                     }else{
-                        //Log.d("hope usr (null)", pos+"> "+usr.getName()+">"+usr.getObjectId());
                         Picasso.with(mContext).load(R.drawable.defaultuser).into(finalHolder.iv_employerPic);
                         if(mAds != null && mAds.size()>0) {
                             mAds.get(pos).imgURL = "default.jpg";
-                        }
-                        //Log.d("hope i(null)",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
+                        }//Log.d("hope i(null)",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
                     }
                 }
             });
@@ -106,8 +102,7 @@ public class ListViewAdapter extends BaseAdapter{
         }else{
             Picasso.with(mContext).load(mAds.get(i).imgURL).into(holder.iv_employerPic);
         }
-        holder.tv_description.setText(mAds.get(i).getDescription());
-        holder.tv_name.setText(mAds.get(i).getUserName());
+
         String dateType=mAds.get(i).getDateType()+" Job";
         if(mAds.get(i).getDateType().equalsIgnoreCase("One Day")){
             dateType+="\nOn: "+mAds.get(i).getDateFrom();
@@ -122,12 +117,14 @@ public class ListViewAdapter extends BaseAdapter{
         }
 
 
-        holder.tv_name.setText(mAds.get(i).getUserName());
+        holder.tv_description.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getDescription()));
+        holder.tv_name.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getUserName()));
+
         holder.tv_jobType.setText(dateType);
         holder.tv_timeType.setText(timeType);
-        holder.tv_wages.setText("₹ "+mAds.get(i).getWageLowerLimit()+"-"+mAds.get(i).getWageHigherLimit());
+        holder.tv_wages.setText(mAds.get(i).getWageLowerLimit()+"-"+mAds.get(i).getWageHigherLimit());
         holder.tv_phoneNo.setText(mAds.get(i).getPhoneNo());
-        holder.tv_address.setText(mAds.get(i).getAddress());
+        holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getAddress()));
 
         String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
 
@@ -160,8 +157,9 @@ public class ListViewAdapter extends BaseAdapter{
         holder.iv_ad_addr.setColorFilter(mContext.getResources().getColor(colorVal));
         holder.iv_ad_time.setColorFilter(mContext.getResources().getColor(colorVal));
         holder.iv_ad_phone.setColorFilter(mContext.getResources().getColor(colorVal));
-        holder.b_apply.setBackgroundColor(mContext.getResources().getColor(colorVal));
+        holder.iv_ad_rupee.setColorFilter(mContext.getResources().getColor(colorVal));
 
+        holder.b_apply.setBackgroundColor(mContext.getResources().getColor(colorVal));
         /*holder.ll_ad_card.setBackgroundColor(mContext.getResources().getColor(colorVal));
 
 
@@ -188,6 +186,7 @@ public class ListViewAdapter extends BaseAdapter{
         @InjectView(R.id.iv_ad_info)ImageView iv_ad_info;
         @InjectView(R.id.iv_ad_addr)ImageView iv_ad_addr;
         @InjectView(R.id.iv_ad_phone)ImageView iv_ad_phone;
+        @InjectView(R.id.iv_ad_rupee)ImageView iv_ad_rupee;
 
         @InjectView(R.id.ll_ad_bg)LinearLayout ll_ad_bg;
         @InjectView(R.id.ll_ad_card)LinearLayout ll_ad_card;

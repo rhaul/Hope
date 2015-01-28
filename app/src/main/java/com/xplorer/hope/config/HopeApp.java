@@ -446,5 +446,11 @@ public class HopeApp extends Application {
         return null;
     }
 
+    public String getUpperCaseString(String myString){
+        String upperString = myString.substring(0,1).toUpperCase() + myString.substring(1);
+        upperString =upperString.replace("\n"," ");
+        return upperString;
+    }
+
 
 }

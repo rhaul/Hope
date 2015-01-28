@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -103,6 +104,11 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     @InjectView(R.id.et_add_wageUpper)
     EditText et_wageUpper;
 
+    @InjectView(R.id.b_add_map)
+    Button b_map;
+
+
+
     // variables
     int startYear;
     int startMonth;
@@ -129,7 +135,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     String workObjId ="";
     WorkAd workAdSave;
     ParseGeoPoint gp;
-    WorkAd ad;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,7 +152,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         tv_s2_startingTime.setOnClickListener(this);
         tv_s2_endingTime.setOnClickListener(this);
 
-
+        b_map.setOnClickListener(this);
 
     }
 
@@ -404,6 +410,8 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
         return true;
     }
+
+
     private void saveWorkAd() {
         HopeApp.getInstance().onPreExecute(AddActivity.this);
         UserInfo usr = (UserInfo) ParseUser.getCurrentUser();
@@ -412,10 +420,10 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         if(workAdSave!=null)  ad = workAdSave;
         else  ad= new WorkAd();
 
-
+        ad.setAddressGP(gp);
         ad.setCategory(tv_categoryName.getText().toString());
-        ad.setDescription(et_description.getText().toString());
-        ad.setAddress(et_address.getText().toString());
+        ad.setDescription(et_description.getText().toString().toLowerCase());
+        ad.setAddress(et_address.getText().toString().toLowerCase());
         ad.setPhoneNo(et_phone.getText().toString());
         ad.setDateType(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()));
         ad.setDateFrom(tv_startingDate.getText().toString());
@@ -522,12 +530,13 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
 
     private void openMapForAddress() {
-        if(ad.getAddressGP()!= null){
-            Intent intent = new Intent(this,MapActivity.class);
-            intent.putExtra("lat",ad.getAddressGP().getLatitude());
-            intent.putExtra("lng",ad.getAddressGP().getLongitude());
-            startActivityForResult(intent, 1); // 1 = get address from map
+        Intent intent = new Intent(this,MapActivity.class);
+        if(workAdSave!=null && workAdSave.getAddressGP()!= null) {
+            intent.putExtra("lat", workAdSave.getAddressGP().getLatitude());
+            intent.putExtra("lng", workAdSave.getAddressGP().getLongitude());
         }
+
+        startActivityForResult(intent, 1); // 1 = get address from map
     }
 
     @Override
@@ -540,6 +549,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
             double lat = data.getDoubleExtra("lat", 0);
             double lng = data.getDoubleExtra("lng",0);
             gp = new ParseGeoPoint(lat,lng);
+
             et_address.setText(address);
         }
     }

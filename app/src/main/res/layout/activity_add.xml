@@ -89,8 +89,10 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:text="Map"
+                android:background="@color/gray"
+                android:textColor="@color/white"
                 android:id="@+id/b_add_map" />
         </LinearLayout>
 

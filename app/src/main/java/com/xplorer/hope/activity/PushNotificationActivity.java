@@ -245,7 +245,6 @@ public class PushNotificationActivity extends Activity {
             }
         });
 
-        tv_description.setText(workAdObject.getDescription());
 
         String dateType = workAdObject.getDateType() + " Job";
         if (workAdObject.getDateType().equalsIgnoreCase("One Day")) {
@@ -259,19 +258,23 @@ public class PushNotificationActivity extends Activity {
         } else {
             timeType += "\n" + workAdObject.getS1StartingTime() + "-" + workAdObject.getS1EndingTime() + "\n" + workAdObject.getS2StartingTime() + "-" + workAdObject.getS2EndingTime() + "";
         }
-        tv_name.setText(workAdObject.getCategory());
+
+
+        tv_name.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getCategory()));
+        tv_description.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getDescription()));
+        tv_address.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getAddress()));
+
         tv_jobType.setText(dateType);
         tv_timeType.setText(timeType);
-        tv_wages.setText("₹ " + workAdObject.getWageLowerLimit() + "-" + workAdObject.getWageHigherLimit());
+        tv_wages.setText(workAdObject.getWageLowerLimit() + "-" + workAdObject.getWageHigherLimit());
         tv_phoneNo.setText(workAdObject.getPhoneNo());
         ll_phone.setVisibility(View.VISIBLE);
-        tv_address.setText(workAdObject.getAddress());
         b_apply.setVisibility(View.GONE);
     }
 
 
     public void setWorkerProfile() {
-        tv_worker_name.setText(workerObject.getName());
+        tv_worker_name.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getName()));
         tv_gender.setText(workerObject.getGender());
 
         if(workerObject.getImageFile() != null ) Picasso.with(this).load(workerObject.getImageFile().getUrl()).into(iv_workerPic);
@@ -285,7 +288,7 @@ public class PushNotificationActivity extends Activity {
         } catch (java.text.ParseException e1) {
             e1.printStackTrace();
         }
-        tv_addr.setText(workerObject.getAddress());
+        tv_addr.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getAddress()));
         tv_wprofile_phoneno.setText(workerObject.getPhoneNo());
 
 

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_ad_bg"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/ll_ad_bg"
     android:background="@color/gray1"
     android:orientation="vertical"
     android:paddingLeft="5dp"
     android:paddingRight="5dp">
 
     <LinearLayout
+        android:id="@+id/ll_ad_card"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/ll_ad_card"
         android:background="@drawable/card"
         android:orientation="vertical"
         android:padding="10dp">
@@ -105,9 +105,9 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dip"
-                    android:layout_marginTop="5dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
+                    android:layout_marginTop="5dp"
                     android:background="#a8a8a8" />
             </LinearLayout>
 
@@ -117,6 +117,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -151,41 +152,47 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dip"
-                    android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:background="#a8a8a8" />
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_ad_wages"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="Amount"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dip"
                     android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
                     android:background="#a8a8a8" />
             </LinearLayout>
 
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_ad_addr"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/address" />
+
+            <TextView
+                android:id="@+id/tv_ad_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="Address"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:background="#a8a8a8" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -197,21 +204,28 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/iv_ad_addr"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:src="@drawable/address" />
-
-                <TextView
-                    android:id="@+id/tv_ad_address"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="Address"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iv_ad_rupee"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="-2dp"
+                        android:src="@drawable/rupee" />
+
+                    <TextView
+                        android:id="@+id/tv_ad_wages"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="Amount"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -224,8 +238,7 @@
                     android:id="@+id/ll_ad_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    >
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/iv_ad_phone"
@@ -255,35 +268,36 @@
             </LinearLayout>
 
         </LinearLayout>
+
+
         <LinearLayout
+            android:id="@+id/ll_ad_btns"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:id="@+id/ll_ad_btns"
             android:orientation="horizontal"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
 
             <Button
                 android:id="@+id/b_ad_Edit"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
+                android:layout_marginRight="1dp"
                 android:layout_weight="1"
                 android:background="@color/gray"
                 android:text="Edit"
-                android:layout_marginRight="1dp"
                 android:textColor="@color/white" />
 
             <Button
                 android:id="@+id/b_ad_Del"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
-                android:background="@color/gray"
-                android:layout_weight="1"
                 android:layout_marginLeft="1dp"
+                android:layout_weight="1"
+                android:background="@color/gray"
                 android:text="Delete"
                 android:textColor="@color/white" />
-            </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
 

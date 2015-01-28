@@ -43,7 +43,6 @@ import butterknife.InjectView;
 public class WorkAdaptor extends BaseAdapter {
     private Context mContext;
     public List<WorkAd> myWorkIds;
-
     public WorkAdaptor(Context mContext, List<WorkAd> myWorkIds) {
         this.mContext = mContext;
         this.myWorkIds = myWorkIds;
@@ -89,9 +88,10 @@ public class WorkAdaptor extends BaseAdapter {
         int index = Arrays.asList(HopeApp.TITLES).indexOf(myWorkIds.get(pos).getCategory());
         Picasso.with(mContext).load(HopeApp.ImgUrl[index]).into(finalHolder.iv_employerPic);
 
+        holder.tv_name.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getCategory()));
+        holder.tv_description.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getDescription()));
+        holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getAddress()));
 
-
-        holder.tv_description.setText(myWorkIds.get(i).getDescription());
 
         String dateType=myWorkIds.get(i).getDateType()+" Job";
         if(myWorkIds.get(i).getDateType().equalsIgnoreCase("One Day")){
@@ -107,12 +107,10 @@ public class WorkAdaptor extends BaseAdapter {
         }
 
 
-        holder.tv_name.setText(myWorkIds.get(i).getCategory());
         holder.tv_jobType.setText(dateType);
         holder.tv_timeType.setText(timeType);
-        holder.tv_wages.setText("₹ "+myWorkIds.get(i).getWageLowerLimit()+"-"+myWorkIds.get(i).getWageHigherLimit());
+        holder.tv_wages.setText(myWorkIds.get(i).getWageLowerLimit()+"-"+myWorkIds.get(i).getWageHigherLimit());
         holder.tv_phoneNo.setText(myWorkIds.get(i).getPhoneNo());
-        holder.tv_address.setText(myWorkIds.get(i).getAddress());
 
 
         holder.b_apply.setText("Workers");
@@ -257,7 +255,7 @@ public class WorkAdaptor extends BaseAdapter {
         // Set dialog title
         dialog.setTitle("Workers onboard");
         ListView lvD = (ListView) dialog.findViewById(R.id.lv_category_list);
-        WorkerAdaptor clA = new WorkerAdaptor(mContext,parseUsers );
+        WorkerAdaptor clA = new WorkerAdaptor(mContext,parseUsers, false );
         lvD.setAdapter(clA);
         dialog.show();
 

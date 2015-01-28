@@ -16,6 +16,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
+import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
 
@@ -166,8 +167,7 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
                 Picasso.with(mContext).load(myWorkIds.get(i).imgURL).into(holder.iv_employerPic);
             }
 
-            holder.tv_description.setText(myWorkIds.get(i).getDescription());
-            holder.tv_name.setText(myWorkIds.get(i).getUserName());
+
             String dateType = myWorkIds.get(i).getDateType() + " Job";
             if (myWorkIds.get(i).getDateType().equalsIgnoreCase("One Day")) {
                 dateType += "\nOn: " + myWorkIds.get(i).getDateFrom();
@@ -182,12 +182,13 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
             }
 
 
-            holder.tv_name.setText(myWorkIds.get(i).getUserName());
+            holder.tv_name.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getUserName()));
+            holder.tv_description.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getDescription()));
+            holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getAddress()));
             holder.tv_jobType.setText(dateType);
             holder.tv_timeType.setText(timeType);
-            holder.tv_wages.setText("₹ " + myWorkIds.get(i).getWageLowerLimit() + "-" + myWorkIds.get(i).getWageHigherLimit());
+            holder.tv_wages.setText(myWorkIds.get(i).getWageLowerLimit() + "-" + myWorkIds.get(i).getWageHigherLimit());
             holder.tv_phoneNo.setText(myWorkIds.get(i).getPhoneNo());
-            holder.tv_address.setText(myWorkIds.get(i).getAddress());
 
 
             holder.b_apply.setVisibility(View.GONE);

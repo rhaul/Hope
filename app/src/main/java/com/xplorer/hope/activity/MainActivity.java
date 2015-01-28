@@ -1,15 +1,12 @@
 package com.xplorer.hope.activity;
 
 
-
-import android.app.Dialog;
-import android.content.Context;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -25,19 +22,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-
 import android.widget.CheckBox;
-
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.astuetz.PagerSlidingTabStrip;
-
-import com.parse.FindCallback;
-
 import com.edmodo.rangebar.RangeBar;
-
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseQuery;
@@ -47,19 +40,14 @@ import com.xplorer.hope.R;
 import com.xplorer.hope.adapter.NavDrawerListAdapter;
 import com.xplorer.hope.adapter.TabsPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
-
-import com.xplorer.hope.object.EWRelation;
-
 import com.xplorer.hope.fragment.CategoryFragment;
-
+import com.xplorer.hope.object.EWRelation;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
 import com.xplorer.hope.service.ConnectionDetector;
 
 import java.io.File;
-
 import java.util.ArrayList;
-
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -95,6 +83,13 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @InjectView(R.id.b_main_filter)
     Button b_filter;
 
+
+
+    //Menu View
+
+    MenuItem searchMenuItem;
+    SearchView searchView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +109,13 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @Override
     protected void onResume() {
         super.onResume();
+
+        //Collapsing Search Bar if came back from search activity
+
+        if(searchMenuItem!=null){
+            searchMenuItem.collapseActionView();
+            searchView.setQuery("", false);
+        }
 
         // language and user type selection
         if (!HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi") && !HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("english")) {
@@ -241,6 +243,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             @Override
             public void onPageSelected(int position) {
                 setBarColors(position);
+                pagerAdapter.getFragment(position).checkIfFilterApplied();
             }
 
             @Override
@@ -264,23 +267,9 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 showFilterDialog();
             }
         });
-        pts_titleBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            }
 
-            @Override
-            public void onPageSelected(int position) {
-                pagerAdapter.getFragment(position).checkIfFilterApplied();
-                // Log.d("position",position+"");
-            }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
 
     }
 
@@ -290,6 +279,9 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[position]);
         pts_titleBar.setBackgroundColor(getResources().getColor(colorVal));
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+        b_sort.setBackgroundColor(getResources().getColor(colorVal));
+        b_filter.setBackgroundColor(getResources().getColor(colorVal));
+
     }
 
     public void getMyWorkids() {
@@ -384,11 +376,11 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 }
                 break;
                 case 5: {
-                    tv_filter_wl_lower.setText("Lower: ? " + HopeApp.getInstance().filterValues[i] * 500);
+                    tv_filter_wl_lower.setText("Lower: ₹ " + HopeApp.getInstance().filterValues[i] * 500);
                 }
                 break;
                 case 6: {
-                    tv_filter_wl_higher.setText("Higher: ? " + HopeApp.getInstance().filterValues[i] * 500);
+                    tv_filter_wl_higher.setText("Higher: ₹ " + HopeApp.getInstance().filterValues[i] * 500);
                     rb_filter_wageLimit.setThumbIndices(HopeApp.getInstance().filterValues[5],HopeApp.getInstance().filterValues[6]);
                 }
                 break;
@@ -397,8 +389,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         rb_filter_wageLimit.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onIndexChangeListener(RangeBar rangeBar, int i, int i2) {
-                tv_filter_wl_lower.setText("Lower: ? " + i * 500);
-                tv_filter_wl_higher.setText("Higher: ? " + i2 * 500);
+                tv_filter_wl_lower.setText("Lower: ₹ " + i * 500);
+                tv_filter_wl_higher.setText("Higher: ₹ " + i2 * 500);
             }
         });
 
@@ -455,8 +447,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                                 cb_filter_f_once.setChecked(true);
                                 cb_filter_f_twice.setChecked(true);
                                 rb_filter_wageLimit.setThumbIndices(0,500*40);
-                                tv_filter_wl_lower.setText("Lower: ? " + 0 * 500);
-                                tv_filter_wl_higher.setText("Higher: ? " + 40 * 500);
+                                tv_filter_wl_lower.setText("Lower: ₹ " + 0 * 500);
+                                tv_filter_wl_higher.setText("Higher: ₹ " + 40 * 500);
                             }
                         });
         builder.show();
@@ -543,7 +535,27 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
+
+        SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        searchMenuItem = menu.findItem(R.id.search);
+        searchView = (SearchView) searchMenuItem.getActionView();
+
+        ComponentName cn = new ComponentName(this, SearchActivity.class);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(cn));
+
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean queryTextFocused) {
+                if(!queryTextFocused) {
+                    searchMenuItem.collapseActionView();
+                    searchView.setQuery("", false);
+                }
+            }
+        });
+
+        return true;
     }
 
     @Override
