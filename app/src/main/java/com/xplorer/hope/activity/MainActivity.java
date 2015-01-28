@@ -3,9 +3,12 @@ package com.xplorer.hope.activity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -22,10 +25,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.edmodo.rangebar.RangeBar;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseQuery;
@@ -36,6 +41,7 @@ import com.xplorer.hope.adapter.NavDrawerListAdapter;
 import com.xplorer.hope.adapter.TabsPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.fragment.CategoryFragment;
+import com.xplorer.hope.object.EWRelation;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
 import com.xplorer.hope.service.ConnectionDetector;
@@ -54,6 +60,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     PagerSlidingTabStrip pts_titleBar;
     @InjectView(R.id.pager)
     ViewPager vp_pager;
+
+    static public int currentFragment=0;
 
     boolean isSetUp = false;
     private TabsPagerAdapter pagerAdapter;
@@ -75,6 +83,13 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @InjectView(R.id.b_main_filter)
     Button b_filter;
 
+
+
+    //Menu View
+
+    MenuItem searchMenuItem;
+    SearchView searchView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +109,13 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @Override
     protected void onResume() {
         super.onResume();
+
+        //Collapsing Search Bar if came back from search activity
+
+        if(searchMenuItem!=null){
+            searchMenuItem.collapseActionView();
+            searchView.setQuery("", false);
+        }
 
         // language and user type selection
         if (!HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi") && !HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("english")) {
@@ -139,7 +161,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
         //-----SET UP MAIN ACTIVITY------------//
         if (!isSetUp) {
-            setUpMainActivity();
+            getMyWorkids();//which sets up man activity
             setUpDrawer();
             isSetUp = true;
         }
@@ -206,7 +228,32 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager(), loadFragments());
         vp_pager.setAdapter(pagerAdapter);
         pts_titleBar.setViewPager(vp_pager);
-        vp_pager.setOffscreenPageLimit(1);
+
+        setBarColors(0);
+        pts_titleBar.setTextColor(getResources().getColor(R.color.white));
+        pts_titleBar.setIndicatorColor(getResources().getColor(R.color.white));
+        pts_titleBar.setDividerColor(getResources().getColor(R.color.white));
+
+        pts_titleBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setBarColors(position);
+                pagerAdapter.getFragment(position).checkIfFilterApplied();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        vp_pager.setOffscreenPageLimit(3);
+
+
         vp_pager.setCurrentItem(0);
         b_sort.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -220,25 +267,57 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 showFilterDialog();
             }
         });
-        pts_titleBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+
+
+
+    }
+
+
+    public void setBarColors(int position){
+        currentFragment=position;
+        Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[position]);
+        pts_titleBar.setBackgroundColor(getResources().getColor(colorVal));
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+        b_sort.setBackgroundColor(getResources().getColor(colorVal));
+        b_filter.setBackgroundColor(getResources().getColor(colorVal));
+
+    }
+
+    public void getMyWorkids() {
+        String myWorkerId = ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
+
+        ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
+        query.whereEqualTo("userID", myWorkerId);
+
+        Log.d("hope getMyWorkids", myWorkerId);
+
+        query.findInBackground(new FindCallback<EWRelation>() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            public void done(List<EWRelation> parseObjects, ParseException e) {
 
-            }
+                if (e == null) {
+                    Log.d("hope getMyWorkids(done)", String.valueOf(parseObjects.size()));
+                    for (int i = 0; i < parseObjects.size(); i++) {
+                        if (parseObjects.get(i).getApprove() == true) {
+                            HopeApp.myWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
+                            HopeApp.myEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
+                        } else {
+                            HopeApp.myPendingWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
+                            HopeApp.myPendingEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
 
-            @Override
-            public void onPageSelected(int position) {
-                pagerAdapter.getFragment(position).checkIfFilterApplied();
-                // Log.d("position",position+"");
-            }
+                        }
+                        Log.d("hope getMyWorkids(workId)", parseObjects.get(i).getWorkID());
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+                    }
+                }
+                setUpMainActivity();
             }
         });
 
     }
+
+
 
     private void showFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -374,6 +453,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                         });
         builder.show();
 
+
+
     }
 
     private void showSortDialog() {
@@ -398,6 +479,12 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     }
 
     private void setUpDrawer() {
+        if(HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("worker")){
+            HopeApp.drawerCandidate = HopeApp.drawerTitlesWorker;
+        }else{
+            HopeApp.drawerCandidate = HopeApp.drawerTitlesEmployer;
+
+        }
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
@@ -410,9 +497,16 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0) {
                     startActivity(new Intent(MainActivity.this, SignUpActivity.class).putExtra("from", "menu"));
+                }else if(i==1){
+                    startActivity(new Intent(MainActivity.this, WorkActivity.class));
+                }else if(i==2){
+                    startActivity(new Intent(MainActivity.this, EmpolyerActivity.class));
                 }
             }
         });
+
+
+        // vp_pager.getCurrentItem()
         //getActionBar().setHomeButtonEnabled(true);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
@@ -441,7 +535,27 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
+
+        SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        searchMenuItem = menu.findItem(R.id.search);
+        searchView = (SearchView) searchMenuItem.getActionView();
+
+        ComponentName cn = new ComponentName(this, SearchActivity.class);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(cn));
+
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean queryTextFocused) {
+                if(!queryTextFocused) {
+                    searchMenuItem.collapseActionView();
+                    searchView.setQuery("", false);
+                }
+            }
+        });
+
+        return true;
     }
 
     @Override
@@ -452,8 +566,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_add) {
-            startActivity(new Intent(this, AddActivity.class));
+        if (id == R.id.action_addAd) {
+            startActivity(new Intent(this, AddActivity.class).putExtra("title", "add"));
             return true;
         }
 

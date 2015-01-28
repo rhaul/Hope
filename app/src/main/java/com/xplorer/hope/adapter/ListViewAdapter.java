@@ -50,12 +50,12 @@ public class ListViewAdapter extends BaseAdapter{
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return mAds.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return 0;
+        return i;
     }
 
     @Override
@@ -75,8 +75,8 @@ public class ListViewAdapter extends BaseAdapter{
         }
 
         final int pos = i;
+        final ViewHolder finalHolder = holder;
         if(mAds.get(i).imgURL == null){
-            final ViewHolder finalHolder = holder;
 
             ParseQuery<ParseUser>  query = ParseUser.getQuery();
 
@@ -85,19 +85,15 @@ public class ListViewAdapter extends BaseAdapter{
                     UserInfo usr = (UserInfo) object;
 
                     if (usr.getImageFile() != null){
-                        //Log.d("hope usr", pos+"> "+usr.getName()+">"+usr.getObjectId()+">"+usr.getImageFile().getUrl());
                         Picasso.with(mContext).load(usr.getImageFile().getUrl()).error(R.drawable.ic_launcher).into(finalHolder.iv_employerPic);
                         if(mAds != null && mAds.size()>0) {
                             mAds.get(pos).imgURL = usr.getImageFile().getUrl();
                         }
-                        //Log.d("hope i",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
                     }else{
-                        //Log.d("hope usr (null)", pos+"> "+usr.getName()+">"+usr.getObjectId());
                         Picasso.with(mContext).load(R.drawable.defaultuser).into(finalHolder.iv_employerPic);
                         if(mAds != null && mAds.size()>0) {
                             mAds.get(pos).imgURL = "default.jpg";
-                        }
-                        //Log.d("hope i(null)",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
+                        }//Log.d("hope i(null)",pos+"> "+mAds.get(pos).getCategory()+"> "+mAds.get(pos).getUserId()+"> "+ mAds.get(pos).imgURL);
                     }
                 }
             });
@@ -106,8 +102,7 @@ public class ListViewAdapter extends BaseAdapter{
         }else{
             Picasso.with(mContext).load(mAds.get(i).imgURL).into(holder.iv_employerPic);
         }
-        holder.tv_description.setText(mAds.get(i).getDescription());
-        holder.tv_name.setText(mAds.get(i).getUserName());
+
         String dateType=mAds.get(i).getDateType()+" Job";
         if(mAds.get(i).getDateType().equalsIgnoreCase("One Day")){
             dateType+="\nOn: "+mAds.get(i).getDateFrom();
@@ -122,22 +117,58 @@ public class ListViewAdapter extends BaseAdapter{
         }
 
 
-        holder.tv_name.setText(mAds.get(i).getUserName());
+        holder.tv_description.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getDescription()));
+        holder.tv_name.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getUserName()));
+
         holder.tv_jobType.setText(dateType);
         holder.tv_timeType.setText(timeType);
-        holder.tv_wages.setText("₹ "+mAds.get(i).getWageLowerLimit()+"-"+mAds.get(i).getWageHigherLimit());
+        holder.tv_wages.setText(mAds.get(i).getWageLowerLimit()+"-"+mAds.get(i).getWageHigherLimit());
         holder.tv_phoneNo.setText(mAds.get(i).getPhoneNo());
-        holder.ll_phone.setVisibility(View.GONE);
-        holder.tv_address.setText(mAds.get(i).getAddress());
+        holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getAddress()));
 
-        holder.b_apply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                open(mAds.get(pos).getUserName(),pos);
-            }
-        });
+        String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
+
+        setIvColor(mAds.get(i).getCategory(), finalHolder);
+        if(HopeApp.myWorksIds.containsKey(mAds.get(i).getObjectId()) || mAds.get(i).getUserId().equalsIgnoreCase(myWorkerId)){
+            holder.b_apply.setVisibility(View.GONE);
+            holder.ll_phone.setVisibility(View.VISIBLE);
+        }else if(HopeApp.myPendingWorksIds.containsKey(mAds.get(i).getObjectId())){
+            holder.b_apply.setText("Pending");
+            holder.b_apply.setVisibility(View.VISIBLE);
+            holder.ll_phone.setVisibility(View.GONE);
+        }else{
+            holder.ll_phone.setVisibility(View.GONE);
+            holder.b_apply.setVisibility(View.VISIBLE);
+            holder.b_apply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    open(mAds.get(pos).getUserName(),pos, finalHolder);
+                }
+            });
+        }
         return view;
     }
+
+    public void setIvColor(String category, final ViewHolder holder){
+        Integer colorVal =  HopeApp.CategoryColor.get(category);
+        //Log.d("setIvColor",colorVal.toString());
+        holder.iv_ad_date.setColorFilter(mContext.getResources().getColor(colorVal));
+        holder.iv_ad_info.setColorFilter(mContext.getResources().getColor(colorVal));
+        holder.iv_ad_addr.setColorFilter(mContext.getResources().getColor(colorVal));
+        holder.iv_ad_time.setColorFilter(mContext.getResources().getColor(colorVal));
+        holder.iv_ad_phone.setColorFilter(mContext.getResources().getColor(colorVal));
+        holder.iv_ad_rupee.setColorFilter(mContext.getResources().getColor(colorVal));
+
+        holder.b_apply.setBackgroundColor(mContext.getResources().getColor(colorVal));
+        /*holder.ll_ad_card.setBackgroundColor(mContext.getResources().getColor(colorVal));
+
+
+        Integer LightcolorVal =  HopeApp.CategoryLightColor.get(category);
+
+        holder.ll_ad_bg.setBackgroundColor(mContext.getResources().getColor(LightcolorVal));*/
+
+    }
+
     public static class ViewHolder {
         @InjectView(R.id.iv_ad_employerPic)ImageView iv_employerPic;
         @InjectView(R.id.tv_ad_description)TextView tv_description;
@@ -150,6 +181,16 @@ public class ListViewAdapter extends BaseAdapter{
         @InjectView(R.id.b_ad_apply)Button b_apply;
         @InjectView(R.id.ll_ad_phone)LinearLayout ll_phone;
 
+        @InjectView(R.id.iv_ad_date)ImageView iv_ad_date;
+        @InjectView(R.id.iv_ad_time)ImageView iv_ad_time;
+        @InjectView(R.id.iv_ad_info)ImageView iv_ad_info;
+        @InjectView(R.id.iv_ad_addr)ImageView iv_ad_addr;
+        @InjectView(R.id.iv_ad_phone)ImageView iv_ad_phone;
+        @InjectView(R.id.iv_ad_rupee)ImageView iv_ad_rupee;
+
+        @InjectView(R.id.ll_ad_bg)LinearLayout ll_ad_bg;
+        @InjectView(R.id.ll_ad_card)LinearLayout ll_ad_card;
+
         public ViewHolder(View view, final Context context ){
             ButterKnife.inject(this, view);
 
@@ -157,7 +198,7 @@ public class ListViewAdapter extends BaseAdapter{
 
     }
 
-    public void open(String name, final int pos){
+    public void open(String name, final int pos,final ViewHolder vh){
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
 
@@ -167,7 +208,8 @@ public class ListViewAdapter extends BaseAdapter{
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
-
+                        vh.b_apply.setOnClickListener(null);
+                        vh.b_apply.setText("Pending");
                         setEWRelation(pos);
                         dialog.cancel();
                     }

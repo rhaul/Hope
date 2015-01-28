@@ -1,10 +1,8 @@
 package com.xplorer.hope.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -89,7 +87,7 @@ public class PushNotificationActivity extends Activity {
     Button b_apply;
     LinearLayout ll_phone;
 
-    ProgressDialog pd;
+
     int infoObtained =0;
 
     @Override
@@ -188,7 +186,7 @@ public class PushNotificationActivity extends Activity {
         }
 
 
-        onPreExecute();
+        HopeApp.getInstance().onPreExecute(PushNotificationActivity.this);
         fetchWorker();
         fetchWork();
 
@@ -202,7 +200,7 @@ public class PushNotificationActivity extends Activity {
 
                 if (e == null) {
                     infoObtained++;
-                    if(infoObtained==2) pd.dismiss();
+                    if(infoObtained==2) HopeApp.pd.dismiss();
 
                     workerObject = (UserInfo) object;
                     setWorkerProfile();
@@ -219,7 +217,7 @@ public class PushNotificationActivity extends Activity {
             public void done(WorkAd workAd, ParseException e) {
                 if (e == null) {
                     infoObtained++;
-                    if(infoObtained==2) pd.dismiss();
+                    if(infoObtained==2) HopeApp.pd.dismiss();
                     workAdObject = workAd;
                     setWorkAd();
                 }else{
@@ -247,7 +245,6 @@ public class PushNotificationActivity extends Activity {
             }
         });
 
-        tv_description.setText(workAdObject.getDescription());
 
         String dateType = workAdObject.getDateType() + " Job";
         if (workAdObject.getDateType().equalsIgnoreCase("One Day")) {
@@ -261,25 +258,23 @@ public class PushNotificationActivity extends Activity {
         } else {
             timeType += "\n" + workAdObject.getS1StartingTime() + "-" + workAdObject.getS1EndingTime() + "\n" + workAdObject.getS2StartingTime() + "-" + workAdObject.getS2EndingTime() + "";
         }
-        tv_name.setText(workAdObject.getCategory());
+
+
+        tv_name.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getCategory()));
+        tv_description.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getDescription()));
+        tv_address.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getAddress()));
+
         tv_jobType.setText(dateType);
         tv_timeType.setText(timeType);
-        tv_wages.setText("₹ " + workAdObject.getWageLowerLimit() + "-" + workAdObject.getWageHigherLimit());
+        tv_wages.setText(workAdObject.getWageLowerLimit() + "-" + workAdObject.getWageHigherLimit());
         tv_phoneNo.setText(workAdObject.getPhoneNo());
         ll_phone.setVisibility(View.VISIBLE);
-        tv_address.setText(workAdObject.getAddress());
         b_apply.setVisibility(View.GONE);
     }
-    public void onPreExecute() {
-        pd = new ProgressDialog(PushNotificationActivity.this);
-        pd.setTitle("Processing...");
-        pd.setMessage("Please wait.");
-        pd.setCancelable(false);
-        pd.setIndeterminate(true);
-        pd.show();
-    }
+
+
     public void setWorkerProfile() {
-        tv_worker_name.setText(workerObject.getName());
+        tv_worker_name.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getName()));
         tv_gender.setText(workerObject.getGender());
 
         if(workerObject.getImageFile() != null ) Picasso.with(this).load(workerObject.getImageFile().getUrl()).into(iv_workerPic);
@@ -289,12 +284,11 @@ public class PushNotificationActivity extends Activity {
         try {
             Date bdate = dateFormat.parse(workerObject.getDob());
             tv_age.setText("Age: "+getAge(bdate.getYear()+1900, bdate.getMonth(), bdate.getDate()));
-            Log.d("hope Age", bdate.getYear()+1900+":"+bdate.getMonth()+":"+bdate.getDate());
 
         } catch (java.text.ParseException e1) {
             e1.printStackTrace();
         }
-        tv_addr.setText(workerObject.getAddress());
+        tv_addr.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getAddress()));
         tv_wprofile_phoneno.setText(workerObject.getPhoneNo());
 
 
@@ -303,7 +297,8 @@ public class PushNotificationActivity extends Activity {
             LicenseStr += "FourWheeler";
         }
         if (workerObject.getlicenseHeavy()) {
-            LicenseStr += "| Heavy";
+            if(LicenseStr.equalsIgnoreCase("License: ")) LicenseStr +="Heavy";
+            else LicenseStr += "| Heavy";
         }
         if (LicenseStr.equalsIgnoreCase("License: ")) {
             ll_license.setVisibility(View.GONE);
@@ -315,7 +310,8 @@ public class PushNotificationActivity extends Activity {
             LangStr += "English";
         }
         if (workerObject.getLangHindi()) {
-            LangStr += "| Hindi";
+            if (LangStr.equalsIgnoreCase("Language: "))LangStr += "Hindi";
+            else LangStr += "| Hindi";
         }
         if (LangStr.equalsIgnoreCase("Language: ")) {
             ll_language.setVisibility(View.GONE);

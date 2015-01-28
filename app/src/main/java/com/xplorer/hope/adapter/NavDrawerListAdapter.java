@@ -17,18 +17,19 @@ import com.xplorer.hope.config.HopeApp;
 public class NavDrawerListAdapter extends BaseAdapter {
     private Context context;
 
+
     public NavDrawerListAdapter(Context context) {
         this.context = context;
     }
 
     @Override
     public int getCount() {
-        return HopeApp.drawerTitlesWorker.length;
+        return HopeApp.drawerCandidate.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return HopeApp.drawerTitlesWorker[position];
+        return HopeApp.drawerCandidate[position];
     }
 
     @Override
@@ -47,6 +48,31 @@ public class NavDrawerListAdapter extends BaseAdapter {
         TextView itemTxt = (TextView) convertView.findViewById(R.id.tv_drawer_itemTxt);
         itemTxt.setText(getItem(position).toString());
 
+        final TextView FinalitemTxt = itemTxt;
+/*
+        FinalitemTxt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()){
+
+                    case ACTION_DOWN:
+                        Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[MainActivity.currentFragment]);
+                        FinalitemTxt.setBackgroundColor(context.getResources().getColor(colorVal));
+                        break;
+
+                    case ACTION_UP:
+                        Log.d("FinalitemTxt","ACTION_UP");
+                        FinalitemTxt.setBackgroundColor(context.getResources().getColor(R.color.white));
+                        break;
+                    default:
+                        Log.d("FinalitemTxt","default");
+                        FinalitemTxt.setBackgroundColor(context.getResources().getColor(R.color.white));
+                        break;
+
+                }
+                return true;
+            }
+        });*/
         return convertView;
     }
 }

@@ -2,6 +2,7 @@ package com.xplorer.hope.config;
 
 import android.app.Application;
 import android.app.Instrumentation;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -32,16 +33,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class HopeApp extends Application {
     // app
     private static HopeApp instance;
     // Debugging tag for the application
-    //public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
+
+
+    public static HashMap<String, List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
+
     public static final String APPTAG = "HopeApp";
+    public ParseQuery<WorkAd> filteredQuery;
+
+    //public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
+
     public static int sortedBy = 3;
     public static ParseQuery<WorkAd> globalQuery;
+
     public static final String[] SORT_TYPES = {
             "Wage: Higher to Lower",
             "Wage: Lower to Higher",
@@ -62,6 +72,10 @@ public class HopeApp extends Application {
             "Gardening",
             "Miscellaneous"
     };
+
+    public static HashMap<String, Integer> CategoryColor = new HashMap();
+    public static HashMap<String, Integer> CategoryLightColor = new HashMap();
+
     public static final int[] ImgUrl = {
             R.drawable.dishwashing,
             R.drawable.cleaning,
@@ -77,18 +91,38 @@ public class HopeApp extends Application {
     };
     public static final String[] drawerTitlesWorker = {
             "Profile",
-            "My Schedule",
-            "Holidays",
+            "Manage Jobs",
+            "Employers",
             "History",
             "Employers",
             "Balance",
-            "My Ads"
+            "Holidays"
     };
+
+    public static final String[] drawerTitlesEmployer = {
+            "Profile",
+            "Manage Jobs",
+            "History",
+            "Employers",
+            "Balance",
+            "Holidays"
+    };
+    public static String[] drawerCandidate ={};
+
     //SP variables
 
     public static String SELECTED_LANGUAGE = "selectedLanguage";
     public static String SELECTED_USER_TYPE = "selectedUserType";
     public static int filteredBy = 0;
+
+
+    public static HashMap myPendingWorksIds = new HashMap();
+    public static HashMap myPendingEmployerIds = new HashMap();
+
+    public static HashMap myWorksIds = new HashMap();
+    public static HashMap myEmployerIds = new HashMap();
+
+    public static ProgressDialog pd;
 
     /**
      * Create main application
@@ -159,7 +193,7 @@ public class HopeApp extends Application {
 
 
         parseInit();
-
+        CatColorInit();
 
     }
 
@@ -187,6 +221,25 @@ public class HopeApp extends Application {
         // Optionally enable public read access.
         // defaultACL.setPublicReadAccess(true);
         ParseACL.setDefaultACL(defaultACL, true);
+
+    }
+
+
+    public void CatColorInit() {
+
+        CategoryColor.put("Dish Washing", R.color.LightGold);
+        CategoryColor.put("House Cleaning",R.color.LightOrange);
+        CategoryColor.put("Cloth Washing", R.color.LightViolet);
+        CategoryColor.put("Cooking", R.color.Green);
+        CategoryColor.put("Construction", R.color.SkyBlue);
+        CategoryColor.put("Wall paint", R.color.Red);
+        CategoryColor.put("Driver", R.color.Green_2);
+        CategoryColor.put("Guard", R.color.Blue_1);
+        CategoryColor.put("Shop Worker", R.color.LightViolet);
+        CategoryColor.put("Gardening", R.color.Sienna);
+        CategoryColor.put("Miscellaneous", R.color.gray8);
+
+
 
     }
 
@@ -300,6 +353,7 @@ public class HopeApp extends Application {
     }
 
     public void setWorkAdSortBy(int selection) {
+
         sortedBy = selection;
     }
 
@@ -353,6 +407,7 @@ public class HopeApp extends Application {
             break;
             case 1: {
                 filteredQuery.orderByAscending("wageHigherLimit");
+
             }
             break;
             case 2: {
@@ -360,18 +415,42 @@ public class HopeApp extends Application {
             }
             break;
             case 3: {
-                filteredQuery.orderByDescending("createdAt");
+		filteredQuery.orderByDescending("createdAt");
             }
             break;
             case 4: {
                 filteredQuery.orderByAscending("createdAt");
+
             }
             break;
         }
         return filteredQuery;
     }
 
+
+    public void onPreExecute(Context context) {
+        pd = new ProgressDialog(context);
+        pd.setTitle("Processing...");
+        pd.setMessage("Please wait.");
+        pd.setCancelable(false);
+        pd.setIndeterminate(true);
+        pd.show();
+    }
+
+    public void setWorkAdFilter() {
+
+    }
+
+
     private static ParseGeoPoint getMyLocation() {
         return null;
     }
+
+    public String getUpperCaseString(String myString){
+        String upperString = myString.substring(0,1).toUpperCase() + myString.substring(1);
+        upperString =upperString.replace("\n"," ");
+        return upperString;
+    }
+
+
 }

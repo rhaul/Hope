@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.costum.android.widget.LoadMoreListView;
@@ -38,7 +39,13 @@ public class CategoryFragment extends Fragment {
     // private QuickReturnFooter ll_footer;
     public ListViewAdapter lva;
     @InjectView(R.id.lv_frag_category)
-    LoadMoreListView lv_category;
+	LoadMoreListView lv_category;
+
+    @InjectView(R.id.fl_frag_bg)
+    FrameLayout fl_bg;
+
+    
+
     private List<WorkAd> categoryItems;
     int cat = 0;
     int locallySortedBy = 3;
@@ -64,7 +71,13 @@ public class CategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_category, container, false);
         ButterKnife.inject(this, view);
+
+
         cat = getArguments().getInt("category", 1);
+
+        /*Integer colorVal =  HopeApp.CategoryLightColor.get(HopeApp.TITLES[cat]);
+        fl_bg.setBackgroundColor(getResources().getColor(colorVal));
+        lv_category.setBackgroundColor(getResources().getColor(colorVal));*/
         return view;
     }
 
@@ -98,6 +111,8 @@ public class CategoryFragment extends Fragment {
         categoryItems = new ArrayList<WorkAd>();
         lva = new ListViewAdapter(getActivity(), categoryItems);
         lv_category.setAdapter(lva);
+
+
         lv_category.setOnLoadMoreListener(new LoadMoreListView.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
@@ -106,13 +121,20 @@ public class CategoryFragment extends Fragment {
         });
         //initList(view, lv_category);
         fetchWorks(HopeApp.getInstance().applyFilteredQuery());
+
     }
 
     private void fetchWorks(ParseQuery<WorkAd> adParseQuery) {
 
         query = adParseQuery;
         query.whereEqualTo("category", HopeApp.TITLES[cat]);
+
+
+        query.addDescendingOrder("createdAt");
+
+
         query.setLimit(2);
+
         query.setSkip(categoryItems.size());
         query.findInBackground(new FindCallback<WorkAd>() {
             @Override
@@ -121,63 +143,18 @@ public class CategoryFragment extends Fragment {
                     categoryItems.addAll(workAds);
                     lva.notifyDataSetChanged();
                 }
+
+
                 locallySortedBy = HopeApp.sortedBy;
                 locallyFilteredBy = HopeApp.filteredBy;
                 query = null;
                 loadMore = true;
                 lv_category.onLoadMoreComplete();
+
             }
         });
     }
-/*
-    private void initList(View rootView, ListView listView) {
 
-        // DobList initializing
-        dobList = new DobList();
-        try {
-
-            // Register ListView
-            //
-            // NoListViewException will be thrown when
-            // there is no ListView
-            dobList.register(listView);
-            // Add ProgressBar to footers of ListView
-            // to be shown in loading more
-            dobList.addDefaultLoadingFooterView();
-
-            // Sets the view to show if the adapter is empty
-            // see startCentralLoading() method
-            //  View noItems = rootView.findViewById(R.id.tv_interest_name);
-            // dobList.setEmptyView(noItems);
-
-            // Callback called when reaching last item in ListView
-            dobList.setOnLoadMoreListener(new OnLoadMoreListener() {
-
-                @Override
-                public void onLoadMore(final int totalItemCount) {
-                    //fetchWorks();
-                }
-            });
-
-        } catch (NoListViewException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            // Show ProgressBar at the center of ListView
-            // this can be used while loading data from
-            // server at the first time
-            //
-            // setEmptyView() must be called before
-            //
-            // NoEmptyViewException will be thrown when
-            // there is no EmptyView
-            dobList.startCentralLoading();
-
-        } catch (NoEmptyViewException e) {
-            e.printStackTrace();
-        }
-    }*/
 
     public void checkIfFilterApplied() {
         if (query == null && categoryItems != null) {

@@ -1,7 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EEEEEE"
+    android:background="@color/gray1"
+    android:id="@+id/fl_frag_bg"
     tools:context="com.xplorer.hope.fragment.CategoryFragment">
 <!--
     <ListView
@@ -9,6 +10,7 @@
         android:layout_height="wrap_content"
         android:dividerHeight="5dp"
         android:scrollbarStyle="outsideOverlay"
+        android:background="@color/gray1"
         android:divider="@android:color/transparent"
         android:id="@+id/lv_frag_category" />-->
 

@@ -52,7 +52,7 @@
                     android:hint="Date of Birth"
                     android:inputType="date"
                     android:text="Date of Birth"
-                    android:textColor="@color/DimGray"
+                    android:textColor="@color/white"
                     android:textSize="18dp" />
 
                 <RadioGroup

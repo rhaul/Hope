@@ -9,7 +9,8 @@
         android:layout_height="match_parent"
         android:textColor="@color/Black"
         android:gravity="center"
-        android:text="baba blacksheap"
+        android:background="@drawable/list_selector"
+        android:text="Option"
         />
 
 
