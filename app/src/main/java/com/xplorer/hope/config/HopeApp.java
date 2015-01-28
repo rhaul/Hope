@@ -55,9 +55,9 @@ public class HopeApp extends Application {
     public static final String[] SORT_TYPES = {
             "Wage: Higher to Lower",
             "Wage: Lower to Higher",
-            "Distance: Nearest to Farthest",
             "Date: Latest to Oldest",
-            "Date: Oldest to Latest"
+            "Date: Oldest to Latest",
+            "Distance: Nearest to Farthest"
     };
     public static final String[] TITLES = {
             "Dish Washing",
@@ -411,14 +411,10 @@ public class HopeApp extends Application {
             }
             break;
             case 2: {
-                filteredQuery.whereWithinKilometers("location", HopeApp.getMyLocation(), 5);
-            }
-            break;
-            case 3: {
 		filteredQuery.orderByDescending("createdAt");
             }
             break;
-            case 4: {
+            case 3: {
                 filteredQuery.orderByAscending("createdAt");
 
             }
