@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -85,6 +86,14 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_works);
         ButterKnife.inject(this);
+
+        getActionBar().setTitle("Search nearby jobs");
+        Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[6]);
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_nbw);
 
@@ -507,6 +516,9 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_mapFilter) {
             applyFilters();
+            return true;
+        }else if (id == android.R.id.home) {
+            finish();
             return true;
         }
 

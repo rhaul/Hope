@@ -148,6 +148,9 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
 
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
         rl_button.setOnClickListener(this);
         rg_jobType.setOnCheckedChangeListener(this);
         tv_startingDate.setOnClickListener(this);
@@ -348,6 +351,9 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
             if(isFormFilled()) saveWorkAd();
+            return true;
+        }else if (id == android.R.id.home) {
+            finish();
             return true;
         }
 

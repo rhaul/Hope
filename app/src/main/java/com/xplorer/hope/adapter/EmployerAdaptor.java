@@ -186,7 +186,7 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
                 public void onClick(View view) {
                     String map;
                     if (myWorkIds.get(pos).getAddressGP() != null) {
-                        String addr = myWorkIds.get(pos).getAddressGP().getLatitude() + "," + myWorkIds.get(pos).getAddressGP().getLatitude();
+                        String addr = myWorkIds.get(pos).getAddressGP().getLatitude() + "," + myWorkIds.get(pos).getAddressGP().getLongitude();
                         map = "http://maps.google.com/maps?q=" + addr;
                     } else {
                         map = "http://maps.google.co.in/maps?q=" + myWorkIds.get(pos).getAddress();

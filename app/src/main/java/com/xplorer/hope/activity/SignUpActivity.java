@@ -174,6 +174,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         mcontex = this;
         et_addr.setOnClickListener(this);
         b_map.setOnClickListener(this);
+        tv_dob.setOnClickListener(this);
         cb_ShopWorker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -220,6 +221,9 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         getActionBar().setTitle("Profile");
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[0]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (getIntent().getStringExtra("from").equalsIgnoreCase("singup")) {
             saveBtn.setTitle("SIGN UP");
@@ -333,6 +337,9 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         if (id == R.id.action_signup) {
             if (checkForm() == true && !isSaveClicked) saveWorkAd();
 
+            return true;
+        }else if (id == android.R.id.home) {
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -455,7 +462,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             btnPhoneConfirm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String username = etPhoneNo.getText().toString();
+                    final String username = etPhoneNo.getText().toString();
                     dialog.dismiss();
                     HopeApp.getInstance().onPreExecute(SignUpActivity.this);
                     ParseUser.logInInBackground(username, "", new LogInCallback() {
@@ -465,6 +472,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
                                 finish();
                                 return;
                             } else {
+                                et_num.setText(username);
                                 Log.e("hope showMobileDialog", e.toString());
                             }
                         }

@@ -1,9 +1,7 @@
 package com.xplorer.hope.adapter;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -18,11 +16,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
 import com.xplorer.hope.activity.AddActivity;
@@ -105,7 +103,7 @@ public String currentWork;
             public void onClick(View view) {
                 String map;
                 if(myWorkIds.get(pos).getAddressGP()!=null){
-                    String addr= myWorkIds.get(pos).getAddressGP().getLatitude()+","+myWorkIds.get(pos).getAddressGP().getLatitude();
+                    String addr= myWorkIds.get(pos).getAddressGP().getLatitude()+","+myWorkIds.get(pos).getAddressGP().getLongitude();
                     map= "http://maps.google.com/maps?q="+addr;
                 }else{
                     map = "http://maps.google.co.in/maps?q=" + myWorkIds.get(pos).getAddress();
@@ -166,11 +164,11 @@ public String currentWork;
                 return;
             }
         });
-
+        holder.b_Del.setText(myWorkIds.get(pos).getActive()?"Disable":"Enable");
         holder.b_Del.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteDialog(myWorkIds.get(pos).getObjectId(), pos);
+                disableThisWork(myWorkIds.get(pos).getObjectId(), pos, finalHolder);
             }
         });
         //b_Edit
@@ -179,64 +177,48 @@ public String currentWork;
         return view;
     }
 
-    public void deleteDialog(final String workObjId, final int pos){
+    public void disableThisWork(final String workObjId, final int pos, final ViewHolder finalHolder){
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+        final boolean setVal = finalHolder.b_Del.getText().toString().equalsIgnoreCase("Disable")?false:true;
 
-        alertDialogBuilder.setMessage("Are you sure you want to delete your work advertisement ?");
-        alertDialogBuilder.setPositiveButton("Accept",
-                new DialogInterface.OnClickListener() {
+        ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
+        query.whereEqualTo("objectId", workObjId);
+        HopeApp.getInstance().onPreExecute(mContext);
+        Log.d("hope deleteDialog", workObjId);
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int arg1) {
-                        ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
-                        query.whereEqualTo("objectId", workObjId);
-                        HopeApp.getInstance().onPreExecute(mContext);
-                        Log.d("hope deleteDialog", workObjId);
+        query.findInBackground(new FindCallback<WorkAd>() {
+            @Override
+            public void done(List<WorkAd> parseObjects, ParseException e) {
 
-                        query.findInBackground(new FindCallback<WorkAd>() {
-                            @Override
-                            public void done(List<WorkAd> parseObjects, ParseException e) {
+                HopeApp.pd.dismiss();
+                if (e == null && parseObjects.size()==1) {
 
-                                HopeApp.pd.dismiss();
-                                if (e == null && parseObjects.size()==1) {
+                    WorkAd workAdSave = parseObjects.get(0);
+                    workAdSave.setActive(setVal);
+                    workAdSave.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e == null) {
+                                String val= setVal?"Enable":"Disable";
+                                Toast.makeText(mContext, val+" Successful", Toast.LENGTH_LONG).show();
+                                finalHolder.b_Del.setText(val);
+                                notifyDataSetChanged();
+                            } else {
+                                Log.e("Disable (done)",e.toString());
+                                Toast.makeText(mContext, "Could not disable, please try again later.", Toast.LENGTH_LONG).show();
 
-                                    WorkAd workAdSave = parseObjects.get(0);
-                                    workAdSave.deleteInBackground(new DeleteCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            if(e==null) {
-                                                Toast.makeText(mContext, "Deletion Successful", Toast.LENGTH_LONG).show();
-                                                myWorkIds.remove(pos);
-                                                notifyDataSetChanged();
-                                            }else{
-                                                Toast.makeText(mContext, "Could not delete, please try again later.", Toast.LENGTH_LONG).show();
-
-                                            }
-                                        }
-                                    });
-
-
-                                }else{
-                                    Log.e("fetchWorkFromWorkId(size)",parseObjects.size()+"" );
-                                }
                             }
-                        });
+                        }
+                    });
 
-                    }
+
+                }else{
+                    Log.e("fetchWorkFromWorkId(size)",parseObjects.size()+"" );
+                }
+            }
+        });
 
 
-                });
-        alertDialogBuilder.setNegativeButton("Decline",
-                new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
 
     }
 

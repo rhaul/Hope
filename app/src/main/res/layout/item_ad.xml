@@ -298,7 +298,7 @@
                 android:layout_marginLeft="1dp"
                 android:layout_weight="1"
                 android:background="@color/gray"
-                android:text="Delete"
+                android:text="Disable"
                 android:textColor="@color/white" />
         </LinearLayout>
 

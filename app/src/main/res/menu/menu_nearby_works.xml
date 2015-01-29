@@ -4,7 +4,7 @@
     tools:context="com.xplorer.hope.activity.NearbyWorksActivity">
 
     <item android:id="@+id/action_mapFilter"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/filter"
         android:title="Filter"
         android:showAsAction="always" />
 </menu>

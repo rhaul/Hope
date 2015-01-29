@@ -43,8 +43,13 @@ public class WorkActivity extends Activity {
         getActionBar().setTitle("My Job Ads");
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[1]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
-        getMyWorkids();
+
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         HopeApp.getInstance().onPreExecute(WorkActivity.this);
+        getMyWorkids();
     }
 
 
@@ -61,7 +66,7 @@ public class WorkActivity extends Activity {
             public void done(List<WorkAd> parseObjects, ParseException e) {
 
                 HopeApp.pd.dismiss();
-                if (e == null) {
+                if (e == null && parseObjects.size()>0) {
                     myWorkAds=parseObjects;
                     workAdptr = new WorkAdaptor(WorkActivity.this, myWorkAds);
                     lv_itemList.setAdapter(workAdptr);
@@ -97,7 +102,10 @@ public class WorkActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }

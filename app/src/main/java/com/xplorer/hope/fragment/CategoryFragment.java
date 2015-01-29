@@ -94,13 +94,6 @@ public class CategoryFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        //lva.notifyDataSetChanged();
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -112,7 +105,7 @@ public class CategoryFragment extends Fragment {
         lv_category.setOnScrollListener(scrollListener);
         View headerView = getActivity().getLayoutInflater().inflate(R.layout.item_category_header, null, false);
         ImageView iv = (ImageView) headerView.findViewById(R.id.iv_category_header);
-        Picasso.with(getActivity()).load(HopeApp.ImgUrl[cat]).into(iv);
+        Picasso.with(getActivity()).load(HopeApp.ImgUrl[cat]).skipMemoryCache().into(iv);
 
         lv_category.addHeaderView(headerView);
         categoryItems = new ArrayList<WorkAd>();
@@ -135,7 +128,7 @@ public class CategoryFragment extends Fragment {
 
         query = adParseQuery;
         query.whereEqualTo("category", HopeApp.TITLES[cat]);
-
+        query.whereEqualTo("active", true);
 
         query.addDescendingOrder("createdAt");
 
