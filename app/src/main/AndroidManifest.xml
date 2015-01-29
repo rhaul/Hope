@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -145,9 +144,16 @@
             android:value="AIzaSyDNkm-u1A9Tewg0sElbNL5tlcKHafZG_mE" />
 
         <activity
+
             android:name=".activity.PendingActivity"
             android:label="@string/title_activity_pending" >
         </activity>
+
+            android:name=".activity.NearbyWorksActivity"
+            android:label="@string/title_activity_nearby_works" >
+        </activity>
+
+
     </application>
 
 </manifest>

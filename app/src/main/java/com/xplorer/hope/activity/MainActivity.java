@@ -227,7 +227,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
     private void setUpMainActivity() {
 
-        pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager(), loadFragments());
+        pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager(),loadFragments());
         vp_pager.setAdapter(pagerAdapter);
         pts_titleBar.setViewPager(vp_pager);
 
@@ -245,7 +245,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             @Override
             public void onPageSelected(int position) {
                 setBarColors(position);
-                pagerAdapter.getFragment(position).checkIfFilterApplied();
+               // pagerAdapter.getFragment(position).checkIfFilterApplied();
             }
 
             @Override
@@ -435,7 +435,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                         filters[6] = rb_filter_wageLimit.getRightIndex();
                         query.whereGreaterThanOrEqualTo("wageLowerLimit", rb_filter_wageLimit.getLeftIndex() * 500).whereLessThanOrEqualTo("wageHigherLimit", rb_filter_wageLimit.getRightIndex() * 500);
                         HopeApp.getInstance().setFilters(filters);
-                        pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+                      //  pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
                         dialog.cancel();
                     }
                 })
@@ -477,8 +477,12 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         lvD.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                HopeApp.getInstance().setWorkAdSortBy(i);
-                pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+                if(i != 4) {
+                    HopeApp.getInstance().setWorkAdSortBy(i);
+                }else{
+                    startActivity(new Intent(MainActivity.this,NearbyWorksActivity.class));
+                }
+              //  pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
                 dialog.dismiss();
             }
         });

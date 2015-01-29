@@ -419,7 +419,10 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
             return false;
         }
 
-
+        if(gp == null){
+            Toast.makeText(AddActivity.this, "Geo Location not set.", Toast.LENGTH_LONG).show();
+            return false;
+        }
         return true;
     }
 
@@ -452,8 +455,6 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         ParseACL acl = new ParseACL();
         acl.setPublicReadAccess(true);
         acl.setPublicWriteAccess(true);
-
-
         ad.setACL(acl);
 
 

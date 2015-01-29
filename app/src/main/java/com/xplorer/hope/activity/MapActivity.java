@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -52,7 +53,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     float radius = 200;
     String address = "";
     GetAddressTask getAddressTask;
-
+    float currZoomLevel = 15;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,18 +122,28 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker marker) {
+                marker.hideInfoWindow();
 
             }
 
             @Override
             public void onMarkerDrag(Marker marker) {
-                marker.hideInfoWindow();
             }
 
             @Override
             public void onMarkerDragEnd(Marker TempMarker) {
                 latLng = new LatLng(TempMarker.getPosition().latitude, TempMarker.getPosition().longitude);
-                showLocationOnMap();
+                if (getAddressTask != null) {
+                    getAddressTask.cancel(true);
+                }
+                getAddressTask = new GetAddressTask(MapActivity.this, false);
+                getAddressTask.execute(latLng.latitude, latLng.longitude);
+            }
+        });
+        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                currZoomLevel = cameraPosition.zoom;
             }
         });
         showLocationOnMap();
@@ -149,13 +160,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
             getAddressTask = new GetAddressTask(MapActivity.this, false);
             getAddressTask.execute(latLng.latitude, latLng.longitude);
-            
+
         } else {
             marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Long press to drag me to your Work Location")
                     .draggable(true));
         }
         marker.showInfoWindow();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, currZoomLevel);
         mMap.animateCamera(cameraUpdate);
 
     }
