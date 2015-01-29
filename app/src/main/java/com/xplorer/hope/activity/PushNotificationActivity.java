@@ -423,6 +423,8 @@ public class PushNotificationActivity extends Activity {
 
     }
 
+
+
     public void addInterest(String Interested, String expectedWage) {
         View viewItemInterest = getLayoutInflater().inflate(R.layout.item_interest, null);
         TextView tvInterested = (TextView) viewItemInterest.findViewById(R.id.tv_interest_name);
