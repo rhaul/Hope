@@ -2,6 +2,7 @@ package com.xplorer.hope.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -71,7 +72,8 @@ public class PushNotificationActivity extends Activity {
     LinearLayout ll_interest;
     LinearLayout ll_license;
     LinearLayout ll_language;
-
+    LinearLayout ll_wprofile_addr;
+    LinearLayout ll_wprofile_phone;
 
 
     // workAd
@@ -86,7 +88,7 @@ public class PushNotificationActivity extends Activity {
     TextView tv_phoneNo;
     Button b_apply;
     LinearLayout ll_phone;
-
+    LinearLayout ll_addr;
 
     int infoObtained =0;
 
@@ -110,6 +112,8 @@ public class PushNotificationActivity extends Activity {
         ll_interestTitle = (LinearLayout)  viewProfile.findViewById(R.id.ll_wprofile_interestTitle);
         ll_language = (LinearLayout) viewProfile.findViewById(R.id.ll_wprofile_language);
         ll_license = (LinearLayout) viewProfile.findViewById(R.id.ll_wprofile_license);
+        ll_wprofile_addr = (LinearLayout) viewProfile.findViewById(R.id.ll_wprofile_addr);
+        ll_wprofile_phone = (LinearLayout) viewProfile.findViewById(R.id.ll_wprofile_phone);
 
         ll_profile.addView(viewProfile);
 
@@ -124,6 +128,7 @@ public class PushNotificationActivity extends Activity {
         tv_address = (TextView) viewWorkAd.findViewById(R.id.tv_ad_address);
         tv_phoneNo = (TextView) viewWorkAd.findViewById(R.id.tv_ad_phoneNo);
         b_apply = (Button) viewWorkAd.findViewById(R.id.b_ad_apply);
+        ll_addr = (LinearLayout) viewWorkAd.findViewById(R.id.ll_ad_addr);
 
         ll_workad.addView(viewWorkAd);
         Bundle b = getIntent().getExtras();
@@ -259,7 +264,29 @@ public class PushNotificationActivity extends Activity {
             timeType += "\n" + workAdObject.getS1StartingTime() + "-" + workAdObject.getS1EndingTime() + "\n" + workAdObject.getS2StartingTime() + "-" + workAdObject.getS2EndingTime() + "";
         }
 
+        ll_addr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String map;
+                if(workAdObject.getAddressGP()!=null){
+                    String addr= workAdObject.getAddressGP().getLatitude()+","+workAdObject.getAddressGP().getLatitude();
+                    map= "http://maps.google.com/maps?q="+addr;
+                }else{
+                    map = "http://maps.google.co.in/maps?q=" + workAdObject.getAddress();
 
+                }
+                Intent int_ = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(map));
+                startActivity(int_);
+            }
+        });
+        ll_phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" +  workAdObject.getPhoneNo()));
+                startActivity(callIntent);
+            }
+        });
         tv_name.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getCategory()));
         tv_description.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getDescription()));
         tv_address.setText(HopeApp.getInstance().getUpperCaseString(workAdObject.getAddress()));
@@ -291,14 +318,37 @@ public class PushNotificationActivity extends Activity {
         tv_addr.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getAddress()));
         tv_wprofile_phoneno.setText(workerObject.getPhoneNo());
 
+        ll_wprofile_addr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String map;
+                if(workerObject.getAddressGP()!=null){
+                    String addr= workerObject.getAddressGP().getLatitude()+","+workerObject.getAddressGP().getLatitude();
+                    map= "http://maps.google.com/maps?q="+addr;
+                }else{
+                    map = "http://maps.google.co.in/maps?q=" + workerObject.getAddress();
+
+                }
+                Intent int_ = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(map));
+                startActivity(int_);
+            }
+        });
+        ll_wprofile_phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" +  workerObject.getPhoneNo()));
+                startActivity(callIntent);
+            }
+        });
 
         String LicenseStr = "License: ", LangStr = "Language: ";
         if (workerObject.getlicenseFour()) {
-            LicenseStr += "FourWheeler";
+            LicenseStr += "Four Wheeler";
         }
         if (workerObject.getlicenseHeavy()) {
             if(LicenseStr.equalsIgnoreCase("License: ")) LicenseStr +="Heavy";
-            else LicenseStr += "| Heavy";
+            else LicenseStr += " | Heavy";
         }
         if (LicenseStr.equalsIgnoreCase("License: ")) {
             ll_license.setVisibility(View.GONE);
@@ -311,7 +361,7 @@ public class PushNotificationActivity extends Activity {
         }
         if (workerObject.getLangHindi()) {
             if (LangStr.equalsIgnoreCase("Language: "))LangStr += "Hindi";
-            else LangStr += "| Hindi";
+            else LangStr += " | Hindi";
         }
         if (LangStr.equalsIgnoreCase("Language: ")) {
             ll_language.setVisibility(View.GONE);
@@ -411,10 +461,6 @@ public class PushNotificationActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }

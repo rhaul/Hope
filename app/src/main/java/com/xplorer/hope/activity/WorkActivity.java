@@ -1,11 +1,14 @@
 package com.xplorer.hope.activity;
 
 import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -25,6 +28,8 @@ import butterknife.InjectView;
 public class WorkActivity extends Activity {
     @InjectView(R.id.lv_work_itemList)
     ListView lv_itemList;
+@InjectView(R.id.tv_work_result)
+    TextView tv_result;
 
     WorkAdaptor workAdptr;
 
@@ -36,7 +41,8 @@ public class WorkActivity extends Activity {
 
         ButterKnife.inject(this);
         getActionBar().setTitle("My Job Ads");
-
+        Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[1]);
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
         getMyWorkids();
         HopeApp.getInstance().onPreExecute(WorkActivity.this);
     }
@@ -60,7 +66,11 @@ public class WorkActivity extends Activity {
                     workAdptr = new WorkAdaptor(WorkActivity.this, myWorkAds);
                     lv_itemList.setAdapter(workAdptr);
                     Log.d("hope getMyWorkids(done)", String.valueOf(myWorkAds.size()));
-
+                    tv_result.setVisibility(View.GONE);
+                    lv_itemList.setVisibility(View.VISIBLE);
+                }else{
+                    tv_result.setVisibility(View.VISIBLE);
+                    lv_itemList.setVisibility(View.GONE);
                 }
             }
         });
@@ -87,9 +97,7 @@ public class WorkActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }

@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -45,7 +46,9 @@ public class SearchActivity extends Activity {
         setContentView(R.layout.activity_search);
 
         ButterKnife.inject(this);
+        Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[5]);
 
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
         searchVal="";
         handleIntent(getIntent());
     }
@@ -101,7 +104,7 @@ public class SearchActivity extends Activity {
                     }else{
                         lv_items.setVisibility(View.VISIBLE);
                         tv_result.setVisibility(View.GONE);
-                        WorkerAdaptor clA = new WorkerAdaptor(SearchActivity.this ,users_, true );
+                        WorkerAdaptor clA = new WorkerAdaptor(SearchActivity.this ,users_, "Interest", "" );
                         lv_items.setAdapter(clA);
 
                     }

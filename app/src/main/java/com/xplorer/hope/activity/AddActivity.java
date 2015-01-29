@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -142,6 +143,11 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         setContentView(R.layout.activity_add);
         ButterKnife.inject(this);
 
+        getActionBar().setTitle("Job Advertisement");
+        Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[4]);
+
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
         rl_button.setOnClickListener(this);
         rg_jobType.setOnCheckedChangeListener(this);
         tv_startingDate.setOnClickListener(this);
@@ -151,6 +157,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         tv_s1_endingTime.setOnClickListener(this);
         tv_s2_startingTime.setOnClickListener(this);
         tv_s2_endingTime.setOnClickListener(this);
+        et_address.setOnClickListener(this);
 
         b_map.setOnClickListener(this);
 
@@ -165,8 +172,10 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
         if (getIntent().getStringExtra("title").equalsIgnoreCase("add")) {
             addBtn.setTitle("ADD");
-            String myWorkerPhoneNo= ((UserInfo) ParseUser.getCurrentUser()).getPhoneNo();
-            et_phone.setText(myWorkerPhoneNo);
+            UserInfo currentUser= ((UserInfo) ParseUser.getCurrentUser());
+            et_phone.setText(currentUser.getPhoneNo());
+            et_address.setText(currentUser.getAddress());
+            gp = currentUser.getAddressGP();
         }else{
             workObjId = getIntent().getStringExtra("workId");
             HopeApp.getInstance().onPreExecute(AddActivity.this);
@@ -204,7 +213,10 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         });
     }
 
+
     public void fillForm(){
+        gp= workAdSave.getAddressGP();
+
         tv_categoryName.setText(workAdSave.getCategory());
         et_description.setText(workAdSave.getDescription());
         et_address.setText(workAdSave.getAddress());
@@ -226,9 +238,9 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
         if(workAdSave.getTimeType().equalsIgnoreCase("Once a day")){
             rb_1day.setChecked(true);
+            ll_s2_timings.setVisibility(View.GONE);
         }else if(workAdSave.getTimeType().equalsIgnoreCase("Twice a day")){
             rb_2day.setChecked(true);
-            ll_s2_timings.setVisibility(View.GONE);
         }
 
 
@@ -443,7 +455,8 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
 
         ad.setACL(acl);
-        ad.setAddressGP(new ParseGeoPoint());
+
+
 
         ad.saveInBackground(new SaveCallback() {
             public void done(ParseException e) {
@@ -523,6 +536,13 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
                 openMapForAddress();
             }
             break;
+
+            case R.id.et_add_address:{
+                if(gp == null){
+                    openMapForAddress();
+                }
+            }
+            break;
             default:
                 break;
         }
@@ -543,7 +563,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1)
+        if(requestCode==1 && data!=null)
         {
             String address = data.getStringExtra("address");
             double lat = data.getDoubleExtra("lat", 0);
@@ -590,6 +610,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
                 }
             }
             break;
+
 
 
         }

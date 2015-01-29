@@ -3,6 +3,8 @@ package com.xplorer.hope.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,6 +128,30 @@ public class ListViewAdapter extends BaseAdapter{
         holder.tv_phoneNo.setText(mAds.get(i).getPhoneNo());
         holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getAddress()));
 
+
+        holder.ll_addr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String map;
+                if(mAds.get(pos).getAddressGP()!=null){
+                    String addr= mAds.get(pos).getAddressGP().getLatitude()+","+mAds.get(pos).getAddressGP().getLatitude();
+                    map= "http://maps.google.com/maps?q="+addr;
+                }else{
+                    map = "http://maps.google.co.in/maps?q=" + mAds.get(pos).getAddress();
+
+                }
+                Intent int_ = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(map));
+                mContext.startActivity(int_);
+            }
+        });
+        holder.ll_phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" +  mAds.get(pos).getPhoneNo()));
+                mContext.startActivity(callIntent);
+            }
+        });
         String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
 
         setIvColor(mAds.get(i).getCategory(), finalHolder);
@@ -190,6 +216,9 @@ public class ListViewAdapter extends BaseAdapter{
 
         @InjectView(R.id.ll_ad_bg)LinearLayout ll_ad_bg;
         @InjectView(R.id.ll_ad_card)LinearLayout ll_ad_card;
+        @InjectView(R.id.ll_ad_addr)LinearLayout ll_addr;
+
+
 
         public ViewHolder(View view, final Context context ){
             ButterKnife.inject(this, view);
@@ -208,6 +237,10 @@ public class ListViewAdapter extends BaseAdapter{
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
+
+                        HopeApp.myPendingWorksIds.put(mAds.get(pos).getObjectId(), mAds.get(pos).getObjectId());
+                        HopeApp.myPendingEmployerIds.put(mAds.get(pos).getUserId(), mAds.get(pos).getUserId());
+
                         vh.b_apply.setOnClickListener(null);
                         vh.b_apply.setText("Pending");
                         setEWRelation(pos);
@@ -228,6 +261,7 @@ public class ListViewAdapter extends BaseAdapter{
         alertDialog.show();
 
     }
+
     private void setEWRelation(final int pos) {
         EWRelation rel = new EWRelation();
         rel.setApprove(false);

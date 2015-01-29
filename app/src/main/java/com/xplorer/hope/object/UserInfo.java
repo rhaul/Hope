@@ -2,6 +2,7 @@ package com.xplorer.hope.object;
 
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 /**
@@ -13,6 +14,7 @@ public class UserInfo extends ParseUser {
 
     public UserInfo(){}
 
+    public Boolean isApproved;
     public String getType() { return getString("type"); }
 
     public void setType(String type) {
@@ -267,7 +269,7 @@ public class UserInfo extends ParseUser {
 
     //  licenseType
     public Boolean getlicenseFour() {
-        return getBoolean("licenseType");
+        return getBoolean("licenseFour");
     }
 
     public void setlicenseFour(Boolean licenseFour) {
@@ -290,5 +292,10 @@ public class UserInfo extends ParseUser {
         put("image", image);
     }
 
-
+    public void setAddressGP(ParseGeoPoint gp){
+        put("addressGP",gp);
+    }
+    public ParseGeoPoint getAddressGP(){
+        return getParseGeoPoint("addressGP");
+    }
 }

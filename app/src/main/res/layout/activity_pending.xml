@@ -1,27 +1,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray1"
     android:orientation="horizontal"
-    tools:context="com.xplorer.hope.activity.EmpolyerActivity">
 
+    tools:context="com.xplorer.hope.activity.PendingActivity">
 
     <ListView
-        android:id="@+id/lv_employer_ads"
+        android:id="@+id/lv_pending_ads"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/gray1" />
 
     <TextView
-        android:id="@+id/tv_employer_result"
+        android:id="@+id/tv_pending_result"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:gravity="center"
-        android:text="Don't have any employer?\n Apply to Jobd opening and get some."
+        android:text="Volla !! You don't have any pending approvals."
         android:textColor="@color/gray8"
         android:visibility="gone" />
 

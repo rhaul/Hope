@@ -74,7 +74,7 @@ public class HopeApp extends Application {
     };
 
     public static HashMap<String, Integer> CategoryColor = new HashMap();
-    public static HashMap<String, Integer> CategoryLightColor = new HashMap();
+
 
     public static final int[] ImgUrl = {
             R.drawable.dishwashing,
@@ -92,8 +92,7 @@ public class HopeApp extends Application {
     public static final String[] drawerTitlesWorker = {
             "Profile",
             "Manage Jobs",
-            "Employers",
-            "History",
+            "Pending Approvals",
             "Employers",
             "Balance",
             "Holidays"
@@ -102,6 +101,7 @@ public class HopeApp extends Application {
     public static final String[] drawerTitlesEmployer = {
             "Profile",
             "Manage Jobs",
+            "Pending Approvals",
             "History",
             "Employers",
             "Balance",

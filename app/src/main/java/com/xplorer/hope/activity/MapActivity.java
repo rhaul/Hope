@@ -3,6 +3,7 @@ package com.xplorer.hope.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.xplorer.hope.R;
+import com.xplorer.hope.config.HopeApp;
 
 import java.io.IOException;
 import java.util.List;
@@ -56,6 +58,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         ButterKnife.inject(this);
+
+
+        getActionBar().setTitle("Set Location");
+        Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[3]);
+
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
@@ -224,9 +234,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }

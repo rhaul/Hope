@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.costum.android.widget.LoadMoreListView;
 import com.etiennelawlor.quickreturn.library.enums.QuickReturnType;
@@ -92,6 +93,12 @@ public class CategoryFragment extends Fragment {
             throw new ClassCastException("Parent container must implement the QuickReturnInterface");
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        //lva.notifyDataSetChanged();
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -142,6 +149,10 @@ public class CategoryFragment extends Fragment {
                 if (workAds != null && workAds.size() > 0 && e == null) {
                     categoryItems.addAll(workAds);
                     lva.notifyDataSetChanged();
+                }
+
+                if(e != null){
+                    Toast.makeText(getActivity(), "Please check your Internet Connection.", Toast.LENGTH_LONG).show();
                 }
 
 

@@ -78,7 +78,7 @@
             android:layout_height="wrap_content">
 
             <EditText
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:inputType="textPostalAddress"
                 android:maxLines="3"

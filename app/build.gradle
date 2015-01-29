@@ -21,18 +21,12 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:20.0.0'
-    compile 'com.google.android.gms:play-services:6.5.87'
-    compile 'com.jakewharton:butterknife:6.0.0'
-    compile 'com.android.support:support-v4:20.0.0'
-    compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
-    compile 'com.edmodo:rangebar:1.0.0'
     compile files('libs/picasso-2.4.0.jar')
     compile project(':quickReturn')
-
-
-    compile files('libs/Sectionizer/ssa-20120716.jar')
-
     compile project(':loadMore')
-
+    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.jakewharton:butterknife:6.0.0'
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
+    compile 'com.edmodo:rangebar:1.0.0'
 }

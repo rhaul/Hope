@@ -17,5 +17,6 @@
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_search_result">SearchResultActivity</string>
     <string name="hint_name">Search Worker</string>
+    <string name="title_activity_pending">PendingActivity</string>
 
 </resources>

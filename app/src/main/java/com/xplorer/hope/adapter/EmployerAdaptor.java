@@ -1,6 +1,8 @@
 package com.xplorer.hope.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,18 +81,6 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
             return 1;
         }
 
-        /*if(position-noHeader==0) {
-            prevCat=myWorkIds.get(position-noHeader).getCategory();
-            noHeader++;
-            return 0;
-        }else if(myWorkIds.get(position-noHeader).getCategory().equalsIgnoreCase(prevCat) ){
-            return 1;
-        }
-        prevCat=myWorkIds.get(position-noHeader).getCategory();
-        noHeader++;*/
-
-
-        //return 0;
     }
 
     @Override
@@ -191,8 +181,44 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
             holder.tv_phoneNo.setText(myWorkIds.get(i).getPhoneNo());
 
 
-            holder.b_apply.setVisibility(View.GONE);
-            holder.ll_phone.setVisibility(View.VISIBLE);
+            holder.ll_addr.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String map;
+                    if (myWorkIds.get(pos).getAddressGP() != null) {
+                        String addr = myWorkIds.get(pos).getAddressGP().getLatitude() + "," + myWorkIds.get(pos).getAddressGP().getLatitude();
+                        map = "http://maps.google.com/maps?q=" + addr;
+                    } else {
+                        map = "http://maps.google.co.in/maps?q=" + myWorkIds.get(pos).getAddress();
+
+                    }
+                    Intent int_ = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(map));
+                    mContext.startActivity(int_);
+                }
+            });
+            holder.ll_phone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                    callIntent.setData(Uri.parse("tel:" + myWorkIds.get(pos).getPhoneNo()));
+                    mContext.startActivity(callIntent);
+                }
+            });
+            String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
+
+
+            if(HopeApp.myWorksIds.containsKey(myWorkIds.get(i).getObjectId()) || myWorkIds.get(i).getUserId().equalsIgnoreCase(myWorkerId)){
+                holder.b_apply.setVisibility(View.GONE);
+                holder.ll_phone.setVisibility(View.VISIBLE);
+            }else if(HopeApp.myPendingWorksIds.containsKey(myWorkIds.get(i).getObjectId())){
+                holder.b_apply.setText("Pending");
+                holder.b_apply.setVisibility(View.VISIBLE);
+                holder.ll_phone.setVisibility(View.GONE);
+            }else{
+                holder.ll_phone.setVisibility(View.GONE);
+                holder.b_apply.setVisibility(View.VISIBLE);
+
+            }
         }
         return view;
     }
@@ -208,6 +234,8 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
         @InjectView(R.id.tv_ad_phoneNo)TextView tv_phoneNo;
         @InjectView(R.id.b_ad_apply)Button b_apply;
         @InjectView(R.id.ll_ad_phone)LinearLayout ll_phone;
+        @InjectView(R.id.ll_ad_addr)LinearLayout ll_addr;
+
 
         public ViewHolder(View view, final Context context ){
             ButterKnife.inject(this, view);

@@ -1,15 +1,14 @@
 package com.xplorer.hope.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -33,6 +32,7 @@ import android.widget.Toast;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
@@ -49,8 +49,9 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class SignUpActivity extends Activity implements View.OnClickListener {
-    private static final int REQUEST_CAMERA = 1;
+    private static final int SELECT_LOCATION = 1;
     private static final int SELECT_FILE = 2;
+
     // Activity implements View.OnClickListener,RadioGroup.OnCheckedChangeListener
     @InjectView(R.id.et_sign_name)
     EditText et_name;
@@ -140,6 +141,12 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
     @InjectView(R.id.iv_sign_profilePhoto)
     ImageView iv_profilePhoto;
 
+    @InjectView(R.id.ll_signUp_qualDialogue)
+    LinearLayout ll_qualDialogue;
+
+    @InjectView(R.id.b_sign_map)
+    Button b_map;
+
     Menu menu;
     MenuItem saveBtn;
     Context mcontex;
@@ -152,6 +159,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
     byte[] dataImage = null;
     UserInfo usr;
     Boolean isNull = false;
+    ParseGeoPoint gp;
 
 
     @Override
@@ -164,7 +172,8 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         ButterKnife.inject(this);
         isSaveClicked = false;
         mcontex = this;
-        tv_dob.setOnClickListener(this);
+        et_addr.setOnClickListener(this);
+        b_map.setOnClickListener(this);
         cb_ShopWorker.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -198,6 +207,20 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         this.menu = menu;
         MenuItem saveBtn = menu.findItem(R.id.action_signup);
 
+
+        if (HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("employer")) {
+            ll_qualDialogue.setVisibility(View.GONE);
+        }else{
+            ll_qualDialogue.setVisibility(View.VISIBLE);
+        }
+
+        et_addr.setOnClickListener(this);
+
+
+        getActionBar().setTitle("Profile");
+        Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[0]);
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
         if (getIntent().getStringExtra("from").equalsIgnoreCase("singup")) {
             saveBtn.setTitle("SIGN UP");
             showMobileDialog();
@@ -207,6 +230,9 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             HopeApp.getInstance().onPreExecute(SignUpActivity.this);
             usr = (UserInfo) ParseUser.getCurrentUser();
 
+
+            gp = usr.getAddressGP();
+            //Log.d();
             et_name.setText(usr.getName());
             et_addr.setText(usr.getAddress());
             et_num.setText(usr.getPhoneNo());
@@ -322,9 +348,9 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             isNull = true;
         }
         usr.setPassword("");
-        usr.setUsername(et_num.getText().toString().toLowerCase());
+        usr.setUsername(et_num.getText().toString());
         usr.setType(HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE));
-        usr.setName(et_name.getText().toString());
+        usr.setName(et_name.getText().toString().toLowerCase());
         usr.setDob(tv_dob.getText().toString());
         usr.setAddress(et_addr.getText().toString().toLowerCase());
         usr.setPhoneNo(et_num.getText().toString());
@@ -341,6 +367,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         usr.setShopWorker(cb_ShopWorker.isChecked());
         usr.setMiscellaneous(cb_Miscellaneous.isChecked());
         usr.setWallpaint(cb_Wallpaint.isChecked());
+        usr.setAddressGP(gp);
 
         if(!et_DishWashingExpWage.getText().toString().equalsIgnoreCase("")) usr.setDishWashingExpWage(Long.parseLong(et_DishWashingExpWage.getText().toString()));
         if(!et_HouseCleaningExpWage.getText().toString().equalsIgnoreCase("")) usr.setHouseCleaningExpWage(Long.parseLong(et_HouseCleaningExpWage.getText().toString()));
@@ -408,6 +435,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             });
         }
     }
+
 
 
     private void showMobileDialog() {
@@ -485,37 +513,38 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             }
 
             case R.id.iv_sign_profilePhoto: {
-                selectImageClickHandler();
+                Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                startActivityForResult(
+                        Intent.createChooser(intent, "Select File"),
+                        SELECT_FILE);
                 break;
             }
+
+            case R.id.et_sign_addr: {
+                if(gp == null){
+                    openMapForAddress();
+                }
+                break;
+            }
+            case R.id.b_sign_map: {
+                openMapForAddress();
+                break;
+            }
+
+
 
         }
     }
 
-    private void selectImageClickHandler() {
-        final CharSequence[] items = {"Capture from Camera", "Choose from Gallery"};
+    private void openMapForAddress() {
+        Intent intent = new Intent(this,MapActivity.class);
+        if(usr!=null && usr.getAddressGP()!= null) {
+            intent.putExtra("lat", usr.getAddressGP().getLatitude());
+            intent.putExtra("lng", usr.getAddressGP().getLongitude());
+        }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Image");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Capture from Camera")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    File file = new File(mcontex.getFilesDir(), "temp.jpg");
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-                    startActivityForResult(intent, REQUEST_CAMERA);
-                } else if (items[item].equals("Choose from Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    startActivityForResult(
-                            Intent.createChooser(intent, "Select File"),
-                            SELECT_FILE);
-                }
-            }
-        });
-        builder.show();
+        startActivityForResult(intent, 1); // 1 = get address from map
     }
     public Bitmap getResizedBitmap(Bitmap image) {
         int width = image.getWidth();
@@ -531,29 +560,26 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
     }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            File f = null;
-            Bitmap bm = null;
-            if (requestCode == REQUEST_CAMERA) {
 
-                f = new File(mcontex.getFilesDir(), "temp.jpg");
+        if (requestCode == SELECT_LOCATION && data!=null) {
 
-                try {
-                    BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
+            String address = data.getStringExtra("address");
+            double lat = data.getDoubleExtra("lat", 0);
+            double lng = data.getDoubleExtra("lng",0);
+            gp = new ParseGeoPoint(lat,lng);
 
-                    bm = BitmapFactory.decodeFile(f.getAbsolutePath(),
-                            btmapOptions);
-                    bm = getResizedBitmap(bm);
-                    iv_profilePhoto.setImageBitmap(bm);
+            et_addr.setText(address);
 
+        }else if (requestCode == SELECT_FILE) {
+            if (resultCode == RESULT_OK) {
+                File f = null;
+                Bitmap bm = null;
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (requestCode == SELECT_FILE) {
                 Uri selectedImageUri = data.getData();
 
                 String tempPath = getPath(selectedImageUri, this);
@@ -562,10 +588,11 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
                 bm = getResizedBitmap(bm);
                 iv_profilePhoto.setImageBitmap(bm);
 
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bm.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                dataImage = stream.toByteArray();
             }
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bm.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            dataImage = stream.toByteArray();
         }
     }
 
@@ -631,6 +658,9 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             return false;
         } else if (et_num.getText().toString().equalsIgnoreCase("")) {
             Toast.makeText(SignUpActivity.this, "Your Mobile Number cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }else if (et_num.getText().toString().length()!=10) {
+            Toast.makeText(SignUpActivity.this, "Please enter 10 digit valid mobile number", Toast.LENGTH_LONG).show();
             return false;
         }
 

@@ -26,44 +26,35 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class EmpolyerActivity extends Activity {
-    @InjectView(R.id.lv_employer_ads)
+public class PendingActivity extends Activity {
+    @InjectView(R.id.lv_pending_ads)
     ListView lv_ads;
 
-    @InjectView(R.id.tv_employer_result)
+    @InjectView(R.id.tv_pending_result)
     TextView tv_result;
 
-
-
     public EmployerAdaptor empAdaptor;
+    public boolean isWorker = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_empolyer);
+        setContentView(R.layout.activity_pending);
+
         ButterKnife.inject(this);
-
-
-        getActionBar().setTitle("My Employers");
-        Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[4]);
+        getActionBar().setTitle("Pending Requests");
+        Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[2]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
-        /*lv_ads.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                iv_categoryImage.setVisibility(View.VISIBLE);
-                tv_categoryName.setVisibility(View.VISIBLE);
-                Picasso.with(AddActivity.this).load(HopeApp.ImgUrl[i]).into(iv_categoryImage);
-                tv_categoryName.setText(HopeApp.TITLES[i]);
-                dialog.dismiss();
-            }
-        });*/
+
+
+
     }
 
-
     @Override
-    protected void onResume() {
+     protected void onResume() {
         super.onResume();
-        HopeApp.getInstance().onPreExecute(EmpolyerActivity.this);
-        if(HopeApp.myWorksIds==null || HopeApp.myWorksIds.size()==0) getMyWorkids();
+        HopeApp.getInstance().onPreExecute(PendingActivity.this);
+        if (HopeApp.myWorksIds == null || HopeApp.myWorksIds.size() == 0) getMyWorkids();
         else fetchWorks();
 
     }
@@ -71,7 +62,7 @@ public class EmpolyerActivity extends Activity {
     private void fetchWorks() {
 
         ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
-        query.whereContainedIn("objectId", HopeApp.myWorksIds.values());
+        query.whereContainedIn("objectId", HopeApp.myPendingWorksIds.values());
         Log.d("HopeApp.myWorksIds.values().toString()", HopeApp.myWorksIds.values().toString());
 
 
@@ -82,14 +73,13 @@ public class EmpolyerActivity extends Activity {
                 Log.d("workAds", String.valueOf(workAds.size()));
                 HopeApp.pd.dismiss();
                 if (e == null) {
-                    empAdaptor= new EmployerAdaptor(EmpolyerActivity.this, 0, workAds);
-                    //sectionAdapter= new SimpleSectionAdapter<WorkAd>
-                     //      (EmpolyerActivity.this,empAdaptor, R.layout.category_header, R.id.tv_catHeader_catname, new CategorySectionizer());
+                    empAdaptor = new EmployerAdaptor(PendingActivity.this, 0, workAds);
+
                     lv_ads.setAdapter(empAdaptor);
                     tv_result.setVisibility(View.GONE);
                     lv_ads.setVisibility(View.VISIBLE);
 
-                }else{
+                } else {
                     tv_result.setVisibility(View.VISIBLE);
                     lv_ads.setVisibility(View.GONE);
                 }
@@ -97,9 +87,10 @@ public class EmpolyerActivity extends Activity {
             }
         });
     }
-    public void getMyWorkids(){
 
-        String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
+    public void getMyWorkids() {
+
+        String myWorkerId = ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
 
         ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
         query.whereEqualTo("userID", myWorkerId);
@@ -113,10 +104,10 @@ public class EmpolyerActivity extends Activity {
                 if (e == null) {
                     Log.d("hope getMyWorkids(done)", String.valueOf(parseObjects.size()));
                     for (int i = 0; i < parseObjects.size(); i++) {
-                        if(parseObjects.get(i).getApprove()==true) {
+                        if (parseObjects.get(i).getApprove() == true) {
                             HopeApp.myWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
                             HopeApp.myEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
-                        }else{
+                        } else {
                             HopeApp.myPendingWorksIds.put(parseObjects.get(i).getWorkID(), parseObjects.get(i).getWorkID());
                             HopeApp.myPendingEmployerIds.put(parseObjects.get(i).getEmployerID(), parseObjects.get(i).getEmployerID());
 
@@ -135,11 +126,10 @@ public class EmpolyerActivity extends Activity {
 
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_empolyer, menu);
+        getMenuInflater().inflate(R.menu.menu_pending, menu);
         return true;
     }
 
@@ -150,7 +140,7 @@ public class EmpolyerActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-
+        //noinspection SimplifiableIfStatement
 
         return super.onOptionsItemSelected(item);
     }

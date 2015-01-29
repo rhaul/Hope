@@ -160,9 +160,11 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
 
         //-----SET UP MAIN ACTIVITY------------//
-        if (!isSetUp) {
-            getMyWorkids();//which sets up man activity
+        if (!isSetUp) {//which sets up man activity
+
+            getMyWorkids();
             setUpDrawer();
+            setUpMainActivity();
             isSetUp = true;
         }
     }
@@ -251,7 +253,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
             }
         });
-        vp_pager.setOffscreenPageLimit(3);
+        vp_pager.setOffscreenPageLimit(1);
 
 
         vp_pager.setCurrentItem(0);
@@ -279,6 +281,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[position]);
         pts_titleBar.setBackgroundColor(getResources().getColor(colorVal));
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+        getActionBar().setDisplayShowTitleEnabled(false);
+        getActionBar().setDisplayShowTitleEnabled(true);
         b_sort.setBackgroundColor(getResources().getColor(colorVal));
         b_filter.setBackgroundColor(getResources().getColor(colorVal));
 
@@ -310,8 +314,11 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                         Log.d("hope getMyWorkids(workId)", parseObjects.get(i).getWorkID());
 
                     }
+
+                    if(pagerAdapter!=null && pagerAdapter.getFragment(vp_pager.getCurrentItem()).lva!=null) pagerAdapter.getFragment(vp_pager.getCurrentItem()).lva.notifyDataSetChanged();
+
                 }
-                setUpMainActivity();
+                //setUpMainActivity();
             }
         });
 
@@ -446,7 +453,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                                 cb_filter_wt_custom.setChecked(true);
                                 cb_filter_f_once.setChecked(true);
                                 cb_filter_f_twice.setChecked(true);
-                                rb_filter_wageLimit.setThumbIndices(0,500*40);
+                                rb_filter_wageLimit.setThumbIndices(0,40);
                                 tv_filter_wl_lower.setText("Lower: ₹ " + 0 * 500);
                                 tv_filter_wl_higher.setText("Higher: ₹ " + 40 * 500);
                             }
@@ -500,6 +507,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 }else if(i==1){
                     startActivity(new Intent(MainActivity.this, WorkActivity.class));
                 }else if(i==2){
+                    startActivity(new Intent(MainActivity.this, PendingActivity.class));
+                }else if(i==3){
                     startActivity(new Intent(MainActivity.this, EmpolyerActivity.class));
                 }
             }

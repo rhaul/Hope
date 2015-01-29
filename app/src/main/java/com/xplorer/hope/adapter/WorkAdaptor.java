@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,8 +44,15 @@ import butterknife.InjectView;
 public class WorkAdaptor extends BaseAdapter {
     private Context mContext;
     public List<WorkAd> myWorkIds;
+    public List<UserInfo> netWorkersForThisWork;
+    public int runCount=0;
+public String currentWork;
+   public Dialog dialog;
+
     public WorkAdaptor(Context mContext, List<WorkAd> myWorkIds) {
+        netWorkersForThisWork=new ArrayList<UserInfo>();
         this.mContext = mContext;
+        runCount=0;
         this.myWorkIds = myWorkIds;
     }
 
@@ -92,6 +100,29 @@ public class WorkAdaptor extends BaseAdapter {
         holder.tv_description.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getDescription()));
         holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getAddress()));
 
+        holder.ll_addr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String map;
+                if(myWorkIds.get(pos).getAddressGP()!=null){
+                    String addr= myWorkIds.get(pos).getAddressGP().getLatitude()+","+myWorkIds.get(pos).getAddressGP().getLatitude();
+                    map= "http://maps.google.com/maps?q="+addr;
+                }else{
+                    map = "http://maps.google.co.in/maps?q=" + myWorkIds.get(pos).getAddress();
+
+                }
+                Intent int_ = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(map));
+                mContext.startActivity(int_);
+            }
+        });
+        holder.ll_phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" +  myWorkIds.get(pos).getPhoneNo()));
+                mContext.startActivity(callIntent);
+            }
+        });
 
         String dateType=myWorkIds.get(i).getDateType()+" Job";
         if(myWorkIds.get(i).getDateType().equalsIgnoreCase("One Day")){
@@ -119,7 +150,12 @@ public class WorkAdaptor extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 HopeApp.getInstance().onPreExecute(mContext);
-                fetchWorkerForThisWork(myWorkIds.get(pos).getObjectId());
+                currentWork=myWorkIds.get(pos).getObjectId();
+                runCount=0;
+                netWorkersForThisWork=new ArrayList<UserInfo>();
+                fetchWorkerForThisWork(myWorkIds.get(pos).getObjectId(), true);
+                fetchWorkerForThisWork(myWorkIds.get(pos).getObjectId(), false);
+
             }
         });
 
@@ -203,12 +239,14 @@ public class WorkAdaptor extends BaseAdapter {
         alertDialog.show();
 
     }
-    public void fetchWorkerForThisWork(String workId){
+
+
+    public void fetchWorkerForThisWork(String workId,final boolean approveStatus){
         String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
 
         ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
         query.whereEqualTo("employerID", myWorkerId);
-        query.whereEqualTo("Approve", true);
+        query.whereEqualTo("Approve", approveStatus);
         query.whereEqualTo("workID", workId);
 
         Log.d("hope fetchWorkerForThisWork", myWorkerId);
@@ -221,7 +259,7 @@ public class WorkAdaptor extends BaseAdapter {
                     for (int i = 0; i < parseObjects.size(); i++) {
                         workerIds.add(parseObjects.get(i).getUserID());
                     }
-                    fetchWorkerProfiles(workerIds);
+                    fetchWorkerProfiles(workerIds, approveStatus);
                     Log.d("hope fetchWorkerForThisWork(done)", String.valueOf(parseObjects.size()));
 
                 }
@@ -229,7 +267,7 @@ public class WorkAdaptor extends BaseAdapter {
         });
     }
 
-    private void fetchWorkerProfiles(List<String> workerIds) {
+    private void fetchWorkerProfiles(List<String> workerIds,final boolean approveStatus) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereContainedIn("objectId",workerIds );
 
@@ -237,26 +275,39 @@ public class WorkAdaptor extends BaseAdapter {
             @Override
             public void done(List<ParseUser> parseUsers, ParseException e) {
                 List <UserInfo> users_ = ( List <UserInfo>)(List<?>) parseUsers;
-                HopeApp.pd.dismiss();
+
                 if (e == null) {
-                    if(users_.size()==0) {
+                    for(int i=0; i<users_.size(); i++) {
+                        users_.get(i).isApproved = approveStatus;
+
+                        netWorkersForThisWork.add(users_.get(i));
+                    }
+
+                }
+                runCount++;
+                Log.d("hope runCount", runCount+"");
+                if(runCount==2){
+                    HopeApp.pd.dismiss();
+                    if(netWorkersForThisWork.size()==0) {
                         Toast.makeText(mContext, "No worker has been assigned for this work.", Toast.LENGTH_SHORT).show();
-                        ;
-                    }else showWorkerDialog(users_);
+
+                    }else showWorkerDialog(netWorkersForThisWork);
                 }
             }
         });
 
     }
     private void showWorkerDialog(List<UserInfo> parseUsers) {
-        final Dialog dialog = new Dialog(mContext);
+        dialog = new Dialog(mContext);
         // Include dialog.xml file
         dialog.setContentView(R.layout.dialog_category_list);
         // Set dialog title
-        dialog.setTitle("Workers onboard");
+        dialog.setTitle("Workers");
         ListView lvD = (ListView) dialog.findViewById(R.id.lv_category_list);
-        WorkerAdaptor clA = new WorkerAdaptor(mContext,parseUsers, false );
+        WorkerAdaptor clA = new WorkerAdaptor(mContext,parseUsers, "workersAcceptReject",currentWork  );
         lvD.setAdapter(clA);
+
+
         dialog.show();
 
     }
@@ -275,6 +326,8 @@ public class WorkAdaptor extends BaseAdapter {
         @InjectView(R.id.ll_ad_btns)LinearLayout ll_btns;
         @InjectView(R.id.b_ad_Edit)Button b_Edit;
         @InjectView(R.id.b_ad_Del)Button b_Del;
+
+        @InjectView(R.id.ll_ad_addr)LinearLayout ll_addr;
 
         public ViewHolder(View view, final Context context ){
             ButterKnife.inject(this, view);

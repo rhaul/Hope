@@ -1,6 +1,8 @@
 package com.xplorer.hope.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
 import com.xplorer.hope.config.HopeApp;
@@ -28,12 +31,15 @@ public class WorkerAdaptor  extends BaseAdapter {
 
     private static Context mContext;
     public List<UserInfo> usrs;
-    public boolean addInterst;
+    public String behaviour;
+    public String workId;
 
-    public WorkerAdaptor(Context mContext, List<UserInfo> usrs, boolean addInterst) {
+    public WorkerAdaptor(Context mContext, List<UserInfo> usrs, String behaviour, String workId) {
         this.mContext = mContext;
         this.usrs = usrs;
-        this.addInterst = addInterst;
+        this.behaviour = behaviour;
+        this.workId = workId;
+
     }
 
     @Override
@@ -54,6 +60,8 @@ public class WorkerAdaptor  extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder = null;
+        final UserInfo workerObject=usrs.get(i);
+        final int pos= i;
 
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -62,11 +70,92 @@ public class WorkerAdaptor  extends BaseAdapter {
             holder = new ViewHolder(view, mContext);
 
             view.setTag(holder);
+            holder.ll_interestTitle.setVisibility(View.GONE);
+
+            if(behaviour=="workersAcceptReject" && workerObject.isApproved==false){
+
+
+                holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                holder.tv_wprofile_btn1.setText("Accept");
+                holder.tv_wprofile_btn2.setText("Decline");
+                holder.tv_wprofile_btn1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        HopeApp.sendPushMessage(workerObject.getObjectId(), ParseUser.getCurrentUser().getObjectId(),workId,"Job Application Accepted","Your application for the following job has been accepted.","JAReply");
+                        HopeApp.setEWRelationTrue(workId, workerObject.getObjectId(), ParseUser.getCurrentUser().getObjectId());
+
+                        usrs.remove(pos);
+                        notifyDataSetChanged();
+                        return;
+                    }
+                });
+                holder.tv_wprofile_btn2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        HopeApp.sendPushMessage(workerObject.getObjectId(),ParseUser.getCurrentUser().getObjectId(),workId,"Job Application Declined","Your application for the following job has been declined.","JAReply");
+                        HopeApp.removeEWRelation(workId, workerObject.getObjectId(), ParseUser.getCurrentUser().getObjectId());
+                        usrs.remove(pos);
+                        notifyDataSetChanged();
+                        return;
+                    }
+                });
+            }
+
+            if(behaviour=="Interest") {
+                final ViewHolder finalHolder = holder;
+
+                if (workerObject.getCooking()) {
+                    addInterest("Cooking", "₹ " + String.valueOf(workerObject.getCookingExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getClothWashing()) {
+                    addInterest("Washing", "₹ " + String.valueOf(workerObject.getClothWashingExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getHouseCleaning()) {
+                    addInterest("House Cleaning", "₹ " + String.valueOf(workerObject.getHouseCleaningExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getDishWashing()) {
+                    addInterest("Dish Washing", "₹ " + String.valueOf(workerObject.getDishWashingExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getConstruction()) {
+                    addInterest("Construction", "₹ " + String.valueOf(workerObject.getConstructionExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getWallpaint()) {
+                    addInterest("Wall Paint", "₹ " + String.valueOf(workerObject.getWallpaintExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getDriver()) {
+                    addInterest("Driver", "₹ " + String.valueOf(workerObject.getDriverExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getGuard()) {
+                    addInterest("Guard", "₹ " + String.valueOf(workerObject.getGuardExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getShopWorker()) {
+                    addInterest("Shop work", "₹ " + String.valueOf(workerObject.getShopWorkerExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getGardening()) {
+                    addInterest("Gardening", "₹ " + String.valueOf(workerObject.getGardeningExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+                if (workerObject.getMiscellaneous()) {
+                    addInterest("Cooking", "₹ " + String.valueOf(workerObject.getMiscellaneousExpWage()), finalHolder);
+                    holder.ll_interestTitle.setVisibility(View.VISIBLE);
+                }
+            }
         }
         else {
             holder = (ViewHolder) view.getTag();
         }
-        UserInfo workerObject=usrs.get(i);
+
+
+
 
         holder.tv_worker_name.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getName()));
         holder.tv_gender.setText(workerObject.getGender());
@@ -86,13 +175,38 @@ public class WorkerAdaptor  extends BaseAdapter {
         holder.tv_addr.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getAddress()));
         holder.tv_wprofile_phoneno.setText(workerObject.getPhoneNo());
 
+        holder.ll_wprofile_addr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String map;
+                if(workerObject.getAddressGP()!=null){
+                    String addr= workerObject.getAddressGP().getLatitude()+","+workerObject.getAddressGP().getLatitude();
+                    map= "http://maps.google.com/maps?q="+addr;
+                }else{
+                    map = "http://maps.google.co.in/maps?q=" + workerObject.getAddress();
+
+                }
+                Intent int_ = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(map));
+                mContext.startActivity(int_);
+            }
+        });
+        holder.ll_wprofile_phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:" +  workerObject.getPhoneNo()));
+                mContext.startActivity(callIntent);
+            }
+        });
+
+
         String LicenseStr = "License: ", LangStr = "Language: ";
         if (workerObject.getlicenseFour()) {
-            LicenseStr += "FourWheeler";
+            LicenseStr += "Four Wheeler";
         }
         if (workerObject.getlicenseHeavy()) {
             if(LicenseStr.equalsIgnoreCase("License: ")) LicenseStr +="Heavy";
-            else LicenseStr += "| Heavy";
+            else LicenseStr += " | Heavy";
         }
         if (LicenseStr.equalsIgnoreCase("License: ")) {
             holder.ll_license.setVisibility(View.GONE);
@@ -105,7 +219,7 @@ public class WorkerAdaptor  extends BaseAdapter {
         }
         if (workerObject.getLangHindi()) {
             if (LangStr.equalsIgnoreCase("Language: "))LangStr += "Hindi";
-            else LangStr += "| Hindi";
+            else LangStr += " | Hindi";
         }
         if (LangStr.equalsIgnoreCase("Language: ")) {
             holder.ll_language.setVisibility(View.GONE);
@@ -114,56 +228,9 @@ public class WorkerAdaptor  extends BaseAdapter {
             holder.tv_lang.setText(LangStr);
         }
 
-        holder.ll_interestTitle.setVisibility(View.GONE);
 
 
-        if(addInterst) {
-            final ViewHolder finalHolder = holder;
-            if (workerObject.getCooking()) {
-                addInterest("Cooking", "₹ " + String.valueOf(workerObject.getCookingExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getClothWashing()) {
-                addInterest("Washing", "₹ " + String.valueOf(workerObject.getClothWashingExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getHouseCleaning()) {
-                addInterest("House Cleaning", "₹ " + String.valueOf(workerObject.getHouseCleaningExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getDishWashing()) {
-                addInterest("Dish Washing", "₹ " + String.valueOf(workerObject.getDishWashingExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getConstruction()) {
-                addInterest("Construction", "₹ " + String.valueOf(workerObject.getConstructionExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getWallpaint()) {
-                addInterest("Wall Paint", "₹ " + String.valueOf(workerObject.getWallpaintExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getDriver()) {
-                addInterest("Driver", "₹ " + String.valueOf(workerObject.getDriverExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getGuard()) {
-                addInterest("Guard", "₹ " + String.valueOf(workerObject.getGuardExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getShopWorker()) {
-                addInterest("Shop work", "₹ " + String.valueOf(workerObject.getShopWorkerExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getGardening()) {
-                addInterest("Gardening", "₹ " + String.valueOf(workerObject.getGardeningExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-            if (workerObject.getMiscellaneous()) {
-                addInterest("Cooking", "₹ " + String.valueOf(workerObject.getMiscellaneousExpWage()), finalHolder);
-                holder.ll_interestTitle.setVisibility(View.VISIBLE);
-            }
-        }
+
         return view;
     }
     public void addInterest(String Interested, String expectedWage, final ViewHolder finalHolder) {
@@ -196,6 +263,15 @@ public class WorkerAdaptor  extends BaseAdapter {
         LinearLayout ll_license;
         LinearLayout ll_language;
 
+
+        TextView tv_wprofile_btn1;
+        TextView tv_wprofile_btn2;
+
+
+        LinearLayout ll_wprofile_addr;
+        LinearLayout ll_wprofile_phone;
+
+
         public ViewHolder(View view, final Context context) {
             tv_worker_name = (TextView) view.findViewById(R.id.tv_wprofile_name);
             tv_gender = (TextView) view.findViewById(R.id.tv_wprofile_gender);
@@ -209,6 +285,12 @@ public class WorkerAdaptor  extends BaseAdapter {
             ll_interestTitle = (LinearLayout) view.findViewById(R.id.ll_wprofile_interestTitle);
             ll_language = (LinearLayout) view.findViewById(R.id.ll_wprofile_language);
             ll_license = (LinearLayout) view.findViewById(R.id.ll_wprofile_license);
+
+            tv_wprofile_btn1 = (TextView) view.findViewById(R.id.tv_wprofile_btn1);
+            tv_wprofile_btn2 = (TextView) view.findViewById(R.id.tv_wprofile_btn2);
+
+            ll_wprofile_addr = (LinearLayout) view.findViewById(R.id.ll_wprofile_addr);
+            ll_wprofile_phone = (LinearLayout) view.findViewById(R.id.ll_wprofile_phone);
 
         }
     }

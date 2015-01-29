@@ -15,7 +15,7 @@ android:orientation="horizontal"
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="No work found."
+        android:text="Do you have any job openings?\n If yes, then add an advertisement from Home Screen."
         android:textColor="@color/gray8"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
