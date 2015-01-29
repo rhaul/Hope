@@ -12,12 +12,12 @@ public class Attendance extends ParseObject {
     public Attendance(){}
 
 
-    public String getUserID() {
-        return getString("userID");
+    public String getWorkerID() {
+        return getString("Worker");
     }
 
-    public void setUserID(String userID) {
-        put("userID", userID);
+    public void setWorkerID(String Worker) {
+        put("Worker", Worker);
     }
 
     public String getEmployerID() {
@@ -33,4 +33,25 @@ public class Attendance extends ParseObject {
     public void setWorkID(String workID) {
         put("workID", workID);
     }
+
+
+    public String getDate() {
+        return getString("date");
+    }
+
+    public void setDate(String date) {
+        put("date", date);
+    }
+
+
+    public String getTime() {
+        return getString("time");
+    }
+
+    public void setTime(String time) {
+        put("time", time);
+    }
+
+
+
 }

@@ -15,16 +15,10 @@
     <string name="title_activity_empolyer">EmpolyerActivity</string>
     <string name="title_activity_work">WorkActivity</string>
     <string name="title_activity_map">MapActivity</string>
-
-
     <string name="title_activity_search_result">SearchResultActivity</string>
     <string name="hint_name">Search Worker</string>
     <string name="title_activity_pending">PendingActivity</string>
-
-
-
     <string name="title_activity_nearby_works">NearbyWorksActivity</string>
-
-
+    <string name="title_activity_attendance">AttendanceActivity</string>
 
 </resources>

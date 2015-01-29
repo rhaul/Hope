@@ -514,8 +514,12 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 }else if(i==2){
                     startActivity(new Intent(MainActivity.this, PendingActivity.class));
                 }else if(i==3){
+                    startActivity(new Intent(MainActivity.this, AttendanceActivity.class));
+                }else if(i==4){
                     startActivity(new Intent(MainActivity.this, EmpolyerActivity.class));
                 }
+
+
             }
         });
 

@@ -92,8 +92,8 @@ public class HopeApp extends Application {
             "Profile",
             "Manage Jobs",
             "Pending Requests",
+            "Worker's Attendance",
             "Employers",
-            "Balance",
             "Holidays"
     };
 
@@ -101,7 +101,7 @@ public class HopeApp extends Application {
             "Profile",
             "Manage Jobs",
             "Pending Requests",
-            "History",
+            "Worker's Attendance",
             "Employers",
             "Balance",
             "Holidays"

@@ -37,9 +37,8 @@
         android:name=".config.HopeApp"
         android:allowBackup="true"
         android:icon="@drawable/icon_hope"
-        android:logo="@drawable/ic_launcher"
-
         android:label="@string/app_name"
+        android:logo="@drawable/ic_launcher"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".activity.MainActivity"
@@ -147,7 +146,6 @@
 
         <!--AIzaSyDNkm-u1A9Tewg0sElbNL5tlcKHafZG_mE-->
         <activity
-
             android:name=".activity.PendingActivity"
             android:label="@string/title_activity_pending" >
         </activity>
@@ -155,8 +153,10 @@
             android:name=".activity.NearbyWorksActivity"
             android:label="@string/title_activity_nearby_works" >
         </activity>
-
-
+        <activity
+            android:name=".activity.AttendanceActivity"
+            android:label="@string/title_activity_attendance" >
+        </activity>
     </application>
 
 </manifest>

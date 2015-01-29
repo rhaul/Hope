@@ -1,6 +1,5 @@
 package com.xplorer.hope.activity;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -42,7 +41,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     @InjectView(R.id.b_map_setMyWL)
     Button b_setMyWL;
 
-    AlertDialog dialog;
+
 
     private GoogleMap mMap;
     private Marker marker;

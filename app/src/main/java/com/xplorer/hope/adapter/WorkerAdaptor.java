@@ -72,6 +72,8 @@ public class WorkerAdaptor  extends BaseAdapter {
             view.setTag(holder);
             holder.ll_interestTitle.setVisibility(View.GONE);
 
+
+
             if(behaviour=="workersAcceptReject" && workerObject.isApproved==false){
 
 
