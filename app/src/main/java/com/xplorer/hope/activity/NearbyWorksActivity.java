@@ -1,4 +1,4 @@
-package com.xplorer.hope.activity;
+﻿package com.xplorer.hope.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -97,10 +97,16 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_works);
         ButterKnife.inject(this);
-        getActionBar().setTitle("Search nearby jobs");
-        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.Green_2)));
         categories.addAll(Arrays.asList(HopeApp.TITLES));
         categories.add(0, "All");
+
+        getActionBar().setTitle("Search nearby jobs");
+        Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[6]);
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_nbw);
 
@@ -554,6 +560,9 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_mapFilter) {
             applyFilters();
+            return true;
+        }else if (id == android.R.id.home) {
+            finish();
             return true;
         }
 

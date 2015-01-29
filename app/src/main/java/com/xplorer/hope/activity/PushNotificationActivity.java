@@ -2,6 +2,7 @@ package com.xplorer.hope.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -99,6 +100,10 @@ public class PushNotificationActivity extends Activity {
 
         ButterKnife.inject(this);
 
+        getActionBar().setTitle("Notification");
+        Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[5]);
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
         viewProfile = getLayoutInflater().inflate(R.layout.item_worker_profile, null);
         tv_worker_name = (TextView) viewProfile.findViewById(R.id.tv_wprofile_name);
         tv_gender = (TextView) viewProfile.findViewById(R.id.tv_wprofile_gender);
@@ -148,7 +153,7 @@ public class PushNotificationActivity extends Activity {
 
         tv_message.setText(msg);
         if(type.equalsIgnoreCase("JAReply")){
-            b_accept.setText("My Schedule");
+            b_accept.setText("Home Page");
             ll_divider.setVisibility(View.GONE);
             b_decline.setVisibility(View.GONE);
 
@@ -269,7 +274,7 @@ public class PushNotificationActivity extends Activity {
             public void onClick(View view) {
                 String map;
                 if(workAdObject.getAddressGP()!=null){
-                    String addr= workAdObject.getAddressGP().getLatitude()+","+workAdObject.getAddressGP().getLatitude();
+                    String addr= workAdObject.getAddressGP().getLatitude()+","+workAdObject.getAddressGP().getLongitude();
                     map= "http://maps.google.com/maps?q="+addr;
                 }else{
                     map = "http://maps.google.co.in/maps?q=" + workAdObject.getAddress();
@@ -323,7 +328,7 @@ public class PushNotificationActivity extends Activity {
             public void onClick(View view) {
                 String map;
                 if(workerObject.getAddressGP()!=null){
-                    String addr= workerObject.getAddressGP().getLatitude()+","+workerObject.getAddressGP().getLatitude();
+                    String addr= workerObject.getAddressGP().getLatitude()+","+workerObject.getAddressGP().getLongitude();
                     map= "http://maps.google.com/maps?q="+addr;
                 }else{
                     map = "http://maps.google.co.in/maps?q=" + workerObject.getAddress();

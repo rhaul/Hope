@@ -180,7 +180,7 @@ public class WorkerAdaptor  extends BaseAdapter {
             public void onClick(View view) {
                 String map;
                 if(workerObject.getAddressGP()!=null){
-                    String addr= workerObject.getAddressGP().getLatitude()+","+workerObject.getAddressGP().getLatitude();
+                    String addr= workerObject.getAddressGP().getLatitude()+","+workerObject.getAddressGP().getLongitude();
                     map= "http://maps.google.com/maps?q="+addr;
                 }else{
                     map = "http://maps.google.co.in/maps?q=" + workerObject.getAddress();

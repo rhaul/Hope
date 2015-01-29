@@ -36,7 +36,9 @@
     <application
         android:name=".config.HopeApp"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/icon_hope"
+        android:logo="@drawable/ic_launcher"
+
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -113,7 +115,7 @@
 
         <meta-data
             android:name="com.parse.push.notification_icon"
-            android:resource="@drawable/ic_launcher" />
+            android:resource="@drawable/icon_hope" />
 
         <activity
             android:name=".activity.PushNotificationActivity"
@@ -149,7 +151,6 @@
             android:name=".activity.PendingActivity"
             android:label="@string/title_activity_pending" >
         </activity>
-
         <activity
             android:name=".activity.NearbyWorksActivity"
             android:label="@string/title_activity_nearby_works" >

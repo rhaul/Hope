@@ -91,7 +91,7 @@ public class HopeApp extends Application {
     public static final String[] drawerTitlesWorker = {
             "Profile",
             "Manage Jobs",
-            "Pending Approvals",
+            "Pending Requests",
             "Employers",
             "Balance",
             "Holidays"
@@ -100,7 +100,7 @@ public class HopeApp extends Application {
     public static final String[] drawerTitlesEmployer = {
             "Profile",
             "Manage Jobs",
-            "Pending Approvals",
+            "Pending Requests",
             "History",
             "Employers",
             "Balance",

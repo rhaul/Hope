@@ -47,6 +47,9 @@ public class PendingActivity extends Activity {
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
 
 
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
 
     }
 
@@ -72,7 +75,7 @@ public class PendingActivity extends Activity {
             public void done(List<WorkAd> workAds, ParseException e) {
                 Log.d("workAds", String.valueOf(workAds.size()));
                 HopeApp.pd.dismiss();
-                if (e == null) {
+                if (e == null  && workAds.size()>0) {
                     empAdaptor = new EmployerAdaptor(PendingActivity.this, 0, workAds);
 
                     lv_ads.setAdapter(empAdaptor);
@@ -140,6 +143,10 @@ public class PendingActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
         //noinspection SimplifiableIfStatement
 
         return super.onOptionsItemSelected(item);

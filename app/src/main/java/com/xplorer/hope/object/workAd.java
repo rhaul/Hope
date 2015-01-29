@@ -148,5 +148,12 @@ public class WorkAd extends ParseObject {
     public ParseGeoPoint getAddressGP(){
         return getParseGeoPoint("addressGP");
     }
+    public Boolean getActive() {
+        return getBoolean("active");
+    }
+
+    public void setActive(Boolean active) {
+        put("active",active );
+    }
 
 }

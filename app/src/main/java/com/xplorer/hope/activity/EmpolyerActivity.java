@@ -46,6 +46,8 @@ public class EmpolyerActivity extends Activity {
         getActionBar().setTitle("My Employers");
         Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[4]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         /*lv_ads.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -81,7 +83,7 @@ public class EmpolyerActivity extends Activity {
             public void done(List<WorkAd> workAds, ParseException e) {
                 Log.d("workAds", String.valueOf(workAds.size()));
                 HopeApp.pd.dismiss();
-                if (e == null) {
+                if (e == null && workAds.size()>0) {
                     empAdaptor= new EmployerAdaptor(EmpolyerActivity.this, 0, workAds);
                     //sectionAdapter= new SimpleSectionAdapter<WorkAd>
                      //      (EmpolyerActivity.this,empAdaptor, R.layout.category_header, R.id.tv_catHeader_catname, new CategorySectionizer());
@@ -150,7 +152,10 @@ public class EmpolyerActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
