@@ -295,6 +295,13 @@ public class WorkerAdaptor  extends BaseAdapter {
         }
     }
 
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        if(usrs != null &&usrs.size() == 0){
+            WorkAdaptor.cancelDialog();
+        }
+    }
 
     public  static String getAge(int _year, int _month, int _day) {
 

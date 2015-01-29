@@ -141,14 +141,16 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDNkm-u1A9Tewg0sElbNL5tlcKHafZG_mE" />
+            android:value="AIzaSyCSO1r1bEhtCcRe0Bmvx4IF9G7bYoyeSsc" />
 
+        <!--AIzaSyDNkm-u1A9Tewg0sElbNL5tlcKHafZG_mE-->
         <activity
 
             android:name=".activity.PendingActivity"
             android:label="@string/title_activity_pending" >
         </activity>
 
+        <activity
             android:name=".activity.NearbyWorksActivity"
             android:label="@string/title_activity_nearby_works" >
         </activity>

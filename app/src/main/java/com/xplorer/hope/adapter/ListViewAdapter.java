@@ -134,7 +134,7 @@ public class ListViewAdapter extends BaseAdapter{
             public void onClick(View view) {
                 String map;
                 if(mAds.get(pos).getAddressGP()!=null){
-                    String addr= mAds.get(pos).getAddressGP().getLatitude()+","+mAds.get(pos).getAddressGP().getLatitude();
+                    String addr= mAds.get(pos).getAddressGP().getLatitude()+","+mAds.get(pos).getAddressGP().getLongitude();
                     map= "http://maps.google.com/maps?q="+addr;
                 }else{
                     map = "http://maps.google.co.in/maps?q=" + mAds.get(pos).getAddress();

@@ -14,7 +14,6 @@ import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCrashReporting;
 import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
@@ -433,14 +432,6 @@ public class HopeApp extends Application {
         pd.show();
     }
 
-    public void setWorkAdFilter() {
-
-    }
-
-
-    private static ParseGeoPoint getMyLocation() {
-        return null;
-    }
 
     public String getUpperCaseString(String myString){
         String upperString = myString.substring(0,1).toUpperCase() + myString.substring(1);

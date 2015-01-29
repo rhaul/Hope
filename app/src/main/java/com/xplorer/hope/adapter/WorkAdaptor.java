@@ -47,7 +47,7 @@ public class WorkAdaptor extends BaseAdapter {
     public List<UserInfo> netWorkersForThisWork;
     public int runCount=0;
 public String currentWork;
-   public Dialog dialog;
+   public static Dialog dialog;
 
     public WorkAdaptor(Context mContext, List<WorkAd> myWorkIds) {
         netWorkersForThisWork=new ArrayList<UserInfo>();
@@ -304,12 +304,16 @@ public String currentWork;
         // Set dialog title
         dialog.setTitle("Workers");
         ListView lvD = (ListView) dialog.findViewById(R.id.lv_category_list);
-        WorkerAdaptor clA = new WorkerAdaptor(mContext,parseUsers, "workersAcceptReject",currentWork  );
-        lvD.setAdapter(clA);
-
-
+        WorkerAdaptor adapter = new WorkerAdaptor(mContext,parseUsers, "workersAcceptReject",currentWork  );
+        lvD.setAdapter(adapter);
         dialog.show();
 
+    }
+
+    public static  void cancelDialog(){
+        if(dialog != null && dialog.isShowing()) {
+            dialog.cancel();
+        }
     }
 
     public static class ViewHolder {

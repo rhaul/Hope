@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -34,6 +35,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -55,6 +59,7 @@ import com.xplorer.hope.object.WorkAd;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -66,15 +71,22 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
     // views
     @InjectView(R.id.ll_nbw_work)
     LinearLayout ll_work;
+    @InjectView(R.id.ll_nbw_filter_dialog)
+    LinearLayout ll_filter_dialog;
 
+    @InjectView(R.id.ll_filter_buttons)
+    LinearLayout ll_buttons;
+
+    List<String> categories = new ArrayList<String>();
     private GoogleMap mMap;
     private Marker myMarker;
     private Geocoder geocoder;
     LocationManager manager;
+    private Circle circle;
     LatLng latLng = new LatLng(28.63821, 77.2047405);
     String address = "";
     GetAddressTask getAddressTask;
-    float currZoomLevel = 12;
+    float currZoomLevel = 11;
     int [] filter = new int[]{1,1,1,1,1,0,40,0,10};
     private List<WorkAd> workAdItems = new ArrayList<WorkAd>();
     private List<Marker> workMarkers = new ArrayList<Marker>();
@@ -85,6 +97,10 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_works);
         ButterKnife.inject(this);
+        getActionBar().setTitle("Search nearby jobs");
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.Green_2)));
+        categories.addAll(Arrays.asList(HopeApp.TITLES));
+        categories.add(0, "All");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_nbw);
 
@@ -112,6 +128,12 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
             latLng = new LatLng(lastLoc.getLatitude(), lastLoc.getLongitude());
         }
         mMap.setMyLocationEnabled(true);
+        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                currZoomLevel = cameraPosition.zoom;
+            }
+        });
         mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
@@ -141,6 +163,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
                 getAddressTask = new GetAddressTask(NearbyWorksActivity.this, false);
                 getAddressTask.execute(latLng.latitude, latLng.longitude);
                 removeWorkMarkers();
+                showGeofence();
                 fetchWorks(false);
             }
         });
@@ -306,9 +329,14 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     public void onBackPressed() {
-        if (ll_work.getVisibility() == View.VISIBLE) {
+        if(ll_filter_dialog.getVisibility() == View.VISIBLE){
+            ll_filter_dialog.setVisibility(View.GONE);
+            ll_buttons.setVisibility(View.GONE);
+        }
+        else if (ll_work.getVisibility() == View.VISIBLE) {
             hideWorkView();
-        } else {
+        }
+        else {
             super.onBackPressed();
         }
 
@@ -343,6 +371,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         for (int i = 0; i < workMarkers.size(); i++) {
             workMarkers.get(i).remove();
         }
+        circle.remove();
         workMarkers.clear();
         workAdItems.clear();
     }
@@ -396,7 +425,9 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
     private void fetchWorks(boolean b) {
 
         query = ParseQuery.getQuery("WorkAd");
-        query.whereEqualTo("category", HopeApp.TITLES[filter[7]]);
+        if(filter[7] != 0){
+            query.whereEqualTo("category", HopeApp.TITLES[filter[7]]);
+        }
         query.whereWithinKilometers("addressGP", new ParseGeoPoint(latLng.latitude, latLng.longitude), filter[8]);
         if(b){
             //filter
@@ -421,7 +452,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
             query.whereContainedIn("dateType", dateTypes);
             query.whereContainedIn("timeType", frequency);
             query.whereGreaterThanOrEqualTo("wageLowerLimit",filter[5]*500).whereLessThanOrEqualTo("wageHigherLimit",filter[6]*500);
- // 2km
+            showGeofence();
         }
         query.addDescendingOrder("createdAt");
         // query.setLimit(2);
@@ -441,7 +472,6 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         for (int i = 0; i < workAdItems.size(); i++) {
             addWorkMarker(i);
         }
-        myMarker.showInfoWindow();
         fitWorkAds();
     }
 
@@ -455,6 +485,8 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         int padding = 200; // offset from edges of the map in pixels
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         mMap.animateCamera(cu);
+
+        myMarker.showInfoWindow();
     }
 
     private void addWorkMarker(int pos) {
@@ -484,11 +516,26 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
             myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Long press to drag me to your Search Location")
                     .draggable(true));
         }
+        showGeofence();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, currZoomLevel);
         mMap.animateCamera(cameraUpdate);
 
     }
 
+
+    private void showGeofence() {
+        if(circle != null){
+            circle.remove();
+        }
+        CircleOptions circleOptions = new CircleOptions()
+                .center(new LatLng(myMarker.getPosition().latitude,myMarker.getPosition().longitude))
+                .radius(filter[8]*1000)
+                .fillColor(0x20ff0000)
+                .strokeColor(Color.TRANSPARENT)
+                .strokeWidth(2);
+
+        circle = mMap.addCircle(circleOptions);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -515,28 +562,77 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
 
 
     private void applyFilters() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Filters");
-        View filters = getLayoutInflater().inflate(R.layout.dialog_filter, null);
-        builder.setView(filters);
-        final LinearLayout ll_category = (LinearLayout) filters.findViewById(R.id.ll_filter_category);
-        final LinearLayout ll_radius = (LinearLayout) filters.findViewById(R.id.ll_filter_radius);
+        final LinearLayout ll_category = (LinearLayout) findViewById(R.id.ll_filter_category);
+        final LinearLayout ll_radius = (LinearLayout) findViewById(R.id.ll_filter_radius);
+        final LinearLayout ll_workType = (LinearLayout) findViewById(R.id.ll_filter_workType);
+        final LinearLayout ll_frequency = (LinearLayout) findViewById(R.id.ll_filter_frequency);
+        final LinearLayout ll_wage = (LinearLayout) findViewById(R.id.ll_filter_wage);
         ll_category.setVisibility(View.VISIBLE);
         ll_radius.setVisibility(View.VISIBLE);
-        final Spinner sp_category = (Spinner) filters.findViewById(R.id.sp_filter_category);
-        final TextView tv_radius = (TextView) filters.findViewById(R.id.tv_filter_radius);
-        final SeekBar sb_radius = (SeekBar) filters.findViewById(R.id.sb_filter_radius);
-        final CheckBox cb_filter_wt_oneDay = (CheckBox) filters.findViewById(R.id.cb_filter_wt_oneDay);
-        final CheckBox cb_filter_wt_monthly = (CheckBox) filters.findViewById(R.id.cb_filter_wt_monthly);
-        final CheckBox cb_filter_wt_custom = (CheckBox) filters.findViewById(R.id.cb_filter_wt_custom);
-        final CheckBox cb_filter_f_once = (CheckBox) filters.findViewById(R.id.cb_filter_f_once);
-        final CheckBox cb_filter_f_twice = (CheckBox) filters.findViewById(R.id.cb_filter_f_twice);
-        final RangeBar rb_filter_wageLimit = (RangeBar) filters.findViewById(R.id.rb_filter_wageLimit);
-        final TextView tv_filter_wl_lower = (TextView) filters.findViewById(R.id.tv_filter_wl_lower);
-        final TextView tv_filter_wl_higher = (TextView) filters.findViewById(R.id.tv_filter_wl_higher);
+        final TextView tv_category = (TextView) findViewById(R.id.tv_filter_category);
+        final Spinner sp_category = (Spinner) findViewById(R.id.sp_filter_category);
+        final TextView tv_radius = (TextView) findViewById(R.id.tv_filter_radius);
+        final SeekBar sb_radius = (SeekBar) findViewById(R.id.sb_filter_radius);
+        final CheckBox cb_filter_wt_oneDay = (CheckBox) findViewById(R.id.cb_filter_wt_oneDay);
+        final CheckBox cb_filter_wt_monthly = (CheckBox) findViewById(R.id.cb_filter_wt_monthly);
+        final CheckBox cb_filter_wt_custom = (CheckBox) findViewById(R.id.cb_filter_wt_custom);
+        final CheckBox cb_filter_f_once = (CheckBox) findViewById(R.id.cb_filter_f_once);
+        final CheckBox cb_filter_f_twice = (CheckBox) findViewById(R.id.cb_filter_f_twice);
+        final RangeBar rb_filter_wageLimit = (RangeBar) findViewById(R.id.rb_filter_wageLimit);
+        final TextView tv_filter_wl_lower = (TextView) findViewById(R.id.tv_filter_wl_lower);
+        final TextView tv_filter_wl_higher = (TextView) findViewById(R.id.tv_filter_wl_higher);
+         Button b_cancel = (Button) findViewById(R.id.b_filter_cancel);
+         Button b_apply = (Button) findViewById(R.id.b_filter_apply);
 
+        b_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ll_filter_dialog.setVisibility(View.GONE);
+                ll_buttons.setVisibility(View.GONE);
+            }
+        });
+
+        b_apply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (cb_filter_wt_oneDay.isChecked()) {
+                    filter[0] = 1;
+                } else {
+                    filter[0] = 0;
+                }
+                if (cb_filter_wt_monthly.isChecked()) {
+                    filter[1] = 1;
+                } else {
+                    filter[1] = 0;
+                }
+                if (cb_filter_wt_custom.isChecked()) {
+                    filter[2] = 1;
+                } else {
+                    filter[2] = 0;
+                }
+                if (cb_filter_f_once.isChecked()) {
+                    filter[3] = 1;
+                } else {
+                    filter[3] = 0;
+                }
+                if (cb_filter_f_twice.isChecked()) {
+                    filter[4] = 1;
+                } else {
+                    filter[4] = 0;
+                }
+                filter[5] = rb_filter_wageLimit.getLeftIndex();
+                filter[6] = rb_filter_wageLimit.getRightIndex();
+                filter[7] = sp_category.getSelectedItemPosition();
+                filter[8] = sb_radius.getProgress() + 1;
+                //  pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+                fetchWorks(true);
+                ll_filter_dialog.setVisibility(View.GONE);
+                ll_buttons.setVisibility(View.GONE);
+            }
+        });
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, HopeApp.TITLES);
+                android.R.layout.simple_list_item_1, categories.toArray(new String[categories.size()]));
         sp_category.setAdapter(adapter);
         sp_category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -605,8 +701,8 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
                 }
                 break;
                 case 8: {
-                    tv_radius.setText("Radius: "+(filter[8]+1)+" km");
-                    sb_radius.setProgress(filter[8]);
+                    tv_radius.setText("Radius: "+(filter[8])+" km");
+                    sb_radius.setProgress(filter[8]-1);
                 }
                 break;
             }
@@ -614,17 +710,33 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         sb_radius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                filter[8] = progress++;
-                tv_radius.setText("Radius: "+progress+" km");
+                tv_radius.setText("Radius: "+(progress+1)+" km");
+                filter[8] = progress+1;
+                showGeofence();
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                ll_filter_dialog.setBackgroundColor(Color.TRANSPARENT);
+                ll_radius.setBackgroundColor(getResources().getColor(R.color.ALPHA_Green_2));
+                tv_category.setVisibility(View.GONE);
+                sp_category.setVisibility(View.GONE);
+                ll_workType.setVisibility(View.GONE);
+                ll_frequency.setVisibility(View.GONE);
+                ll_wage.setVisibility(View.GONE);
+                ll_buttons.setVisibility(View.GONE);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                ll_filter_dialog.setBackgroundColor(Color.WHITE);
+                ll_radius.setBackgroundColor(Color.WHITE);
+                tv_category.setVisibility(View.VISIBLE);
+                sp_category.setVisibility(View.VISIBLE);
+                ll_workType.setVisibility(View.VISIBLE);
+                ll_frequency.setVisibility(View.VISIBLE);
+                ll_wage.setVisibility(View.VISIBLE);
+                ll_buttons.setVisibility(View.VISIBLE);
 
             }
         });
@@ -635,54 +747,11 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
                 tv_filter_wl_higher.setText("Higher: ₹ " + i2 * 500);
             }
         });
-
-        builder.setPositiveButton("Apply",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (cb_filter_wt_oneDay.isChecked()) {
-                            filter[0] = 1;
-                        } else {
-                            filter[0] = 0;
-                        }
-                        if (cb_filter_wt_monthly.isChecked()) {
-                            filter[1] = 1;
-                        } else {
-                            filter[1] = 0;
-                        }
-                        if (cb_filter_wt_custom.isChecked()) {
-                            filter[2] = 1;
-                        } else {
-                            filter[2] = 0;
-                        }
-                        if (cb_filter_f_once.isChecked()) {
-                            filter[3] = 1;
-                        } else {
-                            filter[3] = 0;
-                        }
-                        if (cb_filter_f_twice.isChecked()) {
-                            filter[4] = 1;
-                        } else {
-                            filter[4] = 0;
-                        }
-                        filter[5] = rb_filter_wageLimit.getLeftIndex();
-                        filter[6] = rb_filter_wageLimit.getRightIndex();
-                        filter[7] = sp_category.getSelectedItemPosition();
-                        filter[8] = sb_radius.getProgress()+1;
-                        //  pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
-                        fetchWorks(true);
-                        dialog.cancel();
-                    }
-                })
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-        builder.show();
-
+        ll_filter_dialog.setVisibility(View.VISIBLE);
+        ll_buttons.setVisibility(View.VISIBLE);
 
     }
+
     private class GetAddressTask extends
             AsyncTask<Double, Void, Address> {
         Context mContext;

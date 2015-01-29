@@ -331,6 +331,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         builder.setTitle("Filters");
         View filters = getLayoutInflater().inflate(R.layout.dialog_filter, null);
         builder.setView(filters);
+        final LinearLayout ll_buttons = (LinearLayout) filters.findViewById(R.id.ll_filter_buttons);
         final CheckBox cb_filter_wt_oneDay = (CheckBox) filters.findViewById(R.id.cb_filter_wt_oneDay);
         final CheckBox cb_filter_wt_monthly = (CheckBox) filters.findViewById(R.id.cb_filter_wt_monthly);
         final CheckBox cb_filter_wt_custom = (CheckBox) filters.findViewById(R.id.cb_filter_wt_custom);

@@ -455,7 +455,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             btnPhoneConfirm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String username = etPhoneNo.getText().toString();
+                    final String username = etPhoneNo.getText().toString();
                     dialog.dismiss();
                     HopeApp.getInstance().onPreExecute(SignUpActivity.this);
                     ParseUser.logInInBackground(username, "", new LogInCallback() {
@@ -466,6 +466,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
                                 return;
                             } else {
                                 Log.e("hope showMobileDialog", e.toString());
+                                et_num.setText(username);
                             }
                         }
                     });

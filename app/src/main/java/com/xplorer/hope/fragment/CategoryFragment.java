@@ -94,13 +94,6 @@ public class CategoryFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        //lva.notifyDataSetChanged();
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 

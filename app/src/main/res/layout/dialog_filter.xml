@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:scrollbarStyle="outsideOverlay"
     android:padding="5dp">
 
     <LinearLayout
@@ -12,18 +13,23 @@
 
         <LinearLayout
             android:id="@+id/ll_filter_category"
-            android:visibility="gone"
+            android:background="@android:color/transparent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_height="95dp"
+            android:visibility="gone"
+            android:layout_marginBottom="5dp"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView6"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_filter_category"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
                 android:text="Category"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:background="@color/gray1"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <Spinner
@@ -34,28 +40,34 @@
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_filter_radius"
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:visibility="gone"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tv_filter_radius"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:text="Radius: 2 km"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:textColor="@color/white"
+                android:background="@color/gray1"
+                android:text="Radius: 10 km"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <SeekBar
                 android:id="@+id/sb_filter_radius"
-                android:max="10"
+                android:max="9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_filter_workType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
@@ -63,10 +75,15 @@
 
             <TextView
                 android:id="@+id/textView1"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:text="Work Type"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:textColor="@color/white"
+                android:background="@color/gray1"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <LinearLayout
@@ -102,6 +119,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_filter_frequency"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
@@ -109,10 +127,15 @@
 
             <TextView
                 android:id="@+id/textView2"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:text="Frequency"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:textColor="@color/white"
+                android:background="@color/gray1"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <LinearLayout
@@ -141,16 +164,23 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/ll_filter_wage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textView3"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:text="Wage limit"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:textColor="@color/white"
+                android:background="@color/gray1"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <LinearLayout
@@ -181,10 +211,10 @@
                 android:id="@+id/rb_filter_wageLimit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="50dp"
                 custom:tickCount="41" />
 
         </LinearLayout>
-        </LinearLayout>
+
+    </LinearLayout>
 
 </ScrollView>
