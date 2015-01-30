@@ -6,18 +6,18 @@ import com.parse.ParseObject;
 /**
  * Created by Raghavendra on 11-01-2015.
  */
-@ParseClassName("attendance")
+@ParseClassName("Attendance")
 public class Attendance extends ParseObject {
 
     public Attendance(){}
 
 
     public String getWorkerID() {
-        return getString("Worker");
+        return getString("workerID");
     }
 
     public void setWorkerID(String Worker) {
-        put("Worker", Worker);
+        put("workerID", Worker);
     }
 
     public String getEmployerID() {

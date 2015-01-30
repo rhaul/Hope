@@ -1,4 +1,4 @@
-﻿package com.xplorer.hope.activity;
+package com.xplorer.hope.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -590,8 +590,8 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         final RangeBar rb_filter_wageLimit = (RangeBar) findViewById(R.id.rb_filter_wageLimit);
         final TextView tv_filter_wl_lower = (TextView) findViewById(R.id.tv_filter_wl_lower);
         final TextView tv_filter_wl_higher = (TextView) findViewById(R.id.tv_filter_wl_higher);
-         Button b_cancel = (Button) findViewById(R.id.b_filter_cancel);
-         Button b_apply = (Button) findViewById(R.id.b_filter_apply);
+        Button b_cancel = (Button) findViewById(R.id.b_filter_cancel);
+        Button b_apply = (Button) findViewById(R.id.b_filter_apply);
 
         b_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
