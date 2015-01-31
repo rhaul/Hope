@@ -26,7 +26,11 @@ public class SelectUserTypeActivity extends Activity implements View.OnClickList
         b_worker.setOnClickListener(this);
         b_employer.setOnClickListener(this);
 
+        if (HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi")){
+            b_worker.setText("कर्मचारी");
+            b_employer.setText("नियोक्ता");
 
+        }
     }
 
 

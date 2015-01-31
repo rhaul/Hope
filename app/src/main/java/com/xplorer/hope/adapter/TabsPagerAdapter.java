@@ -4,7 +4,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.fragment.CategoryFragment;
 
 import java.util.ArrayList;
@@ -13,9 +12,13 @@ import java.util.List;
 public class TabsPagerAdapter extends FragmentPagerAdapter {
 
     private List<CategoryFragment> fragments = new ArrayList<CategoryFragment>();
-    public TabsPagerAdapter(FragmentManager fm,List<CategoryFragment> list) {
+
+
+    public static String[] TITLES;
+    public TabsPagerAdapter(FragmentManager fm,List<CategoryFragment> list, String TITLES[]) {
         super(fm);
         fragments = list;
+        this.TITLES=TITLES;
     }
 
     public CategoryFragment getFragment(int position){
@@ -35,7 +38,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return HopeApp.TITLES[position];
+        return TITLES[position];
     }
 
 }

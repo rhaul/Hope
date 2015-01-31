@@ -60,7 +60,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         ButterKnife.inject(this);
 
 
-        getActionBar().setTitle("Set Location");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Set Location", null, null));
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[3]);
 
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
@@ -76,6 +76,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
         manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mapFragment.getMapAsync(this);
+        b_setMyWL.setText(HopeApp.getInstance().getHindiLanguage("Set My Work Location",null, null));
+
         b_setMyWL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +165,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             getAddressTask.execute(latLng.latitude, latLng.longitude);
 
         } else {
-            marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Long press to drag me to your Work Location")
+            marker = mMap.addMarker(new MarkerOptions().position(latLng).title(HopeApp.getInstance().getHindiLanguage("Long press me to drag to your Work Location", null, null))
                     .draggable(true));
         }
         marker.showInfoWindow();
@@ -244,7 +246,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
         //noinspection SimplifiableIfStatement
 
         return super.onOptionsItemSelected(item);

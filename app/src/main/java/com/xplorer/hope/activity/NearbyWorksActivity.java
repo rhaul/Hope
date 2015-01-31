@@ -100,7 +100,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         categories.addAll(Arrays.asList(HopeApp.TITLES));
         categories.add(0, "All");
 
-        getActionBar().setTitle("Search nearby jobs");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Search nearby jobs",null, null));
         Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[6]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
 
@@ -519,7 +519,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
             getAddressTask.execute(latLng.latitude, latLng.longitude);
 
         } else {
-            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Long press to drag me to your Search Location")
+            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(HopeApp.getInstance().getHindiLanguage("Long press me to drag to your Search Location", null, null))
                     .draggable(true));
         }
         showGeofence();

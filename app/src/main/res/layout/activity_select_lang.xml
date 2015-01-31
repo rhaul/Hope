@@ -9,7 +9,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text="Hindi"
+        android:text="हिंदी"
         android:textColor="@color/white"
         android:textSize="50sp"
         android:background="@color/BlueViolet"

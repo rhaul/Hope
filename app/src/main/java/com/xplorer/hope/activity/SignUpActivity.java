@@ -147,6 +147,12 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
     @InjectView(R.id.b_sign_map)
     Button b_map;
 
+
+    @InjectView(R.id.tv_sign_interest)
+    TextView tv_interest;
+
+    @InjectView(R.id.tv_sign_exptWage)
+    TextView tv_exptWage;
     Menu menu;
     MenuItem saveBtn;
     Context mcontex;
@@ -198,6 +204,8 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             }
         });
         iv_profilePhoto.setOnClickListener(this);
+
+        setHindiVocab();
     }
 
 
@@ -218,7 +226,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         et_addr.setOnClickListener(this);
 
 
-        getActionBar().setTitle("Profile");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Profile", null, null));
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[0]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
 
@@ -324,6 +332,44 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         }
 
         return true;
+    }
+
+    public void setHindiVocab(){
+        et_name.setHint(HopeApp.getInstance().getHindiLanguage("Name", null, null));
+        et_addr.setHint(HopeApp.getInstance().getHindiLanguage("Address", null, null));
+        et_num.setHint(HopeApp.getInstance().getHindiLanguage("Phone Number (10 digit)", null, null));
+        et_addr.setHint(HopeApp.getInstance().getHindiLanguage("Address", null, null));
+
+
+
+        tv_dob.setText(HopeApp.getInstance().getHindiLanguage("Date of Birth", null, null));
+        tv_interest.setText(HopeApp.getInstance().getHindiLanguage("Interest", null, null));
+        tv_exptWage.setText(HopeApp.getInstance().getHindiLanguage("Expected Wages\n(per month)", null, null));
+
+
+        cb_dishWashing.setText(HopeApp.getInstance().getHindiLanguage("Dish Washing", null, null));
+        cb_Cooking.setText(HopeApp.getInstance().getHindiLanguage("Cooking", null, null));
+        cb_Driver.setText(HopeApp.getInstance().getHindiLanguage("Driver", null, null));
+        cb_Construction.setText(HopeApp.getInstance().getHindiLanguage("Construction", null, null));
+        cb_ClothWashing.setText(HopeApp.getInstance().getHindiLanguage("Cloth Washing", null, null));
+        cb_Guard.setText(HopeApp.getInstance().getHindiLanguage("Guard", null, null));
+        cb_Miscellaneous.setText(HopeApp.getInstance().getHindiLanguage("Miscellaneous", null, null));
+        cb_Wallpaint.setText(HopeApp.getInstance().getHindiLanguage("Wall paint", null, null));
+        cb_ShopWorker.setText(HopeApp.getInstance().getHindiLanguage("Shop Worker", null, null));
+        cb_HouseCleaning.setText(HopeApp.getInstance().getHindiLanguage("House Cleaning", null, null));
+        cb_Gardening.setText(HopeApp.getInstance().getHindiLanguage("Gardening", null, null));
+
+
+        cb_LanguageEnglish.setText(HopeApp.getInstance().getHindiLanguage("English", null, null));
+        cb_LanguageHindi.setText(HopeApp.getInstance().getHindiLanguage("Hindi", null, null));
+        cb_licenseFourwheeler.setText(HopeApp.getInstance().getHindiLanguage("Four wheeler", null, null));
+        cb_licenseHeavy.setText(HopeApp.getInstance().getHindiLanguage("Heavy", null, null));
+
+        rb_male.setText(HopeApp.getInstance().getHindiLanguage("Male", null, null));
+        rb_female.setText(HopeApp.getInstance().getHindiLanguage("Female", null, null));
+
+        b_map.setText(HopeApp.getInstance().getHindiLanguage("Map", null, null));
+
     }
 
     @Override

@@ -55,7 +55,7 @@ public class AttendanceActivity extends FragmentActivity {
         setContentView(R.layout.activity_attendance);
         ButterKnife.inject(this);
 
-        getActionBar().setTitle("Attendance");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Worker's Attendance", null, null));
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[4]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
         getActionBar().setHomeButtonEnabled(true);
@@ -75,6 +75,8 @@ public class AttendanceActivity extends FragmentActivity {
     }
 
     public void fetchWorkerAll() {
+
+
         String myWorkerId = ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
 
         ParseQuery<EWRelation> query = ParseQuery.getQuery("EWRelation");
