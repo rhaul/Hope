@@ -29,10 +29,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
@@ -40,10 +42,12 @@ import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
 import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.object.UserInfo;
+import com.xplorer.hope.object.WorkAd;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Calendar;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -147,6 +151,12 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
     @InjectView(R.id.b_sign_map)
     Button b_map;
 
+
+    @InjectView(R.id.tv_sign_interest)
+    TextView tv_interest;
+
+    @InjectView(R.id.tv_sign_exptWage)
+    TextView tv_exptWage;
     Menu menu;
     MenuItem saveBtn;
     Context mcontex;
@@ -198,6 +208,8 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
             }
         });
         iv_profilePhoto.setOnClickListener(this);
+
+        setHindiVocab();
     }
 
 
@@ -218,7 +230,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         et_addr.setOnClickListener(this);
 
 
-        getActionBar().setTitle("Profile");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Profile", null, null));
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[0]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
 
@@ -324,6 +336,44 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         }
 
         return true;
+    }
+
+    public void setHindiVocab(){
+        et_name.setHint(HopeApp.getInstance().getHindiLanguage("Name", null, null));
+        et_addr.setHint(HopeApp.getInstance().getHindiLanguage("Address", null, null));
+        et_num.setHint(HopeApp.getInstance().getHindiLanguage("Phone Number (10 digit)", null, null));
+        et_addr.setHint(HopeApp.getInstance().getHindiLanguage("Address", null, null));
+
+
+
+        tv_dob.setText(HopeApp.getInstance().getHindiLanguage("Date of Birth", null, null));
+        tv_interest.setText(HopeApp.getInstance().getHindiLanguage("Interest", null, null));
+        tv_exptWage.setText(HopeApp.getInstance().getHindiLanguage("Expected Wages\n(per month)", null, null));
+
+
+        cb_dishWashing.setText(HopeApp.getInstance().getHindiLanguage("Dish Washing", null, null));
+        cb_Cooking.setText(HopeApp.getInstance().getHindiLanguage("Cooking", null, null));
+        cb_Driver.setText(HopeApp.getInstance().getHindiLanguage("Driver", null, null));
+        cb_Construction.setText(HopeApp.getInstance().getHindiLanguage("Construction", null, null));
+        cb_ClothWashing.setText(HopeApp.getInstance().getHindiLanguage("Cloth Washing", null, null));
+        cb_Guard.setText(HopeApp.getInstance().getHindiLanguage("Guard", null, null));
+        cb_Miscellaneous.setText(HopeApp.getInstance().getHindiLanguage("Miscellaneous", null, null));
+        cb_Wallpaint.setText(HopeApp.getInstance().getHindiLanguage("Wall paint", null, null));
+        cb_ShopWorker.setText(HopeApp.getInstance().getHindiLanguage("Shop Worker", null, null));
+        cb_HouseCleaning.setText(HopeApp.getInstance().getHindiLanguage("House Cleaning", null, null));
+        cb_Gardening.setText(HopeApp.getInstance().getHindiLanguage("Gardening", null, null));
+
+
+        cb_LanguageEnglish.setText(HopeApp.getInstance().getHindiLanguage("English", null, null));
+        cb_LanguageHindi.setText(HopeApp.getInstance().getHindiLanguage("Hindi", null, null));
+        cb_licenseFourwheeler.setText(HopeApp.getInstance().getHindiLanguage("Four wheeler", null, null));
+        cb_licenseHeavy.setText(HopeApp.getInstance().getHindiLanguage("Heavy", null, null));
+
+        rb_male.setText(HopeApp.getInstance().getHindiLanguage("Male", null, null));
+        rb_female.setText(HopeApp.getInstance().getHindiLanguage("Female", null, null));
+
+        b_map.setText(HopeApp.getInstance().getHindiLanguage("Map", null, null));
+
     }
 
     @Override
@@ -434,6 +484,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
                     HopeApp.pd.dismiss();
                     if (e == null) {
                         Toast.makeText(SignUpActivity.this, "Profile saved successfully", Toast.LENGTH_SHORT).show();
+                        updateNameInWorkAds();
                         finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Please check your Internet Connection.", Toast.LENGTH_SHORT).show();
@@ -443,7 +494,31 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    private void updateNameInWorkAds() {
 
+        final String myName= ((UserInfo) ParseUser.getCurrentUser()).getName();
+        String myId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
+
+        ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
+        query.whereEqualTo("userID", myId);
+
+
+
+        query.findInBackground(new FindCallback<WorkAd>() {
+            @Override
+            public void done(List<WorkAd> parseObjects, ParseException e) {
+
+                HopeApp.pd.dismiss();
+                if (e == null && parseObjects.size()>0) {
+                    for(int i=0; i<parseObjects.size(); i++){
+                        parseObjects.get(i).setUserName(myName);
+                        parseObjects.get(i).saveInBackground();
+                    }
+
+                }
+            }
+        });
+    }
 
     private void showMobileDialog() {
         TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
@@ -674,6 +749,10 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         }else if (et_num.getText().toString().length()!=10) {
             Toast.makeText(SignUpActivity.this, "Please enter 10 digit valid mobile number", Toast.LENGTH_LONG).show();
             return false;
+        }else if(gp == null){
+            Toast.makeText(SignUpActivity.this, "Set Geo Location using Map", Toast.LENGTH_LONG).show();
+            return false;
+
         }
 
         return true;

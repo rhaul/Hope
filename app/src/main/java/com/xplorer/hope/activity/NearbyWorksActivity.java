@@ -1,4 +1,4 @@
-package com.xplorer.hope.activity;
+﻿package com.xplorer.hope.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -101,7 +101,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         categories.addAll(Arrays.asList(HopeApp.TITLES));
         categories.add(0, "All");
 
-        getActionBar().setTitle("Search nearby jobs");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Search nearby jobs",null, null));
         Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[6]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
 
@@ -550,6 +550,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         } else {
             myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Long press to drag me to your Search Location")
                     .draggable(true));
+
         }
         showGeofence();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, currZoomLevel);
