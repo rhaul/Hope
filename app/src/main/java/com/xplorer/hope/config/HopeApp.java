@@ -120,6 +120,7 @@ public class HopeApp extends Application {
     };
     public static final String[] drawerTitlesWorker = {
             "Profile",
+            "Change Language",
             "Manage Jobs",
             "Pending Requests",
             "Worker's Attendance",
@@ -130,10 +131,11 @@ public class HopeApp extends Application {
 
     public static final String[] drawerTitlesEmployer = {
             "Profile",
+            "Change Language",
             "Manage Jobs",
             "Pending Requests",
             "Worker's Attendance",
-            "Search in Map",
+            "Search in Map"
 
 
     };
@@ -239,7 +241,6 @@ public class HopeApp extends Application {
         instance = this;
 
         FillHindiDictionary();
-        SELECTED_LANGUAGE = "english";
         parseInit();
         CatColorInit();
 
@@ -291,6 +292,7 @@ public class HopeApp extends Application {
         EnglishToHindi.put("Four wheeler", "चार टायर वाहन");
         EnglishToHindi.put("Heavy", "भारी वाहन");
         EnglishToHindi.put("Language known:", "भाषा जाना जाता है:");
+        EnglishToHindi.put("Change Language", "भाषा बदलें");
         EnglishToHindi.put("English", "अंग्रेजी");
         EnglishToHindi.put("Hindi", "हिंदी");
         EnglishToHindi.put("Set My Work Location", "मेरा कार्य स्थान निर्धारित");
@@ -606,7 +608,7 @@ public class HopeApp extends Application {
 
     public String getHindiLanguage(String txtToConvert, BaseAdapter BA, String type) {
 
-        if (SELECTED_LANGUAGE == "hindi") {
+        if (getSPString(SELECTED_LANGUAGE).equalsIgnoreCase("hindi")) {
             if (EnglishToHindi.containsKey(txtToConvert) && EnglishToHindi.get(txtToConvert) != null) {
                 //Log.d("EnglishToHindi.containsKey("+txtToConvert+")", EnglishToHindi.get(txtToConvert));
                 return EnglishToHindi.get(txtToConvert);

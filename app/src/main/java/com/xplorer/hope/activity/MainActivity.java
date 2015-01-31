@@ -173,11 +173,11 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @Override
     protected void onResume() {
         super.onResume();
-
+/*
         if (mNfcAdapter != null)
-            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, mNFCTechLists);
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, mNFCTechLists);*/
 
-        Log.d("NFC Val", getIntent().getAction());
+//        Log.d("NFC Val", getIntent().getAction());
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()) && ParseUser.getCurrentUser()!=null && ((UserInfo)ParseUser.getCurrentUser()).getType().equalsIgnoreCase("Employer")) {
             processIntent(getIntent());
         }/*
@@ -644,7 +644,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 }else if(i==4){
                     startActivity(new Intent(MainActivity.this,NearbyWorksActivity.class));
                 }else if(i==5){
-
+                    chooseLangDialog();
+                }else if(i==6){
                     startActivity(new Intent(MainActivity.this, EmpolyerActivity.class));
                 }
                 mDrawerLayout.closeDrawers();
@@ -676,6 +677,41 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+    }
+    public void chooseLangDialog(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(HopeApp.getInstance().getHindiLanguage("Change Language", null, null));
+
+        builder.setNegativeButton(HopeApp.getInstance().getHindiLanguage("Hindi", null, null),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if(!HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi")) {
+                            HopeApp.setSPString(HopeApp.SELECTED_LANGUAGE, "hindi");
+                            dialog.cancel();
+                           // Toast.makeText(MainActivity.this,"लागू किए गए परिवर्तनों को देखने के लिए एप्लिकेशन को पुन: लॉन्च करे",Toast.LENGTH_LONG).show();
+                            finish();
+                            startActivity(new Intent(MainActivity.this, MainActivity.class));
+                            return;
+                        }
+                        dialog.cancel();
+                    }
+                })
+                .setNeutralButton("English",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                if(!HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("english")) {
+                                    HopeApp.setSPString(HopeApp.SELECTED_LANGUAGE,"english");
+                                    dialog.cancel();
+                                   // Toast.makeText(MainActivity.this,"Relaunch the app to see the applied changes!",Toast.LENGTH_LONG).show();
+                                    finish();
+                                    startActivity(new Intent(MainActivity.this, MainActivity.class));
+                                    return;
+                                }
+                                dialog.cancel();
+                            }
+                        });
+        builder.show();
     }
 
     @Override
@@ -733,9 +769,11 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
 
+        NdefMessage msg = null;
         if(ParseUser.getCurrentUser() != null ) {
-            long millis = System.currentTimeMillis() - HopeApp.getInstance().getSPLong(HopeApp.LAST_BEAMED_AT);
-            int minutes = (int) (millis / (1000*60*60));
+            long millis = (new Date()).getTime() - HopeApp.getInstance().getSPLong(HopeApp.LAST_BEAMED_AT);
+            int seconds = (int) (millis / 1000);
+            int minutes =  seconds/60;
             if(minutes>=5) {
                 JSONObject json = new JSONObject();
                 try {
@@ -744,7 +782,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                NdefMessage msg = new NdefMessage(
+                msg = new NdefMessage(
                         new NdefRecord[]{createMime(
                                 "application/vnd.com.xplorer.hope", json.toString().getBytes()),
                                 /**
@@ -759,10 +797,10 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                         });
                 return msg;
             }else{
-                Toast.makeText(this,"Try After "+(5-minutes) , Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this,"Try After "+(5-minutes)+" minutes" , Toast.LENGTH_LONG).show();
             }
         }
-        return null;
+        return msg;
     }
 
 
@@ -839,7 +877,6 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             public void done(ParseException e) {
                 if (e == null) {
                     Toast.makeText(MainActivity.this, "Attendance marked successfully", Toast.LENGTH_SHORT).show();
-                    HopeApp.getInstance().setSPLong(HopeApp.LAST_BEAMED_AT,System.currentTimeMillis());
                 } else {
                     Toast.makeText(MainActivity.this, "Please check your Internet Connection.", Toast.LENGTH_SHORT).show();
                 }
@@ -857,47 +894,55 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case ATTENDANCE_MARKED:
-                    showAttendance();
+                        showAttendance();
                     break;
             }
         }
     };
 
     public void showAttendance() {
-        if( ParseUser.getCurrentUser() != null&&((UserInfo)ParseUser.getCurrentUser()).getType().equalsIgnoreCase("Worker") ) {
-            tv_attendance.setText(((UserInfo) ParseUser.getCurrentUser()).getName() + "\n" +
-                    " your attendance \n" +
-                    "has been marked");
-            final Animation zoomin = AnimationUtils.loadAnimation(HopeApp.getInstance(), R.anim.zoom_in);
-            final Animation zoomout = AnimationUtils.loadAnimation(HopeApp.getInstance(), R.anim.zoom_out);
-            tv_attendance.startAnimation(zoomin);
-            tv_attendance.setVisibility(View.VISIBLE);
-            zoomin.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
 
-                }
+        long millis = (new Date()).getTime() - HopeApp.getInstance().getSPLong(HopeApp.LAST_BEAMED_AT);
+        int seconds = (int) (millis / 1000);
+        int minutes =  seconds/60;
+        if(minutes>=5) {
+            if (ParseUser.getCurrentUser() != null && ((UserInfo) ParseUser.getCurrentUser()).getType().equalsIgnoreCase("Worker")) {
+                tv_attendance.setText(((UserInfo) ParseUser.getCurrentUser()).getName() + "\n" +
+                        " your attendance \n" +
+                        "has been marked");
+                final Animation zoomin = AnimationUtils.loadAnimation(HopeApp.getInstance(), R.anim.zoom_in);
+                final Animation zoomout = AnimationUtils.loadAnimation(HopeApp.getInstance(), R.anim.zoom_out);
+                tv_attendance.startAnimation(zoomin);
+                tv_attendance.setVisibility(View.VISIBLE);
+                HopeApp.getInstance().setSPLong(HopeApp.LAST_BEAMED_AT, (new Date()).getTime());
+                zoomin.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    Runnable r = new Runnable() {
-                        @Override
-                        public void run() {
-                            tv_attendance.startAnimation(zoomout);
-                            tv_attendance.setVisibility(View.GONE);
-                        }
-                    };
+                    }
 
-                    Handler h = new Handler();
-                    h.postDelayed(r, 2000);
-                }
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                tv_attendance.startAnimation(zoomout);
+                                tv_attendance.setVisibility(View.GONE);
+                            }
+                        };
 
-                @Override
-                public void onAnimationRepeat(Animation animation) {
+                        Handler h = new Handler();
+                        h.postDelayed(r, 2000);
+                    }
 
-                }
-            });
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+            }
+        }else {
+            Toast.makeText(getApplicationContext(), "Your attendance is already marked!",Toast.LENGTH_LONG).show();
         }
-        //Toast.makeText(getApplicationContext(), "Your attendance is marked!",Toast.LENGTH_LONG).show();
     }
 }

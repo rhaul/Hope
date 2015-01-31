@@ -1,4 +1,4 @@
-﻿package com.xplorer.hope.activity;
+package com.xplorer.hope.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -72,6 +72,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
     // views
     @InjectView(R.id.ll_nbw_work)
     LinearLayout ll_work;
+
     @InjectView(R.id.ll_nbw_filter_dialog)
     LinearLayout ll_filter_dialog;
 

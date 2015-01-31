@@ -3,12 +3,9 @@ package com.xplorer.hope.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-
-
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -144,47 +141,47 @@ public class WorkerAdaptor extends BaseAdapter {
                 final ViewHolder finalHolder = holder;
 
                 if (workerObject.getCooking()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Cooking", null,null), "₹ " + String.valueOf(workerObject.getCookingExpWage()), finalHolder);
+                    addInterest("Cooking", "₹ " + String.valueOf(workerObject.getCookingExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getClothWashing()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Cloth Washing", null,null), "₹ " + String.valueOf(workerObject.getClothWashingExpWage()), finalHolder);
+                    addInterest("Washing", "₹ " + String.valueOf(workerObject.getClothWashingExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getHouseCleaning()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("House Cleaning", null,null), "₹ " + String.valueOf(workerObject.getHouseCleaningExpWage()), finalHolder);
+                    addInterest("House Cleaning", "₹ " + String.valueOf(workerObject.getHouseCleaningExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getDishWashing()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Dish Washing", null,null), "₹ " + String.valueOf(workerObject.getDishWashingExpWage()), finalHolder);
+                    addInterest("Dish Washing", "₹ " + String.valueOf(workerObject.getDishWashingExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getConstruction()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Construction", null,null), "₹ " + String.valueOf(workerObject.getConstructionExpWage()), finalHolder);
+                    addInterest("Construction", "₹ " + String.valueOf(workerObject.getConstructionExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getWallpaint()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Wall Paint", null,null), "₹ " + String.valueOf(workerObject.getWallpaintExpWage()), finalHolder);
+                    addInterest("Wall Paint", "₹ " + String.valueOf(workerObject.getWallpaintExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getDriver()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Driver", null,null), "₹ " + String.valueOf(workerObject.getDriverExpWage()), finalHolder);
+                    addInterest("Driver", "₹ " + String.valueOf(workerObject.getDriverExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getGuard()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Guard", null,null), "₹ " + String.valueOf(workerObject.getGuardExpWage()), finalHolder);
+                    addInterest("Guard", "₹ " + String.valueOf(workerObject.getGuardExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getShopWorker()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Shop Worker", null,null), "₹ " + String.valueOf(workerObject.getShopWorkerExpWage()), finalHolder);
+                    addInterest("Shop work", "₹ " + String.valueOf(workerObject.getShopWorkerExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getGardening()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Gardening", null,null), "₹ " + String.valueOf(workerObject.getGardeningExpWage()), finalHolder);
+                    addInterest("Gardening", "₹ " + String.valueOf(workerObject.getGardeningExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
                 if (workerObject.getMiscellaneous()) {
-                    addInterest(HopeApp.getInstance().getHindiLanguage("Miscellaneous", null,null), "₹ " + String.valueOf(workerObject.getMiscellaneousExpWage()), finalHolder);
+                    addInterest("Cooking", "₹ " + String.valueOf(workerObject.getMiscellaneousExpWage()), finalHolder);
                     holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 }
             }
@@ -193,11 +190,8 @@ public class WorkerAdaptor extends BaseAdapter {
         }
 
 
-
-
-        holder.tv_worker_name.setText(HopeApp.getInstance().getHindiLanguage(workerObject.getName(), this, "WRA"));
-        holder.tv_gender.setText(HopeApp.getInstance().getHindiLanguage(workerObject.getGender(), this, "WRA"));
-
+        holder.tv_worker_name.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getName()));
+        holder.tv_gender.setText(workerObject.getGender());
 
         if (workerObject.getImageFile() != null)
             Picasso.with(mContext).load(workerObject.getImageFile().getUrl()).into(holder.iv_workerPic);
@@ -206,15 +200,13 @@ public class WorkerAdaptor extends BaseAdapter {
         holder.tv_age.setText("");
         try {
             Date bdate = dateFormat.parse(workerObject.getDob());
-
-            holder.tv_age.setText(HopeApp.getInstance().getHindiLanguage("Age", null, null)+": "+getAge(bdate.getYear()+1900, bdate.getMonth(), bdate.getDate()));
-           //Log.d("hope Age", bdate.getYear() + 1900 + ":" + bdate.getMonth() + ":" + bdate.getDate());
-
+            holder.tv_age.setText("Age: " + getAge(bdate.getYear() + 1900, bdate.getMonth(), bdate.getDate()));
+            Log.d("hope Age", bdate.getYear() + 1900 + ":" + bdate.getMonth() + ":" + bdate.getDate());
 
         } catch (java.text.ParseException e1) {
             e1.printStackTrace();
         }
-        holder.tv_addr.setText(HopeApp.getInstance().getHindiLanguage(workerObject.getAddress(), this, "WRA"));
+        holder.tv_addr.setText(HopeApp.getInstance().getUpperCaseString(workerObject.getAddress()));
         holder.tv_wprofile_phoneno.setText(workerObject.getPhoneNo());
 
         holder.ll_wprofile_addr.setOnClickListener(new View.OnClickListener() {
@@ -405,7 +397,7 @@ public class WorkerAdaptor extends BaseAdapter {
         query.findInBackground(new FindCallback<Attendance>() {
             @Override
             public void done(List<Attendance> parseObjects, ParseException e) {
-                if (e == null && parseObjects.size() > 0) {
+                if (e == null && parseObjects.size() >= 0) {
                     // Setup caldroid to use as dialog
                     final HashMap<String, String> attnd = new HashMap<String, String>();
 
