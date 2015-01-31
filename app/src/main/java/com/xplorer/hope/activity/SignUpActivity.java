@@ -746,6 +746,12 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         }else if (et_num.getText().toString().length()!=10) {
             Toast.makeText(SignUpActivity.this, "Please enter 10 digit valid mobile number", Toast.LENGTH_LONG).show();
             return false;
+        }else if (et_num.getText().toString().length()!=10) {
+            Toast.makeText(SignUpActivity.this, "Please enter 10 digit valid mobile number", Toast.LENGTH_LONG).show();
+            return false;
+        }else if(gp == null){
+            Toast.makeText(SignUpActivity.this, "Set Geo Location using Map", Toast.LENGTH_LONG).show();
+            return false;
         }
 
         return true;

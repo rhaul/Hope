@@ -479,7 +479,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         }
 
         if(gp == null){
-            Toast.makeText(AddActivity.this, "Geo Location not set.", Toast.LENGTH_LONG).show();
+            Toast.makeText(AddActivity.this, "Set Geo Location using Map", Toast.LENGTH_LONG).show();
             return false;
         }
         return true;
