@@ -1,6 +1,7 @@
 package com.xplorer.hope.activity;
 
 import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +26,16 @@ public class SelectUserTypeActivity extends Activity implements View.OnClickList
         ButterKnife.inject(this);
         b_worker.setOnClickListener(this);
         b_employer.setOnClickListener(this);
+
+
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Choose Profession Type", null, null));
+        Integer colorVal =R.color.BlueViolet;
+
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         if (HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi")){
             b_worker.setText("कर्मचारी");

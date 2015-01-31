@@ -29,10 +29,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
@@ -40,10 +42,12 @@ import com.squareup.picasso.Picasso;
 import com.xplorer.hope.R;
 import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.object.UserInfo;
+import com.xplorer.hope.object.WorkAd;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Calendar;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -480,6 +484,7 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
                     HopeApp.pd.dismiss();
                     if (e == null) {
                         Toast.makeText(SignUpActivity.this, "Profile saved successfully", Toast.LENGTH_SHORT).show();
+                        updateNameInWorkAds();
                         finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, "Please check your Internet Connection.", Toast.LENGTH_SHORT).show();
@@ -489,7 +494,31 @@ public class SignUpActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    private void updateNameInWorkAds() {
 
+        final String myName= ((UserInfo) ParseUser.getCurrentUser()).getName();
+        String myId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
+
+        ParseQuery<WorkAd> query = ParseQuery.getQuery("WorkAd");
+        query.whereEqualTo("userID", myId);
+
+
+
+        query.findInBackground(new FindCallback<WorkAd>() {
+            @Override
+            public void done(List<WorkAd> parseObjects, ParseException e) {
+
+                HopeApp.pd.dismiss();
+                if (e == null && parseObjects.size()>0) {
+                    for(int i=0; i<parseObjects.size(); i++){
+                        parseObjects.get(i).setUserName(myName);
+                        parseObjects.get(i).saveInBackground();
+                    }
+
+                }
+            }
+        });
+    }
 
     private void showMobileDialog() {
         TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);

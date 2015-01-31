@@ -10,9 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:text="Worker"
-        android:textColor="@color/white"
+        android:textColor="@color/BlueViolet"
         android:textSize="50sp"
-        android:background="@color/BlueViolet"
+        android:background="@color/white"
         android:layout_weight="1"/>
 
 
@@ -22,8 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:text="Employer"
-        android:textColor="@color/BlueViolet"
+        android:textColor="@color/white"
         android:textSize="50sp"
-        android:background="@color/white"
+        android:background="@color/BlueViolet"
         android:layout_weight="1"/>
 </LinearLayout>

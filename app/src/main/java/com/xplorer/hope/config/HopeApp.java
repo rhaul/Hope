@@ -239,7 +239,7 @@ public class HopeApp extends Application {
         instance = this;
 
         FillHindiDictionary();
-        SELECTED_LANGUAGE = "hindi";
+        SELECTED_LANGUAGE = "english";
         parseInit();
         CatColorInit();
 
@@ -350,6 +350,9 @@ public class HopeApp extends Application {
 
         EnglishToHindi.put("Are you sure you want to apply for this work", "क्या आप इस काम के लिए आवेदन करना चाहते हैं");
         EnglishToHindi.put("Search in Map", "नक्शे में खोज");
+
+        EnglishToHindi.put("Choose Profession Type", "पेशे प्रकार चुनें");
+
 
 
     }
@@ -585,6 +588,7 @@ public class HopeApp extends Application {
         pd.setMessage(getHindiLanguage("Please wait.", null, null));
         pd.setCancelable(false);
         pd.setIndeterminate(true);
+        pd.setCancelable(true);
         pd.show();
 
 

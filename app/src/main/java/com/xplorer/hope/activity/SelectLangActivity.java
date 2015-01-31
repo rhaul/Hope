@@ -2,6 +2,7 @@ package com.xplorer.hope.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +28,13 @@ public class SelectLangActivity extends Activity implements View.OnClickListener
         b_hindi.setOnClickListener(this);
         b_english.setOnClickListener(this);
 
+        getActionBar().setTitle("Choose Language / भाषा चुनें");
+        Integer colorVal =R.color.BlueViolet;
 
+        getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
+
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
 
