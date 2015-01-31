@@ -88,6 +88,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         });
     }
 
+
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;

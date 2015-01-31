@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xplorer.hope" >
+    package="com.xplorer.hope">
 
+    <uses-permission android:name="android.permission.NFC" />
+
+    <uses-feature android:name="android.hardware.nfc" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -39,14 +42,21 @@
         android:icon="@drawable/icon_hope"
         android:label="@string/app_name"
         android:logo="@drawable/ic_launcher"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/com.xplorer.hope" />
             </intent-filter>
 
             <meta-data
@@ -55,25 +65,21 @@
         </activity>
         <activity
             android:name=".activity.SelectLangActivity"
-            android:label="@string/title_activity_select_lang" >
-        </activity>
+            android:label="@string/title_activity_select_lang"></activity>
         <activity
             android:name=".activity.SelectUserTypeActivity"
-            android:label="@string/title_activity_select_user_type" >
-        </activity>
+            android:label="@string/title_activity_select_user_type"></activity>
         <activity
             android:name=".activity.SignUpActivity"
-            android:label="@string/title_activity_sign_up" >
-        </activity>
+            android:label="@string/title_activity_sign_up"></activity>
         <activity
             android:name=".activity.AddActivity"
             android:label="@string/title_activity_add"
-            android:windowSoftInputMode="stateHidden" >
-        </activity>
+            android:windowSoftInputMode="stateHidden"></activity>
         <activity
             android:name=".activity.SearchActivity"
             android:label="@string/title_activity_search"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -85,7 +91,7 @@
 
         <service android:name="com.parse.PushService" />
 
-        <receiver android:name="com.parse.ParseBroadcastReceiver" >
+        <receiver android:name="com.parse.ParseBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
@@ -93,7 +99,7 @@
         </receiver>
         <receiver
             android:name="com.parse.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
@@ -104,7 +110,7 @@
         </receiver>
         <receiver
             android:name=".service.PushBroadcastReceiver"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />
@@ -118,24 +124,19 @@
 
         <activity
             android:name=".activity.PushNotificationActivity"
-            android:label="@string/title_activity_push_notification" >
-        </activity>
+            android:label="@string/title_activity_push_notification"></activity>
         <activity
             android:name=".activity.NoInternetActivity"
-            android:label="@string/title_activity_no_internet" >
-        </activity>
+            android:label="@string/title_activity_no_internet"></activity>
         <activity
             android:name=".activity.EmpolyerActivity"
-            android:label="@string/title_activity_empolyer" >
-        </activity>
+            android:label="@string/title_activity_empolyer"></activity>
         <activity
             android:name=".activity.WorkActivity"
-            android:label="@string/title_activity_work" >
-        </activity>
+            android:label="@string/title_activity_work"></activity>
         <activity
             android:name=".activity.MapActivity"
-            android:label="@string/title_activity_map" >
-        </activity>
+            android:label="@string/title_activity_map"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -147,16 +148,13 @@
         <!--AIzaSyDNkm-u1A9Tewg0sElbNL5tlcKHafZG_mE-->
         <activity
             android:name=".activity.PendingActivity"
-            android:label="@string/title_activity_pending" >
-        </activity>
+            android:label="@string/title_activity_pending"></activity>
         <activity
             android:name=".activity.NearbyWorksActivity"
-            android:label="@string/title_activity_nearby_works" >
-        </activity>
+            android:label="@string/title_activity_nearby_works"></activity>
         <activity
             android:name=".activity.AttendanceActivity"
-            android:label="@string/title_activity_attendance" >
-        </activity>
+            android:label="@string/title_activity_attendance"></activity>
     </application>
 
 </manifest>
