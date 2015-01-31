@@ -59,6 +59,8 @@ public class HopeApp extends Application {
     public static HashMap<String, List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
 
     public static final String APPTAG = "HopeApp";
+
+    public static final String LAST_BEAMED_AT = "lastBeamedAt";
     public ParseQuery<WorkAd> filteredQuery;
 
     //public static HashMap<String,List<WorkAd>> workAdsStorage = new HashMap<String, List<WorkAd>>();
@@ -135,7 +137,10 @@ public class HopeApp extends Application {
 
 
     };
+
     public static String[] drawerCandidate = {};
+
+
 
     //SP variables
 
@@ -200,6 +205,20 @@ public class HopeApp extends Application {
         SharedPreferences sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(getInstance());
         return sharedPreferences.getInt(key, 0);
+    }
+
+    public static void setSPLong(String key, long value) {
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(getInstance());
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(key, value);
+        editor.commit();
+    }
+
+    public static long getSPLong(String key) {
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(getInstance());
+        return sharedPreferences.getLong(key, 0);
     }
 
     public static String getSPString(String key) {

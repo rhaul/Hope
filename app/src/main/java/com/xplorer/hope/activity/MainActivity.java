@@ -3,13 +3,23 @@ package com.xplorer.hope.activity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
+import android.nfc.tech.NfcF;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Parcelable;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -19,6 +29,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,10 +39,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.edmodo.rangebar.RangeBar;
 import com.parse.FindCallback;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseQuery;
@@ -41,27 +55,38 @@ import com.xplorer.hope.adapter.NavDrawerListAdapter;
 import com.xplorer.hope.adapter.TabsPagerAdapter;
 import com.xplorer.hope.config.HopeApp;
 import com.xplorer.hope.fragment.CategoryFragment;
+import com.xplorer.hope.object.Attendance;
 import com.xplorer.hope.object.EWRelation;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
 import com.xplorer.hope.service.ConnectionDetector;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
+import static android.nfc.NdefRecord.createMime;
 
-public class MainActivity extends FragmentActivity implements QuickReturnInterface {
+
+public class MainActivity extends FragmentActivity implements QuickReturnInterface, NfcAdapter.CreateNdefMessageCallback,
+        NfcAdapter.OnNdefPushCompleteCallback {
 
     @InjectView(R.id.tabs)
     PagerSlidingTabStrip pts_titleBar;
     @InjectView(R.id.pager)
     ViewPager vp_pager;
+    @InjectView(R.id.tv_main_attendance)
+    TextView tv_attendance;
 
-    static public int currentFragment=0;
+    static public int currentFragment = 0;
 
     boolean isSetUp = false;
     private TabsPagerAdapter pagerAdapter;
@@ -89,6 +114,13 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     MenuItem searchMenuItem;
     SearchView searchView;
 
+    //NFC
+
+    NfcAdapter mNfcAdapter;
+    private PendingIntent mPendingIntent;
+    private IntentFilter[] mIntentFilters;
+    private String[][] mNFCTechLists;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +128,30 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
         ButterKnife.inject(this);
 
+        // Check for available NFC Adapter
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+        } else {
+            // Register callback to set NDEF message
+            mNfcAdapter.setNdefPushMessageCallback(this, this);
+            // Register callback to listen for message-sent success
+            mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
+        }
+        //showAttendance();
+        // create an intent with tag data and deliver to this activity
+        mPendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+
+        // set an intent filter for all MIME data
+        IntentFilter ndefIntent = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        try {
+            ndefIntent.addDataType("*/*");
+            mIntentFilters = new IntentFilter[] { ndefIntent };
+        } catch (Exception e) {
+            Log.e("TagDispatch", e.toString());
+        }
+
+        mNFCTechLists = new String[][] { new String[] { NfcF.class.getName() } };
 
     }
 
@@ -105,13 +161,73 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         return ll_quick_return_footer;
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+/*
+        if (mNfcAdapter != null)
+            mNfcAdapter.disableForegroundDispatch(this);*/
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+/*
+        if (mNfcAdapter != null)
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, mNFCTechLists);*/
+        // Check to see that the Activity started due to an Android Beam
 
+        Log.d("NFC Val", getIntent().getAction());
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()) && ParseUser.getCurrentUser()!=null && ((UserInfo)ParseUser.getCurrentUser()).getType().equalsIgnoreCase("Employer")) {
+            processIntent(getIntent());
+        }/*
+       *//* // Check to see that the Activity started due to an Android Beam
+        Intent intent = getIntent();
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()) && ParseUser.getCurrentUser()!=null && ((UserInfo)ParseUser.getCurrentUser()).getType().equalsIgnoreCase("Employer")) {
+
+            Log.d("NFC Val", getIntent().getAction());
+            if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()) && ParseUser.getCurrentUser()!=null && ((UserInfo)ParseUser.getCurrentUser()).getType().equalsIgnoreCase("Employer")) {
+
+                Log.d("NFC", "YES");
+                String action = intent.getAction();
+                Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+                String s = action + "\n\n" + tag.toString();
+
+                // parse through all NDEF messages and their records and pick text type only
+                Parcelable[] data = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+                if (data != null) {
+                    try {
+                        for (int i = 0; i < data.length; i++) {
+                            NdefRecord[] recs = ((NdefMessage) data[i]).getRecords();
+                            for (int j = 0; j < recs.length; j++) {
+                                if (recs[j].getTnf() == NdefRecord.TNF_WELL_KNOWN &&
+                                        Arrays.equals(recs[j].getType(), NdefRecord.RTD_TEXT)) {
+                                    byte[] payload = recs[j].getPayload();
+                                    String textEncoding = ((payload[0] & 0200) == 0) ? "UTF-8" : "UTF-16";
+                                    int langCodeLen = payload[0] & 0077;
+
+                                    s += ("\n\nNdefMessage[" + i + "], NdefRecord[" + j + "]:\n\"" +
+                                            new String(payload, langCodeLen + 1, payload.length - langCodeLen - 1,
+                                                    textEncoding) + "\"");
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e("TagDispatch", e.toString());
+                    }
+                }
+                Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+            }*//*
+*//*
+
+            Log.d("NFC","YES");
+            processIntent(getIntent());*//*
+        }
         //Collapsing Search Bar if came back from search activity
-
-        if(searchMenuItem!=null){
+*/
+        if (searchMenuItem != null) {
             searchMenuItem.collapseActionView();
             searchView.setQuery("", false);
         }
@@ -234,6 +350,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         b_sort.setText(HopeApp.getInstance().getHindiLanguage("Sort", null, null));
         b_filter.setText(HopeApp.getInstance().getHindiLanguage("Filter", null, null));
 
+
         vp_pager.setAdapter(pagerAdapter);
         pts_titleBar.setViewPager(vp_pager);
 
@@ -251,7 +368,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             @Override
             public void onPageSelected(int position) {
                 setBarColors(position);
-               // pagerAdapter.getFragment(position).checkIfFilterApplied();
+                // pagerAdapter.getFragment(position).checkIfFilterApplied();
             }
 
             @Override
@@ -277,14 +394,12 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         });
 
 
-
-
     }
 
 
-    public void setBarColors(int position){
-        currentFragment=position;
-        Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[position]);
+    public void setBarColors(int position) {
+        currentFragment = position;
+        Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[position]);
         pts_titleBar.setBackgroundColor(getResources().getColor(colorVal));
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
         getActionBar().setDisplayShowTitleEnabled(false);
@@ -321,7 +436,8 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
                     }
 
-                    if(pagerAdapter!=null && pagerAdapter.getFragment(vp_pager.getCurrentItem()).lva!=null) pagerAdapter.getFragment(vp_pager.getCurrentItem()).lva.notifyDataSetChanged();
+                    if (pagerAdapter != null && pagerAdapter.getFragment(vp_pager.getCurrentItem()).lva != null)
+                        pagerAdapter.getFragment(vp_pager.getCurrentItem()).lva.notifyDataSetChanged();
 
                 }
                 //setUpMainActivity();
@@ -329,7 +445,6 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         });
 
     }
-
 
 
     private void showFilterDialog() {
@@ -395,7 +510,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 break;
                 case 6: {
                     tv_filter_wl_higher.setText("Higher: ₹ " + HopeApp.getInstance().filterValues[i] * 500);
-                    rb_filter_wageLimit.setThumbIndices(HopeApp.getInstance().filterValues[5],HopeApp.getInstance().filterValues[6]);
+                    rb_filter_wageLimit.setThumbIndices(HopeApp.getInstance().filterValues[5], HopeApp.getInstance().filterValues[6]);
                 }
                 break;
             }
@@ -442,7 +557,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                         filters[6] = rb_filter_wageLimit.getRightIndex();
                         query.whereGreaterThanOrEqualTo("wageLowerLimit", rb_filter_wageLimit.getLeftIndex() * 500).whereLessThanOrEqualTo("wageHigherLimit", rb_filter_wageLimit.getRightIndex() * 500);
                         HopeApp.getInstance().setFilters(filters);
-                      //  pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+                        //  pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
                         dialog.cancel();
                     }
                 })
@@ -460,13 +575,12 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                                 cb_filter_wt_custom.setChecked(true);
                                 cb_filter_f_once.setChecked(true);
                                 cb_filter_f_twice.setChecked(true);
-                                rb_filter_wageLimit.setThumbIndices(0,40);
+                                rb_filter_wageLimit.setThumbIndices(0, 40);
                                 tv_filter_wl_lower.setText("Lower: ₹ " + 0 * 500);
                                 tv_filter_wl_higher.setText("Higher: ₹ " + 40 * 500);
                             }
                         });
         builder.show();
-
 
 
     }
@@ -484,12 +598,14 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         lvD.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(i != 4) {
+                if (i != 4) {
                     HopeApp.getInstance().setWorkAdSortBy(i);
-                }else{
-                    startActivity(new Intent(MainActivity.this,NearbyWorksActivity.class));
+                } else {
+                    startActivity(new Intent(MainActivity.this, NearbyWorksActivity.class));
                 }
+
                 pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+
                 dialog.dismiss();
             }
         });
@@ -497,9 +613,9 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     }
 
     private void setUpDrawer() {
-        if(HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("worker")){
+        if (HopeApp.getSPString(HopeApp.SELECTED_USER_TYPE).equalsIgnoreCase("worker")) {
             HopeApp.drawerCandidate = HopeApp.drawerTitlesWorker;
-        }else{
+        } else {
             HopeApp.drawerCandidate = HopeApp.drawerTitlesEmployer;
 
         }
@@ -519,15 +635,17 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0) {
                     startActivity(new Intent(MainActivity.this, SignUpActivity.class).putExtra("from", "menu"));
-                }else if(i==1){
+                } else if (i == 1) {
                     startActivity(new Intent(MainActivity.this, WorkActivity.class));
-                }else if(i==2){
+                } else if (i == 2) {
                     startActivity(new Intent(MainActivity.this, PendingActivity.class));
-                }else if(i==3){
+                } else if (i == 3) {
                     startActivity(new Intent(MainActivity.this, AttendanceActivity.class));
+
                 }else if(i==4){
                     startActivity(new Intent(MainActivity.this,NearbyWorksActivity.class));
                 }else if(i==5){
+
                     startActivity(new Intent(MainActivity.this, EmpolyerActivity.class));
                 }
                 mDrawerLayout.closeDrawers();
@@ -567,7 +685,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
-        SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
         searchMenuItem = menu.findItem(R.id.search);
         searchView = (SearchView) searchMenuItem.getActionView();
@@ -579,7 +697,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean queryTextFocused) {
-                if(!queryTextFocused) {
+                if (!queryTextFocused) {
                     searchMenuItem.collapseActionView();
                     searchView.setQuery("", false);
                 }
@@ -611,5 +729,175 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             list.add(new CategoryFragment().newInstance(i));
         }
         return list;
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+
+        if(ParseUser.getCurrentUser() != null) {
+            long millis = System.currentTimeMillis() - HopeApp.getInstance().getSPLong(HopeApp.LAST_BEAMED_AT);
+            int minutes = (int) (millis / (1000*60*60));
+            if(minutes>=5) {
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("workerID", ((UserInfo) ParseUser.getCurrentUser()).getObjectId().toString());
+                    json.put("name", ((UserInfo) ParseUser.getCurrentUser()).getName());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                NdefMessage msg = new NdefMessage(
+                        new NdefRecord[]{createMime(
+                                "application/vnd.com.xplorer.hope", json.toString().getBytes()),
+                                /**
+                                 * The Android Application Record (AAR) is commented out. When a device
+                                 * receives a push with an AAR in it, the application specified in the AAR
+                                 * is guaranteed to run. The AAR overrides the tag dispatch system.
+                                 * You can add it back in to guarantee that this
+                                 * activity starts when receiving a beamed message. For now, this code
+                                 * uses the tag dispatch system.
+                                 */
+                                NdefRecord.createApplicationRecord("com.xplorer.hope")
+                        });
+                return msg;
+            }else{
+                Toast.makeText(this,"Try After "+(5-minutes) , Toast.LENGTH_LONG).show();
+            }
+        }
+        return null;
+    }
+
+
+
+    private static final int ATTENDANCE_MARKED = 1;
+    private static final int ATTENDANCE_RECEIVED = 2;
+
+    @Override
+    public void onNdefPushComplete(NfcEvent event) {
+        // A handler is needed to send messages to the activity when this
+        // callback occurs, because it happens from a binder thread
+        mHandler.obtainMessage(ATTENDANCE_MARKED).sendToTarget();
+
+    }
+
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        // onResume gets called after this to handle the intent
+        setIntent(intent);
+    }
+
+    /**
+     * Parses the NDEF Message from the intent and prints to the TextView
+     */
+    void processIntent(Intent intent) {
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(
+                NfcAdapter.EXTRA_NDEF_MESSAGES);
+        // only one message sent during the beam
+        NdefMessage msg = (NdefMessage) rawMsgs[0];
+        // record 0 contains the MIME type, record 1 is the AAR, if present
+        String messg = new String(msg.getRecords()[0].getPayload());
+        Toast.makeText(this,messg , Toast.LENGTH_LONG).show();
+
+        JSONObject jo = null;
+        try {
+            jo = new JSONObject(messg);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
+            markAttendance(jo.get("workerID").toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("NFC Rec", getIntent().getAction());
+    }
+
+
+    public static String getCurrentDateStamp() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+        Date now = new Date();
+        String strDate = sdfDate.format(now);
+        return strDate;
+    }
+
+    public static String getCurrentTimeStamp() {
+        return new SimpleDateFormat("HH:mm:ss").format(new Date());
+    }
+
+    private void markAttendance(String workerID) {
+        HopeApp.getInstance().onPreExecute(this);
+        Attendance rel = new Attendance();
+        rel.setWorkerID(workerID);
+        rel.setDate(getCurrentDateStamp());
+        rel.setTime(getCurrentTimeStamp());
+        rel.setEmployerID(ParseUser.getCurrentUser().getObjectId());
+        ParseACL acl = new ParseACL();
+        acl.setPublicReadAccess(true);
+        acl.setPublicWriteAccess(true);
+        rel.setACL(acl);
+        rel.saveInBackground(new SaveCallback() {
+            public void done(ParseException e) {
+                if (e == null) {
+                    Toast.makeText(MainActivity.this, "Attendance marked successfully", Toast.LENGTH_SHORT).show();
+                    HopeApp.getInstance().setSPLong(HopeApp.LAST_BEAMED_AT,System.currentTimeMillis());
+                } else {
+                    Toast.makeText(MainActivity.this, "Please check your Internet Connection.", Toast.LENGTH_SHORT).show();
+                }
+
+                HopeApp.pd.cancel();
+            }
+        });
+    }
+
+    /**
+     * This handler receives a message from onNdefPushComplete
+     */
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case ATTENDANCE_MARKED:
+                    showAttendance();
+                    break;
+            }
+        }
+    };
+
+    public void showAttendance() {
+        if( ParseUser.getCurrentUser() != null) {
+            tv_attendance.setText(((UserInfo) ParseUser.getCurrentUser()).getName() + "\n" +
+                    " your attendance \n" +
+                    "has been marked");
+            final Animation zoomin = AnimationUtils.loadAnimation(HopeApp.getInstance(), R.anim.zoom_in);
+            final Animation zoomout = AnimationUtils.loadAnimation(HopeApp.getInstance(), R.anim.zoom_out);
+            tv_attendance.startAnimation(zoomin);
+            tv_attendance.setVisibility(View.VISIBLE);
+            zoomin.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            tv_attendance.startAnimation(zoomout);
+                            tv_attendance.setVisibility(View.GONE);
+                        }
+                    };
+
+                    Handler h = new Handler();
+                    h.postDelayed(r, 2000);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+        //Toast.makeText(getApplicationContext(), "Your attendance is marked!",Toast.LENGTH_LONG).show();
     }
 }

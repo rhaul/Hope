@@ -34,6 +34,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
@@ -499,17 +500,44 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         MarkerOptions markerOptions = new MarkerOptions().
                 title(workAdItems.get(pos).getCategory()).
                 snippet(workAdItems.get(pos).getDescription()).
-                icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_launcher)).
+                icon(getMapIcon(workAdItems.get(pos).getCategory())).
                 position(new LatLng(workAdItems.get(pos).getAddressGP().getLatitude(), workAdItems.get(pos).getAddressGP().getLongitude()));
 
         Marker marker = mMap.addMarker(markerOptions);
         workMarkers.add(marker);
     }
 
+    private BitmapDescriptor getMapIcon(String type) {
+        if (type.equalsIgnoreCase(HopeApp.TITLES[0])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.dishwashingpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[1])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.housecleaningpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[2])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.clothwashingpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[3])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.cookingpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[4])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.constructorpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[5])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.wallpaintpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[6])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.driverpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[7])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.guardpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[8])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.shopworkerpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[9])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.gardeningpin);
+        }else if (type.equalsIgnoreCase(HopeApp.TITLES[10])) {
+            return BitmapDescriptorFactory.fromResource(R.drawable.dishwashingpin);
+        }
+        return BitmapDescriptorFactory.fromResource(R.drawable.locater) ;
+    }
+
     public void showMyMarkerOnMap() {
         if (myMarker != null) {
             myMarker.remove();
-            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Search Location")
+            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Search Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.locater))
                     .draggable(true));
 
             if (getAddressTask != null) {
@@ -519,8 +547,8 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
             getAddressTask.execute(latLng.latitude, latLng.longitude);
 
         } else {
-            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(HopeApp.getInstance().getHindiLanguage("Long press me to drag to your Search Location", null, null))
-                    .draggable(true));
+
+            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title(HopeApp.getInstance().getHindiLanguage("Long press me to drag to your Search Location", null, null)).icon(BitmapDescriptorFactory.fromResource(R.drawable.locater)).draggable(true));
         }
         showGeofence();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, currZoomLevel);
