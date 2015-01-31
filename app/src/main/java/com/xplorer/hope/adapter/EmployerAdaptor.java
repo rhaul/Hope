@@ -212,6 +212,8 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
                 holder.ll_phone.setVisibility(View.VISIBLE);
             }else if(HopeApp.myPendingWorksIds.containsKey(myWorkIds.get(i).getObjectId())){
                 holder.b_apply.setText(HopeApp.getInstance().getHindiLanguage("Pending", null, null));
+                holder.b_apply.setBackgroundColor(mContext.getResources().getColor(R.color.LightViolet));
+
                 holder.b_apply.setVisibility(View.VISIBLE);
                 holder.ll_phone.setVisibility(View.GONE);
             }else{

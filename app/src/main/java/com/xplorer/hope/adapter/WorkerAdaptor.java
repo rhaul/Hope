@@ -89,6 +89,9 @@ public class WorkerAdaptor extends BaseAdapter {
             if (behaviour == "attendance") {
 
 
+                holder.tv_wprofile_btn1.setBackgroundColor(mContext.getResources().getColor(R.color.SkyBlue));
+                holder.tv_wprofile_btn2.setBackgroundColor(mContext.getResources().getColor(R.color.SkyBlue));
+
                 holder.ll_interestTitle.setVisibility(View.VISIBLE);
                 holder.tv_wprofile_btn1.setText("View Attendance");
                 holder.tv_wprofile_btn2.setText("Mark Attendance");
@@ -112,6 +115,8 @@ public class WorkerAdaptor extends BaseAdapter {
 
 
                 holder.ll_interestTitle.setVisibility(View.VISIBLE);
+
+
                 holder.tv_wprofile_btn1.setText("Accept");
                 holder.tv_wprofile_btn2.setText("Decline");
                 holder.tv_wprofile_btn1.setOnClickListener(new View.OnClickListener() {

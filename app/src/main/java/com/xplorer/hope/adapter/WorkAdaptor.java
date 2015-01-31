@@ -155,7 +155,9 @@ public String currentWork;
 
             }
         });
-
+        holder.b_apply.setBackgroundColor(mContext.getResources().getColor(R.color.LightOrange));
+        holder.b_Edit.setBackgroundColor(mContext.getResources().getColor(R.color.LightOrange));
+        holder.b_Del.setBackgroundColor(mContext.getResources().getColor(R.color.LightOrange));
 
         holder.b_Edit.setOnClickListener(new View.OnClickListener() {
             @Override
