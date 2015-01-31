@@ -85,9 +85,11 @@ public class ListViewAdapter extends BaseAdapter{
 
             query.getInBackground(mAds.get(pos).getUserId(), new GetCallback<ParseUser>() {
                 public void done(ParseUser object, ParseException e) {
+
                     UserInfo usr = (UserInfo) object;
 
-                    if (usr.getImageFile() != null){
+
+                    if (usr!=null && usr.getImageFile() != null){
                         Picasso.with(mContext).load(usr.getImageFile().getUrl()).error(R.drawable.ic_launcher).into(finalHolder.iv_employerPic);
                         if(mAds != null && mAds.size()>0) {
                             mAds.get(pos).imgURL = usr.getImageFile().getUrl();

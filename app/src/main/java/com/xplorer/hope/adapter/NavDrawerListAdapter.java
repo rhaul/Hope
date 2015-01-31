@@ -9,27 +9,28 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.xplorer.hope.R;
-import com.xplorer.hope.config.HopeApp;
 
 /**
  * Created by Raghavendra on 14-01-2015.
  */
 public class NavDrawerListAdapter extends BaseAdapter {
     private Context context;
+    String[] drawerCandidate = {};
 
+    public NavDrawerListAdapter(Context context, String[] drawerCandidate ) {
 
-    public NavDrawerListAdapter(Context context) {
         this.context = context;
+        this.drawerCandidate=drawerCandidate;
     }
 
     @Override
     public int getCount() {
-        return HopeApp.drawerCandidate.length;
+        return drawerCandidate.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return HopeApp.drawerCandidate[position];
+        return drawerCandidate[position];
     }
 
     @Override

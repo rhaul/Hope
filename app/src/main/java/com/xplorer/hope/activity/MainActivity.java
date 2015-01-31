@@ -618,15 +618,15 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             HopeApp.drawerCandidate = HopeApp.drawerTitlesEmployer;
 
         }
-
+        String[] LocaldrawerCandidate = new String[HopeApp.drawerCandidate.length];
         for(int i=0; i<HopeApp.drawerCandidate.length; i++){
-            HopeApp.drawerCandidate[i]= HopeApp.getInstance().getHindiLanguage( HopeApp.drawerCandidate[i], null, null);
+            LocaldrawerCandidate[i]= HopeApp.getInstance().getHindiLanguage( HopeApp.drawerCandidate[i], null, null);
         }
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
         // setting the nav drawer list adapter
-        navDrawerListAdapter = new NavDrawerListAdapter(getApplicationContext());
+        navDrawerListAdapter = new NavDrawerListAdapter(getApplicationContext(), LocaldrawerCandidate);
         mDrawerList.setAdapter(navDrawerListAdapter);
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -634,17 +634,16 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0) {
                     startActivity(new Intent(MainActivity.this, SignUpActivity.class).putExtra("from", "menu"));
-                } else if (i == 1) {
-                    startActivity(new Intent(MainActivity.this, WorkActivity.class));
-                } else if (i == 2) {
-                    startActivity(new Intent(MainActivity.this, PendingActivity.class));
-                } else if (i == 3) {
-                    startActivity(new Intent(MainActivity.this, AttendanceActivity.class));
-
-                }else if(i==4){
-                    startActivity(new Intent(MainActivity.this,NearbyWorksActivity.class));
-                }else if(i==5){
+                } else if(i==1){
                     chooseLangDialog();
+                }else if (i == 2) {
+                    startActivity(new Intent(MainActivity.this, WorkActivity.class));
+                } else if (i == 3) {
+                    startActivity(new Intent(MainActivity.this, PendingActivity.class));
+                } else if (i == 4) {
+                    startActivity(new Intent(MainActivity.this, AttendanceActivity.class));
+                }else if(i==5){
+                    startActivity(new Intent(MainActivity.this,NearbyWorksActivity.class));
                 }else if(i==6){
                     startActivity(new Intent(MainActivity.this, EmpolyerActivity.class));
                 }
