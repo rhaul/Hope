@@ -433,6 +433,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
 
         query = ParseQuery.getQuery("WorkAd");
         if(filter[7] != 0){
+            removeWorkMarkers();
             query.whereEqualTo("category", HopeApp.TITLES[filter[7]]);
         }
         query.whereWithinKilometers("addressGP", new ParseGeoPoint(latLng.latitude, latLng.longitude), filter[8]);
@@ -529,7 +530,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
         }else if (type.equalsIgnoreCase(HopeApp.TITLES[9])) {
             return BitmapDescriptorFactory.fromResource(R.drawable.gardeningpin);
         }else if (type.equalsIgnoreCase(HopeApp.TITLES[10])) {
-            return BitmapDescriptorFactory.fromResource(R.drawable.dishwashingpin);
+            return BitmapDescriptorFactory.fromResource(R.drawable.locater);
         }
         return BitmapDescriptorFactory.fromResource(R.drawable.locater) ;
     }
@@ -537,7 +538,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
     public void showMyMarkerOnMap() {
         if (myMarker != null) {
             myMarker.remove();
-            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Search Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.locater))
+            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Search Location")
                     .draggable(true));
 
             if (getAddressTask != null) {
@@ -547,7 +548,7 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
             getAddressTask.execute(latLng.latitude, latLng.longitude);
 
         } else {
-            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Long press to drag me to your Search Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.locater))
+            myMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Long press to drag me to your Search Location")
                     .draggable(true));
         }
         showGeofence();

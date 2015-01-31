@@ -173,10 +173,9 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @Override
     protected void onResume() {
         super.onResume();
-/*
+
         if (mNfcAdapter != null)
-            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, mNFCTechLists);*/
-        // Check to see that the Activity started due to an Android Beam
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, mIntentFilters, mNFCTechLists);
 
         Log.d("NFC Val", getIntent().getAction());
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()) && ParseUser.getCurrentUser()!=null && ((UserInfo)ParseUser.getCurrentUser()).getType().equalsIgnoreCase("Employer")) {
@@ -715,7 +714,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
 
-        if(ParseUser.getCurrentUser() != null) {
+        if(ParseUser.getCurrentUser() != null ) {
             long millis = System.currentTimeMillis() - HopeApp.getInstance().getSPLong(HopeApp.LAST_BEAMED_AT);
             int minutes = (int) (millis / (1000*60*60));
             if(minutes>=5) {
@@ -750,7 +749,6 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
 
     private static final int ATTENDANCE_MARKED = 1;
-    private static final int ATTENDANCE_RECEIVED = 2;
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
@@ -775,22 +773,24 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 NfcAdapter.EXTRA_NDEF_MESSAGES);
         // only one message sent during the beam
         NdefMessage msg = (NdefMessage) rawMsgs[0];
-        // record 0 contains the MIME type, record 1 is the AAR, if present
-        String messg = new String(msg.getRecords()[0].getPayload());
-        Toast.makeText(this,messg , Toast.LENGTH_LONG).show();
+        if(msg!= null){
+            String messg = new String(msg.getRecords()[0].getPayload());
+            // record 0 contains the MIME type, record 1 is the AAR, if present
+            Toast.makeText(this,messg , Toast.LENGTH_LONG).show();
 
-        JSONObject jo = null;
-        try {
-            jo = new JSONObject(messg);
-        } catch (JSONException e) {
-            e.printStackTrace();
+            JSONObject jo = null;
+            try {
+                jo = new JSONObject(messg);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                markAttendance(jo.get("workerID").toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Log.d("NFC Rec", getIntent().getAction());
         }
-        try {
-            markAttendance(jo.get("workerID").toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.d("NFC Rec", getIntent().getAction());
     }
 
 
@@ -845,7 +845,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     };
 
     public void showAttendance() {
-        if( ParseUser.getCurrentUser() != null) {
+        if( ParseUser.getCurrentUser() != null&&((UserInfo)ParseUser.getCurrentUser()).getType().equalsIgnoreCase("Worker") ) {
             tv_attendance.setText(((UserInfo) ParseUser.getCurrentUser()).getName() + "\n" +
                     " your attendance \n" +
                     "has been marked");
