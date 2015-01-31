@@ -26,15 +26,6 @@ public class Attendance extends ParseObject {
 
     public void setEmployerID(String employerID) { put("employerID", employerID); }
 
-    public String getWorkID() {
-        return getString("workID");
-    }
-
-    public void setWorkID(String workID) {
-        put("workID", workID);
-    }
-
-
     public String getDate() {
         return getString("date");
     }

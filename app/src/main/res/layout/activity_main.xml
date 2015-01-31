@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
@@ -61,6 +62,18 @@
                 android:id="@+id/b_main_filter" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tv_main_attendance"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:background="@drawable/circular"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 
