@@ -9,10 +9,10 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text="Hindi"
-        android:textColor="@color/white"
+        android:text="हिंदी"
+        android:textColor="@color/BlueViolet"
         android:textSize="50sp"
-        android:background="@color/BlueViolet"
+        android:background="@color/white"
         android:layout_weight="1"/>
 
 
@@ -22,8 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:text="English"
-        android:textColor="@color/BlueViolet"
+        android:textColor="@color/white"
         android:textSize="50sp"
-        android:background="@color/white"
+        android:background="@color/BlueViolet"
         android:layout_weight="1"/>
 </LinearLayout>

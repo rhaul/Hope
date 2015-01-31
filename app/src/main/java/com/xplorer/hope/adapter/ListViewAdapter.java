@@ -40,6 +40,7 @@ public class ListViewAdapter extends BaseAdapter{
 
     private Context mContext;
     private List<WorkAd> mAds;
+
     public ListViewAdapter(Context context, List<WorkAd> ads){
         mContext = context;
         mAds = ads;
@@ -105,28 +106,29 @@ public class ListViewAdapter extends BaseAdapter{
             Picasso.with(mContext).load(mAds.get(i).imgURL).into(holder.iv_employerPic);
         }
 
-        String dateType=mAds.get(i).getDateType()+" Job";
+        String dateType=HopeApp.getInstance().getHindiLanguage(mAds.get(i).getDateType()+" Job", this, "TV" );
         if(mAds.get(i).getDateType().equalsIgnoreCase("One Day")){
             dateType+="\nOn: "+mAds.get(i).getDateFrom();
         }else if(mAds.get(i).getDateType().equalsIgnoreCase("Custom")){
             dateType+="\nFrom: "+mAds.get(i).getDateFrom()+"\nTo  : "+mAds.get(i).getDateTo();
         }
-        String timeType=mAds.get(i).getTimeType();
-        if(timeType.equalsIgnoreCase("Once a day")){
+        String timeType=HopeApp.getInstance().getHindiLanguage(mAds.get(i).getTimeType(), this, "TV" );
+        if(mAds.get(i).getTimeType().equalsIgnoreCase("Once a day")){
             timeType+="\n"+mAds.get(i).getS1StartingTime()+"-"+mAds.get(i).getS1EndingTime();
         }else {
             timeType+="\n"+mAds.get(i).getS1StartingTime()+"-"+mAds.get(i).getS1EndingTime()+"\n"+mAds.get(i).getS2StartingTime()+"-"+mAds.get(i).getS2EndingTime();
         }
 
 
-        holder.tv_description.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getDescription()));
-        holder.tv_name.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getUserName()));
+
+        holder.tv_description.setText(HopeApp.getInstance().getHindiLanguage(mAds.get(i).getDescription() , this, "LV" ));
+        holder.tv_name.setText(HopeApp.getInstance().getHindiLanguage(mAds.get(i).getUserName() , this, "LV" ));
+        holder.tv_address.setText(HopeApp.getInstance().getHindiLanguage(mAds.get(i).getAddress(), this, "LV" ));
 
         holder.tv_jobType.setText(dateType);
         holder.tv_timeType.setText(timeType);
         holder.tv_wages.setText(mAds.get(i).getWageLowerLimit()+"-"+mAds.get(i).getWageHigherLimit());
         holder.tv_phoneNo.setText(mAds.get(i).getPhoneNo());
-        holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(mAds.get(i).getAddress()));
 
 
         holder.ll_addr.setOnClickListener(new View.OnClickListener() {
@@ -154,15 +156,21 @@ public class ListViewAdapter extends BaseAdapter{
         });
         String myWorkerId= ((UserInfo) ParseUser.getCurrentUser()).getObjectId();
 
+
+
         setIvColor(mAds.get(i).getCategory(), finalHolder);
         if(HopeApp.myWorksIds.containsKey(mAds.get(i).getObjectId()) || mAds.get(i).getUserId().equalsIgnoreCase(myWorkerId)){
+
             holder.b_apply.setVisibility(View.GONE);
             holder.ll_phone.setVisibility(View.VISIBLE);
         }else if(HopeApp.myPendingWorksIds.containsKey(mAds.get(i).getObjectId())){
-            holder.b_apply.setText("Pending");
+            holder.b_apply.setText(HopeApp.getInstance().getHindiLanguage("Pending", null, null));
+
             holder.b_apply.setVisibility(View.VISIBLE);
             holder.ll_phone.setVisibility(View.GONE);
         }else{
+            holder.b_apply.setText(HopeApp.getInstance().getHindiLanguage("Apply", null, null));
+
             holder.ll_phone.setVisibility(View.GONE);
             holder.b_apply.setVisibility(View.VISIBLE);
             holder.b_apply.setOnClickListener(new View.OnClickListener() {
@@ -231,8 +239,8 @@ public class ListViewAdapter extends BaseAdapter{
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
 
-        alertDialogBuilder.setMessage("Are you sure you want to apply to work for "+name+".\nYour rating will depend upon your attendance at the following work if you are accepted.") ;
-        alertDialogBuilder.setPositiveButton("Accept",
+        alertDialogBuilder.setMessage(HopeApp.getInstance().getHindiLanguage("Are you sure you want to apply for this work", null, null)) ;
+        alertDialogBuilder.setPositiveButton(HopeApp.getInstance().getHindiLanguage("Accept", null, null),
                 new DialogInterface.OnClickListener() {
 
                     @Override
@@ -242,14 +250,14 @@ public class ListViewAdapter extends BaseAdapter{
                         HopeApp.myPendingEmployerIds.put(mAds.get(pos).getUserId(), mAds.get(pos).getUserId());
 
                         vh.b_apply.setOnClickListener(null);
-                        vh.b_apply.setText("Pending");
+                        vh.b_apply.setText(HopeApp.getInstance().getHindiLanguage("Pending", null, null));
                         setEWRelation(pos);
                         dialog.cancel();
                     }
 
 
                 });
-        alertDialogBuilder.setNegativeButton("Decline",
+        alertDialogBuilder.setNegativeButton(HopeApp.getInstance().getHindiLanguage("Decline", null, null),
                 new DialogInterface.OnClickListener() {
 
                     @Override

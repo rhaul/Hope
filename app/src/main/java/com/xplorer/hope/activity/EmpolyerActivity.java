@@ -43,7 +43,7 @@ public class EmpolyerActivity extends Activity {
         ButterKnife.inject(this);
 
 
-        getActionBar().setTitle("My Employers");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("My Employers", null, null));
         Integer colorVal =  HopeApp.CategoryColor.get(HopeApp.TITLES[4]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
         getActionBar().setHomeButtonEnabled(true);
@@ -112,7 +112,7 @@ public class EmpolyerActivity extends Activity {
             @Override
             public void done(List<EWRelation> parseObjects, ParseException e) {
 
-                if (e == null) {
+                if (e == null && parseObjects.size()>0) {
                     Log.d("hope getMyWorkids(done)", String.valueOf(parseObjects.size()));
                     for (int i = 0; i < parseObjects.size(); i++) {
                         if(parseObjects.get(i).getApprove()==true) {
@@ -128,6 +128,10 @@ public class EmpolyerActivity extends Activity {
                     }
 
                     fetchWorks();
+                }else{
+                    tv_result.setVisibility(View.VISIBLE);
+                    lv_ads.setVisibility(View.GONE);
+                    HopeApp.pd.dismiss();
                 }
             }
         });

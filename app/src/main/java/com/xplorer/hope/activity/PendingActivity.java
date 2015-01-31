@@ -42,7 +42,7 @@ public class PendingActivity extends Activity {
         setContentView(R.layout.activity_pending);
 
         ButterKnife.inject(this);
-        getActionBar().setTitle("Pending Requests");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Pending Requests", null, null));
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[2]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
 

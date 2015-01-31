@@ -5,8 +5,10 @@ import android.app.Instrumentation;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.BaseAdapter;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -22,15 +24,28 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SendCallback;
 import com.xplorer.hope.R;
+import com.xplorer.hope.adapter.EmployerAdaptor;
+import com.xplorer.hope.adapter.ListViewAdapter;
+import com.xplorer.hope.adapter.WorkAdaptor;
+import com.xplorer.hope.adapter.WorkerAdaptor;
 import com.xplorer.hope.object.Attendance;
 import com.xplorer.hope.object.EWRelation;
 import com.xplorer.hope.object.Schedule;
 import com.xplorer.hope.object.UserInfo;
 import com.xplorer.hope.object.WorkAd;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +75,7 @@ public class HopeApp extends Application {
             "Date: Oldest to Latest",
             "Distance: Nearest to Farthest"
     };
-    public static final String[] TITLES = {
+    public static String[] TITLES = {
             "Dish Washing",
             "House Cleaning",
             "Cloth Washing",
@@ -73,10 +88,23 @@ public class HopeApp extends Application {
             "Gardening",
             "Miscellaneous"
     };
+    public static String[] HindiTITLES = {
+            "डिश धोने",
+            "घर सफाई",
+            "कपड़ा धुलाई",
+            "व्यंजन कला",
+            "निर्माण",
+            "दीवार पेंट",
+            "चालक",
+            "पहरेदार",
+            "दुकान कार्यकर्ता",
+            "बागवानी",
+            "विविध"
+    };
 
     public static HashMap<String, Integer> CategoryColor = new HashMap();
 
-
+    public static HashMap<String, String> EnglishToHindi = new HashMap();
     public static final int[] ImgUrl = {
             R.drawable.dishwashing,
             R.drawable.cleaning,
@@ -95,8 +123,9 @@ public class HopeApp extends Application {
             "Manage Jobs",
             "Pending Requests",
             "Worker's Attendance",
+            "Search in Map",
             "Employers",
-            "Holidays"
+
     };
 
     public static final String[] drawerTitlesEmployer = {
@@ -104,12 +133,14 @@ public class HopeApp extends Application {
             "Manage Jobs",
             "Pending Requests",
             "Worker's Attendance",
-            "Employers",
-            "Balance",
-            "Holidays"
+            "Search in Map",
+
+
     };
 
-    public static String[] drawerCandidate ={};
+    public static String[] drawerCandidate = {};
+
+
 
     //SP variables
 
@@ -207,9 +238,122 @@ public class HopeApp extends Application {
         super.onCreate();
         instance = this;
 
-
+        FillHindiDictionary();
+        SELECTED_LANGUAGE = "english";
         parseInit();
         CatColorInit();
+
+    }
+
+    public void FillHindiDictionary() {
+        EnglishToHindi.put("Apply", "प्रार्थना-पत्र देना");
+        EnglishToHindi.put("Pending", "रूका हुआ");
+        EnglishToHindi.put("Filter", "छाँटना");
+        EnglishToHindi.put("Filters", "छाँटना");
+        EnglishToHindi.put("Sort", "क्रम में लगाना");
+        EnglishToHindi.put("Sort By", "क्रम में लगाना");
+
+
+        EnglishToHindi.put("My Employers", "मेरे नियोक्ता");
+        EnglishToHindi.put("Profile", "पहचान");
+        EnglishToHindi.put("Manage Jobs", "काम प्रबंध");
+        EnglishToHindi.put("Pending Requests", "अनुरोध लंबित");
+        EnglishToHindi.put("Worker's Attendance", "कार्यकर्ता की उपस्थिति");
+        EnglishToHindi.put("Employers", "नियोक्ता");
+
+        EnglishToHindi.put("Date of Birth", "जन्मतिथि");
+        EnglishToHindi.put("Name", "नाम");
+        EnglishToHindi.put("Adress", "पता");
+        EnglishToHindi.put("Phone Number (10 digit)", "फोन नंबर (10 अंक)");
+        EnglishToHindi.put("Male", "पुरुष");
+        EnglishToHindi.put("Female", "स्त्री");
+        EnglishToHindi.put("Interest", "पसंद");
+
+        EnglishToHindi.put("Expected Wages\n(per month)", "वेतन\n"+"(प्रति माह)");
+        EnglishToHindi.put("Add Category", "श्रेणी में जोड़ें");
+        EnglishToHindi.put("Description", "विवरण");
+
+        EnglishToHindi.put("One Day", "एक दिन");
+        EnglishToHindi.put("Monthly", "मासिक");
+        EnglishToHindi.put("Custom", "विकल्प");
+        EnglishToHindi.put("Once a day", "एक दिन में एक बार");
+        EnglishToHindi.put("Twice a day", "दिन में दो बार");
+        EnglishToHindi.put("Lower Limit", "निचली सीमा");
+        EnglishToHindi.put("Upper Limit", "ऊपरी सीमा");
+
+        EnglishToHindi.put("Starting Time", "समय शुरू");
+        EnglishToHindi.put("Ending Time", "समय में अंतिम");
+
+        EnglishToHindi.put("Starting Date", "शुरू करने की तारीख");
+        EnglishToHindi.put("Ending Date", "अंतिम दिनांक");
+
+        EnglishToHindi.put("License Type:", "लाइसेंस के प्रकार:");
+        EnglishToHindi.put("Four wheeler", "चार टायर वाहन");
+        EnglishToHindi.put("Heavy", "भारी वाहन");
+        EnglishToHindi.put("Language known:", "भाषा जाना जाता है:");
+        EnglishToHindi.put("English", "अंग्रेजी");
+        EnglishToHindi.put("Hindi", "हिंदी");
+        EnglishToHindi.put("Set My Work Location", "मेरा कार्य स्थान निर्धारित");
+        EnglishToHindi.put("Cancel", "रद्द करना");
+        EnglishToHindi.put("Job Advertisement", "नौकरी विज्ञापन");
+        EnglishToHindi.put("Attendance", "उपस्थिति");
+        EnglishToHindi.put("My Employers", "मेरे नियोक्ता");
+        EnglishToHindi.put("Set Location", "स्थान प्राप्त");
+        EnglishToHindi.put("Search nearby jobs", "पास में नौकरियां खोजें");
+        EnglishToHindi.put("Processing...", "प्रसंस्करण ...");
+
+        EnglishToHindi.put("Please wait.", "कृपया प्रतीक्षा करें।");
+        EnglishToHindi.put("No Internet Connectivity\n Tap to retry", "उपलब्ध नहीं इंटरनेट कनेक्टिविटी\n"+
+                "पुन: प्रयास करने के लिए टैप");
+        EnglishToHindi.put("Notification", "नोटिफिकेशन");
+        EnglishToHindi.put("My Job Ads", "मेरी नौकरी के विज्ञापन");
+        EnglishToHindi.put("Age", "आयु");
+        EnglishToHindi.put("Attendance", "उपस्थिति");
+        EnglishToHindi.put("Attendance", "उपस्थिति");
+
+        EnglishToHindi.put("Dish Washing", "डिश धोने");
+        EnglishToHindi.put("House Cleaning", "घर सफाई");
+        EnglishToHindi.put("Cloth Washing", "कपड़ा धुलाई");
+        EnglishToHindi.put("Cooking", "व्यंजन कला");
+        EnglishToHindi.put("Construction", "निर्माण");
+        EnglishToHindi.put("Construction", "निर्माण");
+        EnglishToHindi.put("Driver", "चालक");
+        EnglishToHindi.put("Guard", "पहरेदार");
+        EnglishToHindi.put("Shop Worker", "दुकान कार्यकर्ता");
+        EnglishToHindi.put("Gardening", "बागवानी");
+        EnglishToHindi.put("Miscellaneous", "विविध");
+        EnglishToHindi.put("Wall paint", "दीवार पेंट");
+
+        EnglishToHindi.put("Accept", "स्वीकार");
+        EnglishToHindi.put("Decline", "नकारना");
+
+        //नकारना
+        EnglishToHindi.put("Map", "नक़्शा");
+        EnglishToHindi.put("Address", "पता");
+        EnglishToHindi.put("Description", "विवरण");
+
+
+        EnglishToHindi.put("Job Type", "कार्य का प्रकार");
+        EnglishToHindi.put("Timings", "समय");
+        EnglishToHindi.put("Wages (Rupees)", "वेतन (रुपये में)");
+        EnglishToHindi.put("Slot", "निर्धारित समय");
+        EnglishToHindi.put("Description", "विवरण");
+        EnglishToHindi.put("Worker", "कार्यकर्ता");
+        EnglishToHindi.put("Workers", "कार्यकर्ता");
+
+        EnglishToHindi.put("Set Location", "स्थान चुनाव");
+
+        EnglishToHindi.put("Long press me to drag to your Work Location", "आपके कार्य स्थान तक खींचने के लिए मुझे दबाएँ");
+        EnglishToHindi.put("Long press me to drag to your Search Location", "आपके खोज स्थान तक खींचने के लिए मुझे दबाएँ");
+
+        EnglishToHindi.put("Set My Work Location", "मेरा कार्य स्थान सेट करें");
+
+        EnglishToHindi.put("Are you sure you want to apply for this work", "क्या आप इस काम के लिए आवेदन करना चाहते हैं");
+        EnglishToHindi.put("Search in Map", "नक्शे में खोज");
+
+        EnglishToHindi.put("Choose Profession Type", "पेशे प्रकार चुनें");
+
+
 
     }
 
@@ -244,7 +388,7 @@ public class HopeApp extends Application {
     public void CatColorInit() {
 
         CategoryColor.put("Dish Washing", R.color.LightGold);
-        CategoryColor.put("House Cleaning",R.color.LightOrange);
+        CategoryColor.put("House Cleaning", R.color.LightOrange);
         CategoryColor.put("Cloth Washing", R.color.LightViolet);
         CategoryColor.put("Cooking", R.color.Green);
         CategoryColor.put("Construction", R.color.SkyBlue);
@@ -254,7 +398,6 @@ public class HopeApp extends Application {
         CategoryColor.put("Shop Worker", R.color.LightViolet);
         CategoryColor.put("Gardening", R.color.Sienna);
         CategoryColor.put("Miscellaneous", R.color.gray8);
-
 
 
     }
@@ -270,7 +413,6 @@ public class HopeApp extends Application {
     }
 
     public static HopeApp getInstance() {
-
         if (instance == null) {
             instance = new HopeApp();
             return instance;
@@ -373,46 +515,46 @@ public class HopeApp extends Application {
         sortedBy = selection;
     }
 
-    public void setFilters(int [] filters){
-        for (int i=0;i<filters.length;i++){
+    public void setFilters(int[] filters) {
+        for (int i = 0; i < filters.length; i++) {
             filterValues[i] = filters[i];
         }
-        if(filteredBy ==0) {
+        if (filteredBy == 0) {
             filteredBy = 1;
-        }else{
+        } else {
             filteredBy = 0;
         }
     }
 
-    public int filterValues[] = new int[]{1,1,1,
-                                            1,1,
-                                            0,40};
+    public int filterValues[] = new int[]{1, 1, 1,
+            1, 1,
+            0, 40};
 
     public ParseQuery<WorkAd> applyFilteredQuery() {
         ParseQuery<WorkAd> filteredQuery = ParseQuery.getQuery("WorkAd");
 
         //filter
 
-        List<String> dateTypes= new ArrayList<String>();
-        List<String> frequency= new ArrayList<String>();
-        if(filterValues[0] == 1){
+        List<String> dateTypes = new ArrayList<String>();
+        List<String> frequency = new ArrayList<String>();
+        if (filterValues[0] == 1) {
             dateTypes.add("One Day");
         }
-        if(filterValues[1] == 1){
+        if (filterValues[1] == 1) {
             dateTypes.add("Monthly");
         }
-        if(filterValues[2] == 1){
+        if (filterValues[2] == 1) {
             dateTypes.add("Custom");
         }
-        if(filterValues[3] == 1){
+        if (filterValues[3] == 1) {
             frequency.add("Once a day");
         }
-        if(filterValues[4] == 1){
+        if (filterValues[4] == 1) {
             frequency.add("Twice a day");
         }
         filteredQuery.whereContainedIn("dateType", dateTypes);
         filteredQuery.whereContainedIn("timeType", frequency);
-        filteredQuery.whereGreaterThanOrEqualTo("wageLowerLimit",filterValues[5]*500).whereLessThanOrEqualTo("wageHigherLimit",filterValues[6]*500);
+        filteredQuery.whereGreaterThanOrEqualTo("wageLowerLimit", filterValues[5] * 500).whereLessThanOrEqualTo("wageHigherLimit", filterValues[6] * 500);
 
 
         // sort
@@ -427,7 +569,7 @@ public class HopeApp extends Application {
             }
             break;
             case 2: {
-		filteredQuery.orderByDescending("createdAt");
+                filteredQuery.orderByDescending("createdAt");
             }
             break;
             case 3: {
@@ -442,18 +584,167 @@ public class HopeApp extends Application {
 
     public void onPreExecute(Context context) {
         pd = new ProgressDialog(context);
-        pd.setTitle("Processing...");
-        pd.setMessage("Please wait.");
+        pd.setTitle(getHindiLanguage("Processing...", null, null));
+        pd.setMessage(getHindiLanguage("Please wait.", null, null));
         pd.setCancelable(false);
         pd.setIndeterminate(true);
+        pd.setCancelable(true);
         pd.show();
+
+
     }
 
 
-    public String getUpperCaseString(String myString){
-        String upperString = myString.substring(0,1).toUpperCase() + myString.substring(1);
-        upperString =upperString.replace("\n"," ");
+    public String getUpperCaseString(String myString) {
+        String upperString = myString.substring(0, 1).toUpperCase() + myString.substring(1);
+        upperString = upperString.replace("\n", " ");
+
+
         return upperString;
+    }
+
+
+    public String getHindiLanguage(String txtToConvert, BaseAdapter BA, String type) {
+
+        if (SELECTED_LANGUAGE == "hindi") {
+            if (EnglishToHindi.containsKey(txtToConvert) && EnglishToHindi.get(txtToConvert) != null) {
+                //Log.d("EnglishToHindi.containsKey("+txtToConvert+")", EnglishToHindi.get(txtToConvert));
+                return EnglishToHindi.get(txtToConvert);
+            } else {
+                EnglishToHindi.put(txtToConvert, getUpperCaseString(txtToConvert));
+                if(BA!=null) new ATHttpRequest(txtToConvert, BA, type).execute();
+
+                Log.d("ATHttpRequest", txtToConvert);
+                return getUpperCaseString(txtToConvert);
+            }
+        }
+
+        return getUpperCaseString(txtToConvert);
+    }
+
+
+    public class ATHttpRequest extends AsyncTask<String, Void, String> {
+
+        public String response;
+        public String responseArray[];
+        String txtToConvert;
+        int elementId;
+        String type;
+
+
+        String urlStr = "http://www.rogueinstincts.com/MajorProject/Translator.php";
+        BaseAdapter BA;
+
+        public ATHttpRequest(String txtToConvert, BaseAdapter BA, String type) {
+
+            this.txtToConvert = txtToConvert;
+
+            this.type = type;
+
+            String query;
+            NameValuePair item = new BasicNameValuePair("txtToConvert", txtToConvert);
+            List<NameValuePair> LItem = new ArrayList<NameValuePair>();
+            LItem.add(item);
+            query = URLEncodedUtils.format(LItem, "utf-8");
+            Log.d("query URLEncodedUtils", query);
+            query = query.replace("\n", "%0A");
+            Log.d("query URLEncodedUtils", query);
+            urlStr += "?" + query;
+            this.BA = BA;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+
+            HttpURLConnection connection;
+            OutputStreamWriter request = null;
+
+            URL url = null;
+
+            try {
+                url = new URL(urlStr);
+                Log.d("url", urlStr);
+
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(5000);
+
+                request = new OutputStreamWriter(connection.getOutputStream());
+                //request.write(parameters);
+
+                request.flush();
+                request.close();
+
+                String line = "";
+                InputStreamReader isr = new InputStreamReader(connection.getInputStream());
+                BufferedReader reader = new BufferedReader(isr);
+                StringBuilder sb = new StringBuilder();
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                // Response from server after login process will be stored in response variable.
+                response = sb.toString();
+                // You can perform UI operations here
+                isr.close();
+                reader.close();
+
+
+            } catch (IOException e) {
+
+
+                Log.e("httpRequest Error:", e.toString());
+
+            }
+
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            if (response == null) {
+
+
+            } else {
+                Log.d("httpRequest Response:", response);
+
+
+                if (response != null) {
+                    Log.d("response.substring",response.substring(response.length() - 1, response.length()));
+
+                    if(response.substring(response.length()-1, response.length()).equalsIgnoreCase("\n")) {
+                        response = response.substring(0, response.length() - 1);
+                    }
+                    Log.d("httpRequest responseArray:", response);
+                    EnglishToHindi.put(txtToConvert, response);
+
+
+                    if (type.equalsIgnoreCase("LV")) {
+                        ((ListViewAdapter) BA).notifyDataSetChanged();
+                    } else if (type.equalsIgnoreCase("WA")) {
+                        ((WorkAdaptor) BA).notifyDataSetChanged();
+
+                    } else if (type.equalsIgnoreCase("WRA")) {
+                        ((WorkerAdaptor) BA).notifyDataSetChanged();
+
+
+                    } else if (type.equalsIgnoreCase("EA")) {
+                        ((EmployerAdaptor) BA).notifyDataSetChanged();
+
+                    } else if (type.equalsIgnoreCase("CB")) {
+                        ((ListViewAdapter) BA).notifyDataSetChanged();
+
+                    }
+
+                }
+
+            }
+        }
+
     }
 
 

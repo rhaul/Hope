@@ -340,8 +340,16 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
     }
 
     private void setUpMainActivity() {
+        if(HopeApp.getSPString(HopeApp.SELECTED_LANGUAGE).equalsIgnoreCase("hindi"))
+            pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager(),loadFragments(), HopeApp.HindiTITLES);
+        else
+            pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager(),loadFragments(), HopeApp.TITLES);
 
-        pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager(), loadFragments());
+
+        b_sort.setText(HopeApp.getInstance().getHindiLanguage("Sort", null, null));
+        b_filter.setText(HopeApp.getInstance().getHindiLanguage("Filter", null, null));
+
+
         vp_pager.setAdapter(pagerAdapter);
         pts_titleBar.setViewPager(vp_pager);
 
@@ -440,7 +448,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
 
     private void showFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Filters");
+        builder.setTitle(HopeApp.getInstance().getHindiLanguage("Filters", null, null));
         View filters = getLayoutInflater().inflate(R.layout.dialog_filter, null);
         builder.setView(filters);
         final LinearLayout ll_buttons = (LinearLayout) filters.findViewById(R.id.ll_filter_buttons);
@@ -581,7 +589,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         // Include dialog.xml file
         dialog.setContentView(R.layout.dialog_category_list);
         // Set dialog title
-        dialog.setTitle("Select Filter");
+        dialog.setTitle(HopeApp.getInstance().getHindiLanguage("Sort By", null, null));
         ListView lvD = (ListView) dialog.findViewById(R.id.lv_category_list);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_list_item_1, HopeApp.SORT_TYPES);
@@ -594,7 +602,9 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                 } else {
                     startActivity(new Intent(MainActivity.this, NearbyWorksActivity.class));
                 }
-                //  pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+
+                pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+
                 dialog.dismiss();
             }
         });
@@ -607,6 +617,10 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         } else {
             HopeApp.drawerCandidate = HopeApp.drawerTitlesEmployer;
 
+        }
+
+        for(int i=0; i<HopeApp.drawerCandidate.length; i++){
+            HopeApp.drawerCandidate[i]= HopeApp.getInstance().getHindiLanguage( HopeApp.drawerCandidate[i], null, null);
         }
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -626,9 +640,14 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
                     startActivity(new Intent(MainActivity.this, PendingActivity.class));
                 } else if (i == 3) {
                     startActivity(new Intent(MainActivity.this, AttendanceActivity.class));
-                } else if (i == 4) {
+
+                }else if(i==4){
+                    startActivity(new Intent(MainActivity.this,NearbyWorksActivity.class));
+                }else if(i==5){
+
                     startActivity(new Intent(MainActivity.this, EmpolyerActivity.class));
                 }
+                mDrawerLayout.closeDrawers();
 
 
             }

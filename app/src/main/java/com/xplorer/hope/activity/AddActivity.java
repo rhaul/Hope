@@ -108,6 +108,23 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
     @InjectView(R.id.b_add_map)
     Button b_map;
 
+    @InjectView(R.id.tv_add_category)
+    TextView tv_category;
+
+    @InjectView(R.id.tv_add_jt)
+    TextView tv_add_jt;
+
+    @InjectView(R.id.tv_add_tt)
+    TextView tv_add_tt;
+
+    @InjectView(R.id.tv_add_wg)
+    TextView tv_add_wg;
+
+    @InjectView(R.id.tv_add_slt1)
+    TextView tv_add_slt1;
+
+    @InjectView(R.id.tv_add_slt2)
+    TextView tv_add_slt2;
 
 
     // variables
@@ -143,7 +160,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         setContentView(R.layout.activity_add);
         ButterKnife.inject(this);
 
-        getActionBar().setTitle("Job Advertisement");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("Job Advertisement",null, null));
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[4]);
 
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
@@ -163,6 +180,8 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         et_address.setOnClickListener(this);
 
         b_map.setOnClickListener(this);
+
+        setHindiVocab();
 
     }
 
@@ -188,7 +207,39 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
 
         return true;
     }
+    public void setHindiVocab(){
+        et_wageUpper.setHint(HopeApp.getInstance().getHindiLanguage("Upper Limit", null, null));
+        et_wageLower.setHint(HopeApp.getInstance().getHindiLanguage("Lower Limit", null, null));
+        et_address.setHint(HopeApp.getInstance().getHindiLanguage("Address", null, null));
+        et_phone.setHint(HopeApp.getInstance().getHindiLanguage("Phone Number (10 digit)", null, null));
+        et_description.setHint(HopeApp.getInstance().getHindiLanguage("Description", null, null));
 
+
+        tv_category.setText(HopeApp.getInstance().getHindiLanguage("Add Category", null, null));
+
+        rb_1day.setText(HopeApp.getInstance().getHindiLanguage("Once a day", null, null));
+        rb_2day.setText(HopeApp.getInstance().getHindiLanguage("Twice a day", null, null));
+        rb_jobTypeOneDay.setText(HopeApp.getInstance().getHindiLanguage("One Day", null, null));
+        rb_jobTypeMonthly.setText(HopeApp.getInstance().getHindiLanguage("Monthly", null, null));
+        rb_jobTypeCustom.setText(HopeApp.getInstance().getHindiLanguage("Custom", null, null));
+
+        tv_startingDate.setText(HopeApp.getInstance().getHindiLanguage("Starting Date", null, null));
+        tv_endingDate.setText(HopeApp.getInstance().getHindiLanguage("Ending Date", null, null));
+
+        tv_s1_startingTime.setText(HopeApp.getInstance().getHindiLanguage("Starting Time", null, null));
+        tv_s1_endingTime.setText(HopeApp.getInstance().getHindiLanguage("Ending Time", null, null));
+        tv_s2_startingTime.setText(HopeApp.getInstance().getHindiLanguage("Starting Time", null, null));
+        tv_s2_endingTime.setText(HopeApp.getInstance().getHindiLanguage("Ending Time", null, null));
+
+        tv_add_jt.setText(HopeApp.getInstance().getHindiLanguage("Job Type", null, null));
+        tv_add_tt.setText(HopeApp.getInstance().getHindiLanguage("Timings", null, null));
+        tv_add_wg.setText(HopeApp.getInstance().getHindiLanguage("Wages (Rupees)", null, null));
+        tv_add_slt1.setText(HopeApp.getInstance().getHindiLanguage("Slot", null, null)+"1 :");
+        tv_add_slt2.setText(HopeApp.getInstance().getHindiLanguage("Slot", null, null)+"2 :");
+
+        b_map.setText(HopeApp.getInstance().getHindiLanguage("Map", null, null));
+
+    }
 
     public void fetchWorkFromWorkId(String workId){
 
@@ -242,15 +293,17 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         if(workAdSave.getTimeType().equalsIgnoreCase("Once a day")){
             rb_1day.setChecked(true);
             ll_s2_timings.setVisibility(View.GONE);
+            tv_s1_startingTime.setText(workAdSave.getS1StartingTime());
+            tv_s1_endingTime.setText(workAdSave.getS1EndingTime());
         }else if(workAdSave.getTimeType().equalsIgnoreCase("Twice a day")){
             rb_2day.setChecked(true);
+            tv_s1_startingTime.setText(workAdSave.getS1StartingTime());
+            tv_s1_endingTime.setText(workAdSave.getS1EndingTime());
+            tv_s2_startingTime.setText(workAdSave.getS2StartingTime());
+            tv_s2_endingTime.setText(workAdSave.getS2EndingTime());
         }
 
 
-        tv_s1_startingTime.setText(workAdSave.getS1StartingTime());
-        tv_s1_endingTime.setText(workAdSave.getS1EndingTime());
-        tv_s2_startingTime.setText(workAdSave.getS2StartingTime());
-        tv_s2_endingTime.setText(workAdSave.getS2EndingTime());
 
         et_wageLower.setText(workAdSave.getWageLowerLimit()+"");
         et_wageUpper.setText(workAdSave.getWageHigherLimit()+"");
@@ -376,42 +429,42 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
             return false;
         }
 
-        if(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()).equalsIgnoreCase("One Day")){
-            if(tv_startingDate.getText().toString().equalsIgnoreCase("Starting Date")){
+        if(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()).equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("One Day", null, null))){
+            if(tv_startingDate.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Starting Date", null, null))){
                 Toast.makeText(AddActivity.this, "Work Date cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
             }
-        }else if(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()).equalsIgnoreCase("Custom")){
+        }else if(getDateTypeFromRG(rg_jobType.getCheckedRadioButtonId()).equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Custom", null, null))){
 
-            if(tv_startingDate.getText().toString().equalsIgnoreCase("Starting Date")){
+            if(tv_startingDate.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Starting Date", null, null))){
                 Toast.makeText(AddActivity.this, "Work Starting Date cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
-            }else if(tv_endingDate.getText().toString().equalsIgnoreCase("Starting Date")){
+            }else if(tv_endingDate.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Starting Date", null, null))){
                 Toast.makeText(AddActivity.this, "Work Ending Date cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
             }
 
         }
 
-        if(getTimeTypeFromRG(rg_timingType.getCheckedRadioButtonId()).equalsIgnoreCase("Once a day")){
-            if(tv_s1_startingTime.getText().toString().equalsIgnoreCase("Starting Time")){
+        if(getTimeTypeFromRG(rg_timingType.getCheckedRadioButtonId()).equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Once a day", null, null))){
+            if(tv_s1_startingTime.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Starting Time", null, null))){
                 Toast.makeText(AddActivity.this, "Work Slot 1 Starting Time cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
-            }else if(tv_s1_endingTime.getText().toString().equalsIgnoreCase("Ending Date")){
+            }else if(tv_s1_endingTime.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Ending Date", null, null))){
                 Toast.makeText(AddActivity.this, "Work Slot 1 Ending Time cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
             }
         }else{
-            if(tv_s1_startingTime.getText().toString().equalsIgnoreCase("Starting Time")){
+            if(tv_s1_startingTime.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Starting Time", null, null))){
                 Toast.makeText(AddActivity.this, "Work Slot 1 Starting Time cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
-            }else if(tv_s1_endingTime.getText().toString().equalsIgnoreCase("Ending Date")){
+            }else if(tv_s1_endingTime.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Ending Date", null, null))){
                 Toast.makeText(AddActivity.this, "Work Slot 1 Ending Time cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
-            }else if(tv_s2_startingTime.getText().toString().equalsIgnoreCase("Starting Time")){
+            }else if(tv_s2_startingTime.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Starting Time", null, null))){
                 Toast.makeText(AddActivity.this, "Work Slot 2 Starting Time cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
-            }else if(tv_s2_endingTime.getText().toString().equalsIgnoreCase("Ending Date")){
+            }else if(tv_s2_endingTime.getText().toString().equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage("Ending Date", null, null))){
                 Toast.makeText(AddActivity.this, "Work Slot 2 Ending Time cannot be empty.", Toast.LENGTH_LONG).show();
                 return false;
             }
@@ -426,7 +479,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         }
 
         if(gp == null){
-            Toast.makeText(AddActivity.this, "Geo Location not set.", Toast.LENGTH_LONG).show();
+            Toast.makeText(AddActivity.this, "Set Geo Location using Map", Toast.LENGTH_LONG).show();
             return false;
         }
         return true;
@@ -458,6 +511,7 @@ public class AddActivity extends Activity implements View.OnClickListener,RadioG
         ad.setWageHigherLimit(Long.parseLong(et_wageUpper.getText().toString()));
         ad.setUserId(usr.getObjectId());
         ad.setUserName(usr.getName());
+        ad.setActive(true);
         ParseACL acl = new ParseACL();
         acl.setPublicReadAccess(true);
         acl.setPublicWriteAccess(true);

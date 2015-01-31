@@ -47,16 +47,16 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
         HeaderTitle=new ArrayList<String>();
         if(objects.size()!=0){
             myWorkIds.add(null);
-            PrevCatStr = objects.get(0).getCategory();
+            PrevCatStr = HopeApp.getInstance().getHindiLanguage(objects.get(0).getCategory(),null, null);
             HeaderTitle.add(PrevCatStr);
         }else{
             myWorkIds=objects;
         }
 
         for(int i=0; i<objects.size(); i++){
-            if(!PrevCatStr.equalsIgnoreCase(objects.get(i).getCategory())){
+            if(!PrevCatStr.equalsIgnoreCase(HopeApp.getInstance().getHindiLanguage(objects.get(i).getCategory(), null, null))){
                 myWorkIds.add(null);
-                PrevCatStr = objects.get(i).getCategory();
+                PrevCatStr = HopeApp.getInstance().getHindiLanguage(objects.get(i).getCategory(),null, null);
                 HeaderTitle.add(PrevCatStr);
 
             }
@@ -129,7 +129,7 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
 
 
         if(getItemViewType(i)==0){
-            holderH.tv_catname.setText(myWorkIds.get(i+1).getCategory());
+            holderH.tv_catname.setText(HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i+1).getCategory(),null, null));
             noHeader++;
         }else {
             final int pos = i;
@@ -158,23 +158,23 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
             }
 
 
-            String dateType = myWorkIds.get(i).getDateType() + " Job";
+            String dateType = HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getDateType() + " Job", this, "EA") ;
             if (myWorkIds.get(i).getDateType().equalsIgnoreCase("One Day")) {
                 dateType += "\nOn: " + myWorkIds.get(i).getDateFrom();
             } else if (myWorkIds.get(i).getDateType().equalsIgnoreCase("Custom")) {
                 dateType += "\nFrom: " + myWorkIds.get(i).getDateFrom() + "\nTo  : " + myWorkIds.get(i).getDateTo();
             }
-            String timeType = myWorkIds.get(i).getTimeType();
-            if (timeType.equalsIgnoreCase("Once a day")) {
+            String timeType =HopeApp.getInstance().getHindiLanguage( myWorkIds.get(i).getTimeType(), this, "EA");
+            if (myWorkIds.get(i).getTimeType().equalsIgnoreCase("Once a day")) {
                 timeType += "\n" + myWorkIds.get(i).getS1StartingTime() + "-" + myWorkIds.get(i).getS1EndingTime();
             } else {
                 timeType += "\n" + myWorkIds.get(i).getS1StartingTime() + "-" + myWorkIds.get(i).getS1EndingTime() + "\n" + myWorkIds.get(i).getS2StartingTime() + "-" + myWorkIds.get(i).getS2EndingTime();
             }
 
 
-            holder.tv_name.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getUserName()));
-            holder.tv_description.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getDescription()));
-            holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getAddress()));
+            holder.tv_name.setText(HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getUserName(), this, "EA"));
+            holder.tv_description.setText(HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getDescription(), this, "EA"));
+            holder.tv_address.setText(HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getAddress(), this, "EA"));
             holder.tv_jobType.setText(dateType);
             holder.tv_timeType.setText(timeType);
             holder.tv_wages.setText(myWorkIds.get(i).getWageLowerLimit() + "-" + myWorkIds.get(i).getWageHigherLimit());
@@ -211,10 +211,12 @@ public class EmployerAdaptor extends ArrayAdapter<WorkAd> {
                 holder.b_apply.setVisibility(View.GONE);
                 holder.ll_phone.setVisibility(View.VISIBLE);
             }else if(HopeApp.myPendingWorksIds.containsKey(myWorkIds.get(i).getObjectId())){
-                holder.b_apply.setText("Pending");
+                holder.b_apply.setText(HopeApp.getInstance().getHindiLanguage("Pending", null, null));
                 holder.b_apply.setVisibility(View.VISIBLE);
                 holder.ll_phone.setVisibility(View.GONE);
             }else{
+                holder.b_apply.setText(HopeApp.getInstance().getHindiLanguage("Apply", null, null));
+
                 holder.ll_phone.setVisibility(View.GONE);
                 holder.b_apply.setVisibility(View.VISIBLE);
 

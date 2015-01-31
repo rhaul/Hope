@@ -94,9 +94,9 @@ public String currentWork;
         int index = Arrays.asList(HopeApp.TITLES).indexOf(myWorkIds.get(pos).getCategory());
         Picasso.with(mContext).load(HopeApp.ImgUrl[index]).into(finalHolder.iv_employerPic);
 
-        holder.tv_name.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getCategory()));
-        holder.tv_description.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getDescription()));
-        holder.tv_address.setText(HopeApp.getInstance().getUpperCaseString(myWorkIds.get(i).getAddress()));
+        holder.tv_name.setText(HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getCategory(), this, "WA"));
+        holder.tv_description.setText(HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getDescription(), this, "WA"));
+        holder.tv_address.setText(HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getAddress(), this, "WA"));
 
         holder.ll_addr.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,14 +122,14 @@ public String currentWork;
             }
         });
 
-        String dateType=myWorkIds.get(i).getDateType()+" Job";
+        String dateType=HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getDateType()+" Job", this, "WA");
         if(myWorkIds.get(i).getDateType().equalsIgnoreCase("One Day")){
             dateType+="\nOn: "+myWorkIds.get(i).getDateFrom();
         }else if(myWorkIds.get(i).getDateType().equalsIgnoreCase("Custom")){
             dateType+="\nFrom: "+myWorkIds.get(i).getDateFrom()+"\nTo  : "+myWorkIds.get(i).getDateTo();
         }
-        String timeType=myWorkIds.get(i).getTimeType();
-        if(timeType.equalsIgnoreCase("Once a day")){
+        String timeType=HopeApp.getInstance().getHindiLanguage(myWorkIds.get(i).getTimeType(), this, "WA");
+        if(myWorkIds.get(i).getTimeType().equalsIgnoreCase("Once a day")){
             timeType+="\n"+myWorkIds.get(i).getS1StartingTime()+"-"+myWorkIds.get(i).getS1EndingTime();
         }else {
             timeType+="\n"+myWorkIds.get(i).getS1StartingTime()+"-"+myWorkIds.get(i).getS1EndingTime()+"\n"+myWorkIds.get(i).getS2StartingTime()+"-"+myWorkIds.get(i).getS2EndingTime();
@@ -141,8 +141,7 @@ public String currentWork;
         holder.tv_wages.setText(myWorkIds.get(i).getWageLowerLimit()+"-"+myWorkIds.get(i).getWageHigherLimit());
         holder.tv_phoneNo.setText(myWorkIds.get(i).getPhoneNo());
 
-
-        holder.b_apply.setText("Workers");
+        holder.b_apply.setText(HopeApp.getInstance().getHindiLanguage("Workers", null, null));
         holder.ll_btns.setVisibility(View.VISIBLE);
         holder.b_apply.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +155,7 @@ public String currentWork;
 
             }
         });
+
 
         holder.b_Edit.setOnClickListener(new View.OnClickListener() {
             @Override

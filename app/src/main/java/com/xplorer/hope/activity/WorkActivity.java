@@ -40,7 +40,7 @@ public class WorkActivity extends Activity {
         setContentView(R.layout.activity_work);
 
         ButterKnife.inject(this);
-        getActionBar().setTitle("My Job Ads");
+        getActionBar().setTitle(HopeApp.getInstance().getHindiLanguage("My Job Ads",null, null));
         Integer colorVal = HopeApp.CategoryColor.get(HopeApp.TITLES[1]);
         getActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(colorVal)));
 
