@@ -152,6 +152,7 @@ public class MainActivity extends FragmentActivity implements QuickReturnInterfa
         }
 
         mNFCTechLists = new String[][] { new String[] { NfcF.class.getName() } };
+       // showAttendance();
 
     }
 

@@ -434,7 +434,6 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
 
         query = ParseQuery.getQuery("WorkAd");
         if(filter[7] != 0){
-            removeWorkMarkers();
             query.whereEqualTo("category", HopeApp.TITLES[filter[7]]);
         }
         query.whereWithinKilometers("addressGP", new ParseGeoPoint(latLng.latitude, latLng.longitude), filter[8]);
@@ -666,6 +665,9 @@ public class NearbyWorksActivity extends FragmentActivity implements OnMapReadyC
                 filter[7] = sp_category.getSelectedItemPosition();
                 filter[8] = sb_radius.getProgress() + 1;
                 //  pagerAdapter.getFragment(vp_pager.getCurrentItem()).checkIfFilterApplied();
+
+                removeWorkMarkers();
+                showGeofence();
                 fetchWorks(true);
                 ll_filter_dialog.setVisibility(View.GONE);
                 ll_buttons.setVisibility(View.GONE);
